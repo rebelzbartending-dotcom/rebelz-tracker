@@ -100,8 +100,8 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
   <div class="error-screen">
     <div>
       <div style="font-size:40px;margin-bottom:16px">⚠️</div>
-      <div style="font-family:var(--fh);font-size:18px;font-weight:800;margin-bottom:8px">Invalid link</div>
-      <div style="font-size:13px;color:var(--t2);line-height:1.6">This link is not valid or has expired.<br/>Ask admin for a new bartender link.</div>
+      <div style="font-family:var(--fh);font-size:18px;font-weight:800;margin-bottom:8px">Event not found</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.6">This link is not valid or the event was deleted.<br/>Ask admin for a new bartender link.</div>
     </div>
   </div>
 </div>
@@ -124,7 +124,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       <input class="inp" id="l-pin" type="tel" maxlength="6" placeholder="••••" style="font-size:26px;text-align:center;letter-spacing:12px"/>
     </div>
     <div id="l-err" style="color:var(--red);font-size:12px;text-align:center;margin-bottom:10px;display:none">Wrong PIN. Try again.</div>
-    <button class="btn btn-acc" onclick="doLogin()">Enter Panel</button>
+    <button class="btn btn-acc" id="login-btn">Enter Panel</button>
   </div>
 </div>
 
@@ -136,9 +136,8 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
   </div>
   <div class="scroll-body">
     <div style="background:#f5a62312;border:0.5px solid #f5a62330;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:var(--amber);line-height:1.6">
-      <strong>Before you start:</strong> Select a template → adjust quantities to match exactly what the client has brought → tap Confirm to go live.
+      <strong>Before you start:</strong> Select a template → adjust quantities → tap Confirm to go live.
     </div>
-
     <div class="card">
       <div class="card-title">Step 1 — Choose template</div>
       <div class="tpl-chips" id="setup-chips">
@@ -150,9 +149,8 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
         <div class="tpl-chip" data-id="blank" onclick="selTpl(this)">✏️ Blank</div>
       </div>
     </div>
-
     <div class="card">
-      <div class="card-title">Step 2 — Edit quantities to match client's actual bottles</div>
+      <div class="card-title">Step 2 — Edit quantities</div>
       <div id="setup-items"></div>
       <div class="divider"></div>
       <div style="font-size:11px;color:var(--t3);margin-bottom:10px;font-family:var(--fm)">Add a drink not in template:</div>
@@ -170,13 +168,12 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
         <button class="btn btn-ghost btn-sm" onclick="setupAdd()" style="white-space:nowrap">+ Add</button>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">Step 3 — Confirm and go live</div>
       <div id="setup-summary" style="font-size:12px;color:var(--t2);font-family:var(--fm);line-height:1.8;margin-bottom:14px">No drinks added yet.</div>
       <div class="confirm-box">
         <div style="font-family:var(--fh);font-size:14px;font-weight:800;color:var(--acc);margin-bottom:6px">Ready to confirm?</div>
-        <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6">Once confirmed, the customer dashboard goes live with these bottles. Double check quantities before confirming.</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6">Once confirmed, the customer dashboard goes live. Double check quantities.</div>
         <button class="btn btn-acc" onclick="confirmStock()" style="margin-bottom:0">✓ Confirm opening stock — go live</button>
       </div>
       <div style="height:8px"></div>
@@ -214,11 +211,8 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     </div>
     <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:var(--fm);margin-bottom:10px">Live consumption — tap to update</div>
     <div id="drink-cards"></div>
-
-    <!-- ADD NEW DRINK MID-EVENT -->
     <div class="card" style="border-color:#c8f56025">
       <div class="card-title" style="color:var(--acc)">+ Client gave a new drink mid-event</div>
-      <div style="font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.6">Use this when the client brings a completely new drink type that was not in the opening stock.</div>
       <div class="field"><label>Drink name</label><input class="inp" id="live-add-name" placeholder="e.g. Black Dog Whiskey"/></div>
       <div style="display:grid;grid-template-columns:1fr 80px;gap:8px">
         <div class="field"><label>Category</label>
@@ -255,7 +249,16 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 const TPLS={
   wedding:[{name:'Royal Stag Whiskey',cat:'whiskey',qty:3},{name:'Bombay Sapphire Gin',cat:'gin',qty:4},{name:'Absolut Vodka',cat:'vodka',qty:2},{name:'Kingfisher Beer',cat:'beer',qty:32},{name:'Sula Red Wine',cat:'wine',qty:4},{name:'Old Monk Rum',cat:'rum',qty:2}],
   corporate:[{name:'Johnnie Walker Black',cat:'whiskey',qty:4},{name:'Hendricks Gin',cat:'gin',qty:2},{name:'Grey Goose Vodka',cat:'vodka',qty:2},{name:'Corona Beer',cat:'beer',qty:24},{name:'Prosecco',cat:'wine',qty:3}],
@@ -266,10 +269,11 @@ const TPLS={
 };
 const COLORS={whiskey:'#c8860a',gin:'#0e9e80',vodka:'#7c5cc4',beer:'#3a7a20',wine:'#aa3870',rum:'#c04020',other:'#888'};
 
-let EVENTS=[];
-let curEv=null;
-let setupDrinks=[];
-let waLog=[];
+let curEv = null;
+let evId = null;
+let setupDrinks = [];
+let waLog = [];
+let evRef = null;
 
 function gid(id){return document.getElementById(id);}
 function toast(msg,dur=2200){const t=gid('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
@@ -278,53 +282,67 @@ function nowISO(){return new Date().toISOString();}
 function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';}catch(e){return d||'—';}}
 function getRem(it){return Math.max(0,it.qty-(it.used||0));}
 function getSt(it){const r=getRem(it);if(r===0)return 'empty';return(r/it.qty)<=0.25?'low':'ok';}
-
-function loadEvents(){try{const s=localStorage.getItem('rblz_ev');return s?JSON.parse(s):[];}catch(e){return [];}}
-function saveEvents(){try{localStorage.setItem('rblz_ev',JSON.stringify(EVENTS));}catch(e){}}
-
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));gid(id).classList.add('active');}
 
-// ── INIT FROM URL ──
-window.addEventListener('DOMContentLoaded',()=>{
-  EVENTS=loadEvents();
-  const params=new URLSearchParams(window.location.search);
-  const evId=params.get('ev');
-  if(!evId){showScreen('scr-error');return;}
-  const ev=EVENTS.find(e=>e.id===evId);
-  if(!ev){showScreen('scr-error');return;}
-  curEv=ev;
-  // Pre-fill login screen
-  gid('login-ev-label').textContent=ev.id;
-  gid('login-ev-name').textContent=ev.event_name;
-  gid('login-ev-date').textContent=ev.client_name+' · '+fmtDate(ev.event_date);
-  showScreen('scr-login');
-  gid('l-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-  // Listen for data changes from admin
-  window.addEventListener('storage',e=>{
-    if(e.key==='rblz_ev'){EVENTS=loadEvents();const updated=EVENTS.find(ev=>ev.id===evId);if(updated&&curEv){Object.assign(curEv,updated);}}
-  });
-});
+function saveToFirebase(){
+  if(!curEv||!evId) return;
+  set(ref(db,'events/'+evId), curEv);
+}
 
-// ── LOGIN ──
+// Init from URL
+const params = new URLSearchParams(window.location.search);
+evId = params.get('ev');
+if(!evId){
+  showScreen('scr-error');
+} else {
+  evRef = ref(db, 'events/'+evId);
+  onValue(evRef, (snapshot) => {
+    const data = snapshot.val();
+    if(!data){
+      showScreen('scr-error');
+      return;
+    }
+    // First load — show login
+    if(!curEv){
+      curEv = data;
+      gid('login-ev-label').textContent = evId;
+      gid('login-ev-name').textContent = data.event_name;
+      gid('login-ev-date').textContent = data.client_name + ' · ' + fmtDate(data.event_date);
+      showScreen('scr-login');
+    } else {
+      // Live update from admin or another bartender
+      const wasLoggedIn = curEv._loggedIn;
+      curEv = data;
+      curEv._loggedIn = wasLoggedIn;
+      if(wasLoggedIn){
+        if(curEv.stock_confirmed) renderCards();
+        renderLog();
+      }
+    }
+  });
+}
+
+// Login
+gid('login-btn').addEventListener('click', doLogin);
+document.addEventListener('keydown', e => { if(e.key==='Enter' && gid('scr-login').classList.contains('active')) doLogin(); });
+
 function doLogin(){
-  const pin=gid('l-pin').value.trim();
-  const err=gid('l-err');err.style.display='none';
+  const pin = gid('l-pin').value.trim();
+  const err = gid('l-err'); err.style.display='none';
   if(!pin){err.textContent='Enter your PIN';err.style.display='block';return;}
   if(curEv.bartender_pin.toString()!==pin.toString()){err.textContent='Wrong PIN. Try again.';err.style.display='block';return;}
-  waLog=[];
-  if(curEv.stock_confirmed){
-    showPanel();
-  } else {
-    showSetup();
-  }
+  curEv._loggedIn = true;
+  waLog = [];
+  if(curEv.stock_confirmed){showPanel();}
+  else{showSetup();}
   toast('Logged in!');
 }
 
-// ── STOCK SETUP ──
+// Setup
 function showSetup(){
   showScreen('scr-setup');
-  gid('setup-ev-label').textContent=curEv.event_name;
-  setupDrinks=[];
+  gid('setup-ev-label').textContent = curEv.event_name;
+  setupDrinks = [];
   selTplById('wedding');
 }
 
@@ -333,31 +351,30 @@ function selTpl(el){
   el.classList.add('sel');
   selTplById(el.dataset.id);
 }
+window.selTpl = selTpl;
 
 function selTplById(id){
-  setupDrinks=(TPLS[id]||[]).map(d=>({...d,used:0}));
+  setupDrinks = (TPLS[id]||[]).map(d=>({...d,used:0}));
   renderSetupItems();
 }
 
 function renderSetupItems(){
-  const el=gid('setup-items');
+  const el = gid('setup-items');
   if(!setupDrinks.length){
     el.innerHTML='<div style="text-align:center;padding:14px;font-size:12px;color:var(--t3);font-family:var(--fm)">No drinks yet — add below</div>';
-    updateSetupSummary();return;
+    updateSetupSummary(); return;
   }
-  el.innerHTML=setupDrinks.map((d,i)=>{
-    const col=COLORS[d.cat]||'#888';
+  el.innerHTML = setupDrinks.map((d,i)=>{
+    const col = COLORS[d.cat]||'#888';
     return `<div class="tpl-item">
       <div style="width:9px;height:9px;border-radius:50%;background:${col};flex-shrink:0"></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</div>
         <div style="font-size:10px;color:var(--t3);font-family:var(--fm)">${d.cat}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <button class="qty-btn" onclick="setupQty(${i},-1)">−</button>
-        <div class="qty-num" id="sqty-${i}">${d.qty}</div>
-        <button class="qty-btn" onclick="setupQty(${i},1)">+</button>
-      </div>
+      <button class="qty-btn" onclick="setupQty(${i},-1)">−</button>
+      <div class="qty-num" id="sqty-${i}">${d.qty}</div>
+      <button class="qty-btn" onclick="setupQty(${i},1)">+</button>
       <button class="remove-x" onclick="setupRemove(${i})">✕</button>
     </div>`;
   }).join('');
@@ -369,8 +386,10 @@ function setupQty(i,delta){
   const el=gid('sqty-'+i);if(el)el.textContent=setupDrinks[i].qty;
   updateSetupSummary();
 }
+window.setupQty = setupQty;
 
 function setupRemove(i){setupDrinks.splice(i,1);renderSetupItems();}
+window.setupRemove = setupRemove;
 
 function setupAdd(){
   const name=gid('sa-name').value.trim();
@@ -381,8 +400,10 @@ function setupAdd(){
   gid('sa-name').value='';gid('sa-qty').value='1';
   renderSetupItems();toast('Added!');
 }
+window.setupAdd = setupAdd;
 
 function clearSetup(){setupDrinks=[];renderSetupItems();}
+window.clearSetup = clearSetup;
 
 function updateSetupSummary(){
   const el=gid('setup-summary');
@@ -391,26 +412,26 @@ function updateSetupSummary(){
   el.innerHTML=setupDrinks.map(d=>`${d.qty}× ${d.name}`).join('<br/>')+'<br/><strong style="color:var(--t1)">Total: '+total+' bottles / cans</strong>';
 }
 
-// ── CONFIRM STOCK ── (NO confirm() dialog - uses inline button only)
 function confirmStock(){
   if(!setupDrinks.length){toast('Add at least one drink first');return;}
-  curEv.stock=setupDrinks.map(d=>({...d,used:0}));
-  curEv.stock_confirmed=true;
-  curEv.status='live';
+  curEv.stock = setupDrinks.map(d=>({...d,used:0}));
+  curEv.stock_confirmed = true;
+  curEv.status = 'live';
   addLog('Opening stock confirmed — '+setupDrinks.length+' drinks, '+setupDrinks.reduce((s,d)=>s+d.qty,0)+' total bottles');
-  saveToStorage();
+  saveToFirebase();
   showPanel();
   toast('Stock confirmed! Event is now live.');
 }
+window.confirmStock = confirmStock;
 
-// ── MAIN PANEL ──
+// Main Panel
 function showPanel(){
   showScreen('scr-panel');
   gid('panel-ev-label').textContent=curEv.event_name;
   gid('panel-ev-name').textContent=curEv.event_name;
   gid('panel-ev-meta').textContent=curEv.client_name+' · '+fmtDate(curEv.event_date)+' · '+(curEv.city||'');
   gid('ev-status').value=curEv.status;
-  renderCards();renderLog();
+  renderCards(); renderLog();
 }
 
 function renderMetrics(){
@@ -424,7 +445,7 @@ function renderMetrics(){
 function renderCards(){
   renderMetrics();
   const el=gid('drink-cards');
-  if(!curEv.stock.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🍾</div><div class="empty-title">No stock</div></div>';return;}
+  if(!curEv.stock||!curEv.stock.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🍾</div><div class="empty-title">No stock</div></div>';return;}
   el.innerHTML=curEv.stock.map((item,i)=>{
     const rem=getRem(item);const st=getSt(item);
     const pct=Math.round((rem/item.qty)*100);
@@ -460,7 +481,7 @@ function renderCards(){
         </button>
       </div>
       <div class="add-btl-row" id="abtl-${i}">
-        <div class="add-btl-label">How many extra bottles<br/>did client give?</div>
+        <div class="add-btl-label">How many extra bottles did client give?</div>
         <input class="add-btl-inp" id="abtl-qty-${i}" type="number" min="1" value="1"/>
         <button class="add-btl-confirm" onclick="addExtraBottles(${i})">Add</button>
         <button class="add-btl-cancel" onclick="toggleAddBottles(${i})">✕</button>
@@ -482,71 +503,75 @@ function consumeOne(i){
   else msg+=`✅ 1 *${it.name}* consumed — *${rem}* remaining.`;
   addLog(it.name+' — 1 consumed, '+rem+' remaining');
   addWAMsg(msg);
+  saveToFirebase();
 }
+window.consumeOne = consumeOne;
 
 function undoOne(i){
   const it=curEv.stock[i];if(!it||!it.used)return;
-  it.used=Math.max(0,it.used-1);flashDc(i);renderCards();addLog('Undo: '+it.name);toast('Undone');
+  it.used=Math.max(0,it.used-1);flashDc(i);renderCards();
+  addLog('Undo: '+it.name);toast('Undone');
+  saveToFirebase();
 }
+window.undoOne = undoOne;
 
 function markAllDone(i){
   const it=curEv.stock[i];if(!it)return;it.used=it.qty;flashDc(i);renderCards();
   addWAMsg(`🔴 *${curEv.event_name}* — *${it.name}* fully consumed! All ${it.qty} done. _(${nowTime()})_`);
   addLog(it.name+' — all done');
+  saveToFirebase();
 }
+window.markAllDone = markAllDone;
 
 function restoreItem(i){
-  const it=curEv.stock[i];if(!it)return;it.used=0;flashDc(i);renderCards();addLog(it.name+' — restored');toast('Restored');
+  const it=curEv.stock[i];if(!it)return;it.used=0;flashDc(i);renderCards();
+  addLog(it.name+' — restored');toast('Restored');
+  saveToFirebase();
 }
+window.restoreItem = restoreItem;
 
-// ── ADD EXTRA BOTTLES MID-EVENT ──
 function toggleAddBottles(i){
-  const row=gid('abtl-'+i);
-  if(!row)return;
+  const row=gid('abtl-'+i);if(!row)return;
   const isOpen=row.classList.contains('open');
-  // Close all others first
   document.querySelectorAll('.add-btl-row').forEach(r=>r.classList.remove('open'));
-  if(!isOpen){
-    row.classList.add('open');
-    setTimeout(()=>{const inp=gid('abtl-qty-'+i);if(inp){inp.value='1';inp.focus();}},100);
-  }
+  if(!isOpen){row.classList.add('open');setTimeout(()=>{const inp=gid('abtl-qty-'+i);if(inp){inp.value='1';inp.focus();}},100);}
 }
+window.toggleAddBottles = toggleAddBottles;
 
 function addExtraBottles(i){
   const it=curEv.stock[i];if(!it)return;
   const inp=gid('abtl-qty-'+i);
   const extra=parseInt(inp?inp.value:1)||1;
   if(extra<1){toast('Enter at least 1');return;}
-  // Add to opening qty so remaining increases
   it.qty+=extra;
   if(!it.restocked)it.restocked=0;
   it.restocked+=extra;
-  // Close the row
   const row=gid('abtl-'+i);if(row)row.classList.remove('open');
   flashDc(i);renderCards();
-  const msg=`🍾 *Rebelz Bartending — ${curEv.event_name}*\n\n*Mid-event restock (${nowTime()}):*\n✅ ${extra} extra ${it.cat==='beer'?'cans':'bottle'+(extra>1?'s':'')} of *${it.name}* added by client.\n📦 Total now: ${it.qty} · Remaining: ${getRem(it)}`;
+  const msg=`🍾 *Rebelz Bartending — ${curEv.event_name}*\n\n*Mid-event restock (${nowTime()}):*\n✅ ${extra} extra ${it.cat==='beer'?'cans':'bottle'+(extra>1?'s':'')} of *${it.name}* added.\n📦 Total now: ${it.qty} · Remaining: ${getRem(it)}`;
   addWAMsg(msg);
-  addLog(`${it.name} — ${extra} extra bottle${extra>1?'s':''} added mid-event by client. Total now ${it.qty}`);
-  saveToStorage();
+  addLog(`${it.name} — ${extra} extra bottle${extra>1?'s':''} added. Total now ${it.qty}`);
+  saveToFirebase();
   toast(`+${extra} ${it.name} added!`);
 }
+window.addExtraBottles = addExtraBottles;
 
-// ── ADD NEW DRINK MID-EVENT ──
 function addNewDrinkLive(){
   const name=gid('live-add-name').value.trim();
   const qty=parseInt(gid('live-add-qty').value)||1;
   const cat=gid('live-add-cat').value;
   if(!name){toast('Enter drink name');gid('live-add-name').focus();return;}
+  if(!curEv.stock)curEv.stock=[];
   curEv.stock.push({name,cat,qty,used:0,restocked:0,addedLive:true});
-  gid('live-add-name').value='';
-  gid('live-add-qty').value='1';
+  gid('live-add-name').value='';gid('live-add-qty').value='1';
   renderCards();
   const msg=`🍾 *Rebelz Bartending — ${curEv.event_name}*\n\n*New drink added (${nowTime()}):*\n✅ *${qty}x ${name}* added mid-event by client.`;
   addWAMsg(msg);
   addLog(`New drink added live: ${qty}x ${name} (${cat})`);
-  saveToStorage();
+  saveToFirebase();
   toast(`${name} added to live stock!`);
 }
+window.addNewDrinkLive = addNewDrinkLive;
 
 function buildSummaryMsg(){
   const lines=curEv.stock.map(i=>`  • ${i.name}: ${i.used||0} used / ${getRem(i)} remaining`).join('\n');
@@ -562,11 +587,12 @@ function buildClosingMsg(){
 function openWA(msg,phone){window.open('https://wa.me/'+(phone||'').replace(/\D/g,'')+'?text='+encodeURIComponent(msg),'_blank');}
 
 function saveAndNotify(){
-  saveToStorage();
+  saveToFirebase();
   const msg=buildSummaryMsg();addWAMsg(msg);
   addLog('Saved — '+curEv.stock.reduce((s,i)=>s+(i.used||0),0)+' consumed');
   toast('Saved! Tap WhatsApp to send.');
 }
+window.saveAndNotify = saveAndNotify;
 
 function sendManualWA(){
   const msg=buildSummaryMsg();
@@ -574,20 +600,24 @@ function sendManualWA(){
   if(curEv.owner_wa)setTimeout(()=>openWA(msg,curEv.owner_wa),700);
   if(!curEv.client_wa&&!curEv.owner_wa)openWA(msg,'');
 }
+window.sendManualWA = sendManualWA;
 
 function closeEventFn(){
-  curEv.status='closed';gid('ev-status').value='closed';saveToStorage();
+  curEv.status='closed';gid('ev-status').value='closed';
   const msg=buildClosingMsg();addWAMsg(msg);addLog('Event closed — final report sent');
+  saveToFirebase();
   if(curEv.client_wa)openWA(msg,curEv.client_wa);
   if(curEv.owner_wa)setTimeout(()=>openWA(msg,curEv.owner_wa),700);
   if(!curEv.client_wa&&!curEv.owner_wa)openWA(msg,'');
   toast('Event closed!');
 }
+window.closeEventFn = closeEventFn;
 
 function changeStatus(val){
-  curEv.status=val;saveToStorage();addLog('Status: '+val);
+  curEv.status=val;saveToFirebase();addLog('Status: '+val);
   toast(val==='live'?'Event is LIVE!':val==='closed'?'Event closed':'Setting up');
 }
+window.changeStatus = changeStatus;
 
 function addWAMsg(msg){
   waLog.push({msg,time:nowTime()});
@@ -601,7 +631,8 @@ function addWAMsg(msg){
 function addLog(msg){
   if(!curEv.log)curEv.log=[];
   curEv.log.unshift({msg,time:nowISO()});
-  saveToStorage();renderLog();
+  saveToFirebase();
+  renderLog();
 }
 
 function renderLog(){
@@ -611,14 +642,6 @@ function renderLog(){
     const t=new Date(l.time).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
     return `<div class="log-item"><span style="color:var(--t2);flex:1">${l.msg}</span><span style="color:var(--t3);font-family:var(--fm);font-size:10px;flex-shrink:0">${t}</span></div>`;
   }).join('');
-}
-
-function saveToStorage(){
-  // Update EVENTS array with curEv changes
-  const idx=EVENTS.findIndex(e=>e.id===curEv.id);
-  if(idx>=0)EVENTS[idx]=curEv;
-  else EVENTS.unshift(curEv);
-  try{localStorage.setItem('rblz_ev',JSON.stringify(EVENTS));}catch(e){}
 }
 </script>
 </body>

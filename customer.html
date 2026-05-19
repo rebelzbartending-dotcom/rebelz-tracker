@@ -79,6 +79,13 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;m
   </div>
 </div>
 
+<div id="loading-view" style="display:flex;min-height:100vh;align-items:center;justify-content:center">
+  <div style="text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">🍸</div>
+    <div style="font-family:var(--fh);font-size:16px;font-weight:800;color:var(--t1)">Loading your tracker...</div>
+  </div>
+</div>
+
 <div id="main-view" style="display:none">
   <div class="hdr">
     <div class="hdr-top">
@@ -101,7 +108,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;m
   <div class="main">
     <div id="c-setup-notice" style="display:none" class="setup-notice">
       <div style="font-size:14px;font-weight:500;color:var(--amb);margin-bottom:4px">⏳ Setting up</div>
-      <div style="font-size:12px;color:var(--t2)">Your bartender is confirming the opening stock. Refresh in a moment.</div>
+      <div style="font-size:12px;color:var(--t2)">Your bartender is confirming the opening stock. This will update automatically.</div>
     </div>
     <div id="c-close-banner" style="display:none" class="close-banner">
       <div style="font-size:20px">✓</div>
@@ -113,21 +120,25 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;m
     </div>
     <div class="sec-lbl">Activity timeline</div>
     <div class="tl-card" id="c-timeline"></div>
-    <div style="text-align:center;padding:8px 0;margin-bottom:4px">
-      <button class="refresh-btn" onclick="loadAndRender()">↻ Refresh</button>
-    </div>
     <div class="footer">
       <div class="footer-brand">Rebelz Bartending Services</div>
       <div class="footer-sub" style="margin-top:3px">Vijayawada · Hyderabad · Vizag</div>
-      <div class="footer-sub" style="margin-top:3px">This tracker is private and shared only with you</div>
+      <div class="footer-sub" style="margin-top:3px">This tracker updates live automatically</div>
     </div>
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 const COLORS={whiskey:'#c8860a',gin:'#0e9e80',vodka:'#7c5cc4',beer:'#3a7a20',wine:'#aa3870',rum:'#c04020',other:'#888'};
-let evId=null;
-let refreshTimer=null;
 
 function gid(id){return document.getElementById(id);}
 function nowTime(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
@@ -135,48 +146,64 @@ function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN'
 function getRem(it){return Math.max(0,it.qty-(it.used||0));}
 function getSt(it){const r=getRem(it);if(r===0)return 'empty';return(r/it.qty)<=0.25?'low':'ok';}
 
-function loadEvents(){try{const s=localStorage.getItem('rblz_ev');return s?JSON.parse(s):[];}catch(e){return [];}}
+const params = new URLSearchParams(window.location.search);
+const evId = params.get('ev');
 
-function loadAndRender(){
-  const events=loadEvents();
-  const ev=events.find(e=>e.id===evId);
-  if(!ev){gid('error-view').style.display='block';gid('main-view').style.display='none';return;}
-  renderDash(ev);
+if(!evId){
+  gid('loading-view').style.display='none';
+  gid('error-view').style.display='block';
+} else {
+  // Listen to Firebase for real-time updates
+  const evRef = ref(db, 'events/'+evId);
+  onValue(evRef, (snapshot) => {
+    gid('loading-view').style.display='none';
+    const ev = snapshot.val();
+    if(!ev){
+      gid('error-view').style.display='block';
+      gid('main-view').style.display='none';
+      return;
+    }
+    renderDash(ev);
+  }, (error) => {
+    gid('loading-view').style.display='none';
+    gid('error-view').style.display='block';
+  });
 }
 
 function renderDash(ev){
   gid('error-view').style.display='none';
   gid('main-view').style.display='block';
+  document.title = ev.event_name + ' — Rebelz Tracker';
 
   // Header
-  gid('c-evname').textContent=ev.event_name+' — '+ev.client_name;
-  gid('c-evmeta').textContent=fmtDate(ev.event_date)+' · '+(ev.venue||ev.city||'');
-  document.title=ev.event_name+' — Rebelz Tracker';
+  gid('c-evname').textContent = ev.event_name + ' — ' + ev.client_name;
+  gid('c-evmeta').textContent = fmtDate(ev.event_date) + ' · ' + (ev.venue||ev.city||'');
 
   // Chip
-  const chip=gid('cust-chip');
-  if(ev.status==='live')chip.innerHTML='<div class="chip-live"><div class="chip-dot"></div><div class="chip-txt">Live now</div></div>';
-  else if(ev.status==='closed')chip.innerHTML='<div class="chip-closed"><div class="chip-closed-txt">Closed</div></div>';
+  const chip = gid('cust-chip');
+  if(ev.status==='live') chip.innerHTML='<div class="chip-live"><div class="chip-dot"></div><div class="chip-txt">Live now</div></div>';
+  else if(ev.status==='closed') chip.innerHTML='<div class="chip-closed"><div class="chip-closed-txt">Closed</div></div>';
   else chip.innerHTML='<div class="chip-setup"><div class="chip-setup-dot"></div><div class="chip-setup-txt">Setting up</div></div>';
 
   // Stats
-  const tot=ev.stock.reduce((s,i)=>s+i.qty,0);
-  const used=ev.stock.reduce((s,i)=>s+(i.used||0),0);
-  gid('c-given').textContent=tot||'—';
-  gid('c-used').textContent=used||'—';
-  gid('c-left').textContent=tot?Math.max(0,tot-used):'—';
-  gid('c-time').textContent=nowTime();
+  const stock = ev.stock || [];
+  const tot = stock.reduce((s,i)=>s+i.qty,0);
+  const used = stock.reduce((s,i)=>s+(i.used||0),0);
+  gid('c-given').textContent = tot||'—';
+  gid('c-used').textContent = used||'—';
+  gid('c-left').textContent = tot ? Math.max(0,tot-used) : '—';
+  gid('c-time').textContent = nowTime();
 
   // Banners
-  gid('c-close-banner').style.display=ev.status==='closed'?'flex':'none';
-  gid('c-setup-notice').style.display=(!ev.stock_confirmed)?'block':'none';
+  gid('c-close-banner').style.display = ev.status==='closed' ? 'flex' : 'none';
+  gid('c-setup-notice').style.display = (!ev.stock_confirmed) ? 'block' : 'none';
 
   // Bottles
-  const bottlesEl=gid('c-bottles');
-  if(!ev.stock_confirmed||!ev.stock.length){
-    bottlesEl.innerHTML='<div style="text-align:center;padding:28px;color:var(--t3);font-size:13px">Bartender is confirming stock...<br/>Refresh in a moment.</div>';
+  const bottlesEl = gid('c-bottles');
+  if(!ev.stock_confirmed || !stock.length){
+    bottlesEl.innerHTML='<div style="text-align:center;padding:28px;color:var(--t3);font-size:13px">Bartender is confirming stock...<br/>This will update automatically.</div>';
   } else {
-    bottlesEl.innerHTML=ev.stock.map(item=>{
+    bottlesEl.innerHTML = stock.map(item=>{
       const rem=getRem(item);const st=getSt(item);
       const pct=Math.round((rem/item.qty)*100);
       const col=COLORS[item.cat]||'#888';
@@ -196,7 +223,7 @@ function renderDash(ev){
   }
 
   // Timeline
-  const tl=gid('c-timeline');
+  const tl = gid('c-timeline');
   if(!ev.log||!ev.log.length){
     tl.innerHTML='<div class="tl-item"><div class="tl-dot info"></div><div class="tl-msg">Waiting for first update from your bartender...</div><div class="tl-time">—</div></div>';
   } else {
@@ -206,22 +233,7 @@ function renderDash(ev){
       return `<div class="tl-item"><div class="tl-dot ${st}"></div><div class="tl-msg">${l.msg}</div><div class="tl-time">${t}</div></div>`;
     }).join('');
   }
-
-  // Auto-refresh if live
-  if(refreshTimer)clearInterval(refreshTimer);
-  if(ev.status==='live'){refreshTimer=setInterval(loadAndRender,15000);}
 }
-
-window.addEventListener('DOMContentLoaded',()=>{
-  const params=new URLSearchParams(window.location.search);
-  evId=params.get('ev');
-  if(!evId){gid('error-view').style.display='block';return;}
-  loadAndRender();
-  // Listen for live updates from bartender
-  window.addEventListener('storage',e=>{
-    if(e.key==='rblz_ev')loadAndRender();
-  });
-});
 </script>
 </body>
 </html>
