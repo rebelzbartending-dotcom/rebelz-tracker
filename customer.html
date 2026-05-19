@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Rebelz — Live Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f5f2ec;--s0:#fff;--s1:#faf8f3;--s2:#f0ece3;--b1:#e0d9cc;--b2:#ccc4b4;--t1:#1a1814;--t2:#6b6558;--t3:#9e9888;--grn:#1a6035;--grn-bg:#eaf5ee;--amb:#7a4e00;--amb-bg:#fef4e0;--red:#7a1818;--red-bg:#fdeaea;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh}
+.hdr{background:var(--t1)}
+.hdr-top{padding:13px 16px 0;display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:var(--fh);font-size:14px;font-weight:800;color:#f5f2ec}.brand em{color:#c8f560;font-style:normal}
+.chip-live{display:flex;align-items:center;gap:5px;background:#c8f56015;border:0.5px solid #c8f56030;border-radius:20px;padding:3px 10px}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:#c8f560;animation:blink 1.5s infinite}
+.chip-txt{font-size:10px;color:#c8f560;font-family:var(--fm)}
+.chip-setup{display:flex;align-items:center;gap:5px;background:#f5a62315;border:0.5px solid #f5a62330;border-radius:20px;padding:3px 10px}
+.chip-setup-dot{width:5px;height:5px;border-radius:50%;background:#f5a623}
+.chip-setup-txt{font-size:10px;color:#f5a623;font-family:var(--fm)}
+.chip-closed{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:0.5px solid rgba(255,255,255,.12);border-radius:20px;padding:3px 10px}
+.chip-closed-txt{font-size:10px;color:rgba(245,242,236,.5);font-family:var(--fm)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hdr-body{padding:14px 16px 0}
+.ev-lbl{font-size:9px;font-family:var(--fm);color:rgba(245,242,236,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.ev-name{font-family:var(--fh);font-size:22px;font-weight:800;color:#f5f2ec;line-height:1.1;margin-bottom:3px}
+.ev-meta{font-size:11px;color:rgba(245,242,236,.45);font-family:var(--fm)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.07);margin-top:14px}
+.stat{padding:12px 8px;background:rgba(255,255,255,.03);text-align:center}
+.stat-l{font-size:9px;color:rgba(245,242,236,.3);text-transform:uppercase;letter-spacing:.06em;font-family:var(--fm);margin-bottom:3px}
+.stat-v{font-family:var(--fh);font-size:20px;font-weight:800;color:#f5f2ec}
+.stat-v.acc{color:#c8f560}
+.main{padding:14px;max-width:600px;margin:0 auto}
+.sec-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:var(--fm);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:.5px;background:var(--b1)}
+.cc{background:var(--s0);border:0.5px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:8px}
+.cc.low{border-color:#e0c070}.cc.empty{border-color:#e0a0a0;opacity:.85}
+.cc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.cc-left{display:flex;align-items:center;gap:8px}
+.cc-dot{width:9px;height:9px;border-radius:50%}
+.cc-name{font-size:14px;font-weight:500;color:var(--t1)}
+.cc-rem{font-family:var(--fh);font-size:26px;font-weight:800}
+.cc-rem.ok{color:var(--grn)}.cc-rem.low{color:var(--amb)}.cc-rem.empty{color:var(--red)}
+.cc-rem-l{font-size:9px;color:var(--t3);font-family:var(--fm);text-align:right}
+.cc-bottles{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px}
+.btl{width:12px;height:24px;border-radius:2px 2px 3px 3px;transition:background .5s}
+.cc-prog{height:4px;background:var(--s2);border-radius:2px;margin-bottom:6px}
+.cc-fill{height:4px;border-radius:2px;transition:width .6s ease}
+.cc-fill.ok{background:var(--grn)}.cc-fill.low{background:var(--amb)}.cc-fill.empty{background:var(--red)}
+.cc-nums{display:flex;justify-content:space-between;font-size:10px;font-family:var(--fm);color:var(--t3)}
+.tl-card{background:var(--s0);border:0.5px solid var(--b1);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.tl-item{display:flex;gap:10px;padding:10px 14px;border-bottom:.5px solid var(--s2);align-items:flex-start}
+.tl-item:last-child{border-bottom:none}
+.tl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.tl-dot.ok{background:var(--grn)}.tl-dot.low{background:var(--amb)}.tl-dot.empty{background:var(--red)}.tl-dot.info{background:var(--t3)}
+.tl-msg{font-size:12px;flex:1;line-height:1.5;color:var(--t2)}
+.tl-time{font-size:10px;color:var(--t3);font-family:var(--fm);white-space:nowrap}
+.close-banner{background:var(--grn);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.close-banner-t{font-family:var(--fh);font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
+.close-banner-s{font-size:11px;color:rgba(255,255,255,.7)}
+.setup-notice{background:var(--amb-bg);border:0.5px solid #e0c070;border-radius:10px;padding:14px 16px;text-align:center;margin-bottom:12px}
+.footer{text-align:center;padding:20px 14px 32px;border-top:.5px solid var(--b1);margin-top:8px}
+.footer-brand{font-family:var(--fh);font-size:13px;font-weight:800;color:var(--t2);margin-bottom:3px}
+.footer-sub{font-size:10px;color:var(--t3);font-family:var(--fm)}
+.error-wrap{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+.refresh-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;border:.5px solid var(--b2);background:transparent;color:var(--t3);font-family:var(--fb)}
+.refresh-btn:active{background:var(--s2)}
+</style>
+</head>
+<body>
+
+<div id="error-view" style="display:none">
+  <div class="error-wrap">
+    <div>
+      <div style="font-size:40px;margin-bottom:16px">⚠️</div>
+      <div style="font-family:var(--fh);font-size:18px;font-weight:800;margin-bottom:8px;color:var(--t1)">Invalid link</div>
+      <div style="font-size:13px;color:var(--t3);line-height:1.6">This link is not valid.<br/>Ask Rebelz Bartending team for your tracker link.</div>
+    </div>
+  </div>
+</div>
+
+<div id="main-view" style="display:none">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="brand">Rebelz<em>.</em> Bartending</div>
+      <div id="cust-chip"></div>
+    </div>
+    <div class="hdr-body">
+      <div class="ev-lbl">Your alcohol tracker</div>
+      <div class="ev-name" id="c-evname">—</div>
+      <div class="ev-meta" id="c-evmeta">—</div>
+      <div class="stats">
+        <div class="stat"><div class="stat-l">Given</div><div class="stat-v" id="c-given">—</div></div>
+        <div class="stat"><div class="stat-l">Used</div><div class="stat-v" id="c-used">—</div></div>
+        <div class="stat"><div class="stat-l">Left</div><div class="stat-v acc" id="c-left">—</div></div>
+        <div class="stat"><div class="stat-l">Updated</div><div class="stat-v" style="font-size:12px;padding-top:4px" id="c-time">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="c-setup-notice" style="display:none" class="setup-notice">
+      <div style="font-size:14px;font-weight:500;color:var(--amb);margin-bottom:4px">⏳ Setting up</div>
+      <div style="font-size:12px;color:var(--t2)">Your bartender is confirming the opening stock. Refresh in a moment.</div>
+    </div>
+    <div id="c-close-banner" style="display:none" class="close-banner">
+      <div style="font-size:20px">✓</div>
+      <div><div class="close-banner-t">Final closing report</div><div class="close-banner-s">Verified by Rebelz Bartending Services</div></div>
+    </div>
+    <div id="c-bottles-wrap">
+      <div class="sec-lbl">Bottle status</div>
+      <div id="c-bottles"></div>
+    </div>
+    <div class="sec-lbl">Activity timeline</div>
+    <div class="tl-card" id="c-timeline"></div>
+    <div style="text-align:center;padding:8px 0;margin-bottom:4px">
+      <button class="refresh-btn" onclick="loadAndRender()">↻ Refresh</button>
+    </div>
+    <div class="footer">
+      <div class="footer-brand">Rebelz Bartending Services</div>
+      <div class="footer-sub" style="margin-top:3px">Vijayawada · Hyderabad · Vizag</div>
+      <div class="footer-sub" style="margin-top:3px">This tracker is private and shared only with you</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS={whiskey:'#c8860a',gin:'#0e9e80',vodka:'#7c5cc4',beer:'#3a7a20',wine:'#aa3870',rum:'#c04020',other:'#888'};
+let evId=null;
+let refreshTimer=null;
+
+function gid(id){return document.getElementById(id);}
+function nowTime(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}):'—';}catch(e){return d||'—';}}
+function getRem(it){return Math.max(0,it.qty-(it.used||0));}
+function getSt(it){const r=getRem(it);if(r===0)return 'empty';return(r/it.qty)<=0.25?'low':'ok';}
+
+function loadEvents(){try{const s=localStorage.getItem('rblz_ev');return s?JSON.parse(s):[];}catch(e){return [];}}
+
+function loadAndRender(){
+  const events=loadEvents();
+  const ev=events.find(e=>e.id===evId);
+  if(!ev){gid('error-view').style.display='block';gid('main-view').style.display='none';return;}
+  renderDash(ev);
+}
+
+function renderDash(ev){
+  gid('error-view').style.display='none';
+  gid('main-view').style.display='block';
+
+  // Header
+  gid('c-evname').textContent=ev.event_name+' — '+ev.client_name;
+  gid('c-evmeta').textContent=fmtDate(ev.event_date)+' · '+(ev.venue||ev.city||'');
+  document.title=ev.event_name+' — Rebelz Tracker';
+
+  // Chip
+  const chip=gid('cust-chip');
+  if(ev.status==='live')chip.innerHTML='<div class="chip-live"><div class="chip-dot"></div><div class="chip-txt">Live now</div></div>';
+  else if(ev.status==='closed')chip.innerHTML='<div class="chip-closed"><div class="chip-closed-txt">Closed</div></div>';
+  else chip.innerHTML='<div class="chip-setup"><div class="chip-setup-dot"></div><div class="chip-setup-txt">Setting up</div></div>';
+
+  // Stats
+  const tot=ev.stock.reduce((s,i)=>s+i.qty,0);
+  const used=ev.stock.reduce((s,i)=>s+(i.used||0),0);
+  gid('c-given').textContent=tot||'—';
+  gid('c-used').textContent=used||'—';
+  gid('c-left').textContent=tot?Math.max(0,tot-used):'—';
+  gid('c-time').textContent=nowTime();
+
+  // Banners
+  gid('c-close-banner').style.display=ev.status==='closed'?'flex':'none';
+  gid('c-setup-notice').style.display=(!ev.stock_confirmed)?'block':'none';
+
+  // Bottles
+  const bottlesEl=gid('c-bottles');
+  if(!ev.stock_confirmed||!ev.stock.length){
+    bottlesEl.innerHTML='<div style="text-align:center;padding:28px;color:var(--t3);font-size:13px">Bartender is confirming stock...<br/>Refresh in a moment.</div>';
+  } else {
+    bottlesEl.innerHTML=ev.stock.map(item=>{
+      const rem=getRem(item);const st=getSt(item);
+      const pct=Math.round((rem/item.qty)*100);
+      const col=COLORS[item.cat]||'#888';
+      const maxShow=Math.min(item.qty,20);
+      const filled=Math.round((rem/item.qty)*maxShow);
+      const bottles=Array.from({length:maxShow},(_,i)=>`<div class="btl" style="background:${i<filled?col:'#e8e3da'}"></div>`).join('');
+      return `<div class="cc ${st}">
+        <div class="cc-top">
+          <div class="cc-left"><div class="cc-dot" style="background:${col}"></div><div class="cc-name">${item.name}</div></div>
+          <div style="text-align:right"><div class="cc-rem ${st}">${rem}</div><div class="cc-rem-l">remaining</div></div>
+        </div>
+        <div class="cc-bottles">${bottles}</div>
+        <div class="cc-prog"><div class="cc-fill ${st}" style="width:${pct}%"></div></div>
+        <div class="cc-nums"><span>Given: ${item.qty}</span><span>Used: ${item.used||0}</span><span>Left: ${rem} (${pct}%)</span></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Timeline
+  const tl=gid('c-timeline');
+  if(!ev.log||!ev.log.length){
+    tl.innerHTML='<div class="tl-item"><div class="tl-dot info"></div><div class="tl-msg">Waiting for first update from your bartender...</div><div class="tl-time">—</div></div>';
+  } else {
+    tl.innerHTML=ev.log.slice(0,15).map(l=>{
+      const t=new Date(l.time).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      const st=l.msg.toLowerCase().includes('low')?'low':l.msg.toLowerCase().includes('closed')||l.msg.toLowerCase().includes('all done')?'empty':'ok';
+      return `<div class="tl-item"><div class="tl-dot ${st}"></div><div class="tl-msg">${l.msg}</div><div class="tl-time">${t}</div></div>`;
+    }).join('');
+  }
+
+  // Auto-refresh if live
+  if(refreshTimer)clearInterval(refreshTimer);
+  if(ev.status==='live'){refreshTimer=setInterval(loadAndRender,15000);}
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const params=new URLSearchParams(window.location.search);
+  evId=params.get('ev');
+  if(!evId){gid('error-view').style.display='block';return;}
+  loadAndRender();
+  // Listen for live updates from bartender
+  window.addEventListener('storage',e=>{
+    if(e.key==='rblz_ev')loadAndRender();
+  });
+});
+</script>
+</body>
+</html>

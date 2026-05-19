@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Rebelz — Bartender</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0c0c0a;--s1:#161614;--s2:#202020;--s3:#2a2a28;--b1:#303030;--b2:#3c3c38;--t1:#f2efe8;--t2:#a09c92;--t3:#606058;--acc:#c8f560;--acc2:#a8d840;--amber:#f5a623;--red:#e84040;--grn:#25a85a;--wa:#25d366;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px}
+.screen{display:none;height:100vh;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px}
+.topbar{background:var(--s1);border-bottom:0.5px solid var(--b1);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{font-family:var(--fh);font-size:17px;font-weight:800;letter-spacing:-.4px}.logo em{color:var(--acc);font-style:normal}
+.topbar-tag{font-size:9px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:14px;border-radius:10px;font-size:14px;font-family:var(--fh);font-weight:700;cursor:pointer;border:none;width:100%;transition:all .15s;margin-bottom:8px}
+.btn:last-child{margin-bottom:0}
+.btn-acc{background:var(--acc);color:#0c0c0a}.btn-acc:active{background:var(--acc2);transform:scale(.97)}
+.btn-ghost{background:transparent;border:0.5px solid var(--b2);color:var(--t2)}.btn-ghost:active{background:var(--s2)}
+.btn-wa{background:var(--wa);color:#fff}.btn-wa:active{background:#1db954}
+.btn-red{background:transparent;border:0.5px solid #e8404045;color:var(--red)}.btn-red:active{background:#e8404015}
+.btn-sm{padding:9px 14px;font-size:12px;width:auto;border-radius:8px;margin-bottom:0}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-family:var(--fm);margin-bottom:5px}
+.inp{width:100%;background:var(--s2);border:0.5px solid var(--b1);border-radius:9px;padding:12px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;-webkit-appearance:none}
+.inp:focus{border-color:var(--acc)}.inp::placeholder{color:var(--t3)}
+select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23606058' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.card{background:var(--s1);border:0.5px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:10px}
+.card-title{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:var(--fm);margin-bottom:13px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.metric{background:var(--s1);border:0.5px solid var(--b1);border-radius:9px;padding:10px 6px;text-align:center}
+.metric-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;font-family:var(--fm);margin-bottom:3px}
+.metric-v{font-family:var(--fh);font-size:22px;font-weight:800}
+.mv-g{color:var(--acc)}.mv-a{color:var(--amber)}.mv-r{color:var(--red)}
+.tpl-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;margin-bottom:14px}
+.tpl-chip{padding:7px 13px;border-radius:20px;border:0.5px solid var(--b2);font-size:12px;color:var(--t2);cursor:pointer;background:transparent}
+.tpl-chip.sel{background:var(--acc);color:#0c0c0a;border-color:var(--acc);font-weight:600}
+.tpl-item{background:var(--s2);border:0.5px solid var(--b1);border-radius:9px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:10px}
+.qty-btn{width:36px;height:36px;border-radius:8px;border:0.5px solid var(--b2);background:var(--s3);color:var(--t1);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qty-btn:active{background:var(--b2)}
+.qty-num{font-family:var(--fh);font-size:18px;font-weight:800;color:var(--acc);min-width:28px;text-align:center}
+.remove-x{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;line-height:1}
+.remove-x:active{color:var(--red)}
+.confirm-box{background:#c8f56010;border:0.5px solid #c8f56030;border-radius:12px;padding:16px;margin-top:4px}
+.dc{background:var(--s1);border:0.5px solid var(--b1);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.dc.low{border-color:#f5a62345}.dc.empty{border-color:#e8404045;opacity:.82}
+.dc.restocked{border-color:#c8f56060}
+.add-btl-row{display:none;padding:10px 14px;background:#c8f56008;border-top:0.5px solid #c8f56020;align-items:center;gap:8px}
+.add-btl-row.open{display:flex}
+.add-btl-inp{width:70px;background:var(--s2);border:0.5px solid var(--b1);border-radius:8px;padding:8px 10px;color:var(--t1);font-size:16px;font-family:var(--fh);font-weight:700;text-align:center;outline:none}
+.add-btl-inp:focus{border-color:var(--acc)}
+.add-btl-label{font-size:12px;color:var(--t2);flex:1}
+.add-btl-confirm{background:var(--acc);color:#0c0c0a;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-family:var(--fh);font-weight:700;cursor:pointer;white-space:nowrap}
+.add-btl-confirm:active{background:var(--acc2)}
+.add-btl-cancel{background:transparent;border:0.5px solid var(--b2);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--t3);cursor:pointer;font-family:var(--fb)}
+.restock-badge{font-size:10px;font-family:var(--fm);background:#c8f56018;color:var(--acc);border:0.5px solid #c8f56030;border-radius:10px;padding:2px 7px;margin-left:6px}
+.dc-top{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.dc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dc-info{flex:1;min-width:0}
+.dc-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc-sub{font-size:11px;color:var(--t3);font-family:var(--fm);margin-top:2px}
+.dc-rem{font-family:var(--fh);font-size:24px;font-weight:800}
+.dc-rem.ok{color:var(--acc)}.dc-rem.low{color:var(--amber)}.dc-rem.empty{color:var(--red)}
+.dc-prog{height:3px;background:var(--b1);margin:0 14px}
+.dc-fill{height:3px;border-radius:2px;transition:width .4s}
+.dc-fill.ok{background:var(--acc)}.dc-fill.low{background:var(--amber)}.dc-fill.empty{background:var(--red)}
+.dc-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b1)}
+.tap{background:var(--s2);padding:15px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;font-family:var(--fb);-webkit-tap-highlight-color:transparent}
+.tap:active{background:var(--s3);transform:scale(.95)}
+.tap-icon{font-size:22px;line-height:1}
+.tap-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em}
+.tap.minus:active{background:#e8404018}
+.tap.done-tap:active{background:#c8f56012}
+.wa-feed{max-height:180px;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.wa-msg{background:#162116;border:0.5px solid #25d36625;border-radius:8px 8px 8px 2px;padding:9px 11px;font-size:12px;color:#c8f0c0;line-height:1.5}
+.wa-time{font-size:10px;color:#25d36660;text-align:right;margin-top:3px;font-family:var(--fm)}
+.log-item{display:flex;justify-content:space-between;gap:8px;padding:9px 14px;border-bottom:0.5px solid #111;font-size:12px}
+.log-item:last-child{border-bottom:none}
+.live-pill{display:flex;align-items:center;gap:5px;background:#c8f56015;border:0.5px solid #c8f56030;border-radius:20px;padding:3px 10px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:blink 1.5s infinite}
+.live-txt{font-size:10px;color:var(--acc);font-family:var(--fm)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--acc);color:#0c0c0a;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--fh);opacity:0;transition:all .2s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty-state{text-align:center;padding:36px 20px;color:var(--t3)}
+.empty-icon{font-size:30px;margin-bottom:10px;opacity:.4}
+.empty-title{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t2);margin-bottom:5px}
+.divider{height:0.5px;background:var(--b1);margin:12px 0}
+.error-screen{display:flex;align-items:center;justify-content:center;min-height:80vh;padding:24px;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- ERROR -->
+<div class="screen active" id="scr-error">
+  <div class="topbar"><div><div class="logo">Rebelz<em>.</em></div><div class="topbar-tag">Bartender Panel</div></div></div>
+  <div class="error-screen">
+    <div>
+      <div style="font-size:40px;margin-bottom:16px">⚠️</div>
+      <div style="font-family:var(--fh);font-size:18px;font-weight:800;margin-bottom:8px">Invalid link</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.6">This link is not valid or has expired.<br/>Ask admin for a new bartender link.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PIN LOGIN -->
+<div class="screen" id="scr-login">
+  <div class="topbar">
+    <div><div class="logo">Rebelz<em>.</em></div><div class="topbar-tag">Bartender Panel</div></div>
+    <div style="font-size:10px;color:var(--t3);font-family:var(--fm)" id="login-ev-label">—</div>
+  </div>
+  <div class="scroll-body">
+    <div style="text-align:center;padding:28px 0 24px">
+      <div style="font-size:40px;margin-bottom:14px">🍸</div>
+      <div style="font-family:var(--fh);font-size:20px;font-weight:800;margin-bottom:6px" id="login-ev-name">Loading...</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:4px" id="login-ev-date">—</div>
+      <div style="font-size:12px;color:var(--t3)">Enter your PIN to access the panel</div>
+    </div>
+    <div class="field">
+      <label>Your PIN</label>
+      <input class="inp" id="l-pin" type="tel" maxlength="6" placeholder="••••" style="font-size:26px;text-align:center;letter-spacing:12px"/>
+    </div>
+    <div id="l-err" style="color:var(--red);font-size:12px;text-align:center;margin-bottom:10px;display:none">Wrong PIN. Try again.</div>
+    <button class="btn btn-acc" onclick="doLogin()">Enter Panel</button>
+  </div>
+</div>
+
+<!-- STOCK SETUP -->
+<div class="screen" id="scr-setup">
+  <div class="topbar">
+    <div><div class="logo">Rebelz<em>.</em></div><div class="topbar-tag">Set opening stock</div></div>
+    <div class="live-pill"><div class="live-dot"></div><div class="live-txt" id="setup-ev-label">—</div></div>
+  </div>
+  <div class="scroll-body">
+    <div style="background:#f5a62312;border:0.5px solid #f5a62330;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:var(--amber);line-height:1.6">
+      <strong>Before you start:</strong> Select a template → adjust quantities to match exactly what the client has brought → tap Confirm to go live.
+    </div>
+
+    <div class="card">
+      <div class="card-title">Step 1 — Choose template</div>
+      <div class="tpl-chips" id="setup-chips">
+        <div class="tpl-chip sel" data-id="wedding" onclick="selTpl(this)">💍 Wedding</div>
+        <div class="tpl-chip" data-id="corporate" onclick="selTpl(this)">💼 Corporate</div>
+        <div class="tpl-chip" data-id="birthday" onclick="selTpl(this)">🎂 Birthday</div>
+        <div class="tpl-chip" data-id="cocktail" onclick="selTpl(this)">🍹 Cocktail</div>
+        <div class="tpl-chip" data-id="sangeet" onclick="selTpl(this)">🎶 Sangeet</div>
+        <div class="tpl-chip" data-id="blank" onclick="selTpl(this)">✏️ Blank</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Step 2 — Edit quantities to match client's actual bottles</div>
+      <div id="setup-items"></div>
+      <div class="divider"></div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:10px;font-family:var(--fm)">Add a drink not in template:</div>
+      <div style="display:grid;grid-template-columns:1fr 72px;gap:8px;margin-bottom:8px">
+        <input class="inp" id="sa-name" placeholder="Drink name" style="font-size:13px"/>
+        <input class="inp" id="sa-qty" type="number" min="1" value="1" style="text-align:center;font-size:13px"/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+        <select class="inp" id="sa-cat" style="font-size:13px">
+          <option value="whiskey">Whiskey</option><option value="gin">Gin</option>
+          <option value="vodka">Vodka</option><option value="beer">Beer</option>
+          <option value="wine">Wine</option><option value="rum">Rum</option>
+          <option value="other">Other</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="setupAdd()" style="white-space:nowrap">+ Add</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Step 3 — Confirm and go live</div>
+      <div id="setup-summary" style="font-size:12px;color:var(--t2);font-family:var(--fm);line-height:1.8;margin-bottom:14px">No drinks added yet.</div>
+      <div class="confirm-box">
+        <div style="font-family:var(--fh);font-size:14px;font-weight:800;color:var(--acc);margin-bottom:6px">Ready to confirm?</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6">Once confirmed, the customer dashboard goes live with these bottles. Double check quantities before confirming.</div>
+        <button class="btn btn-acc" onclick="confirmStock()" style="margin-bottom:0">✓ Confirm opening stock — go live</button>
+      </div>
+      <div style="height:8px"></div>
+      <button class="btn btn-ghost" style="font-size:13px;padding:10px" onclick="clearSetup()">Clear all drinks</button>
+    </div>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<!-- MAIN PANEL -->
+<div class="screen" id="scr-panel">
+  <div class="topbar">
+    <div><div class="logo">Rebelz<em>.</em></div><div class="topbar-tag">Bartender Panel</div></div>
+    <div class="live-pill" id="panel-chip"><div class="live-dot"></div><div class="live-txt" id="panel-ev-label">—</div></div>
+  </div>
+  <div class="scroll-body">
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-family:var(--fh);font-size:15px;font-weight:800" id="panel-ev-name">—</div>
+          <div style="font-size:11px;color:var(--t3);font-family:var(--fm);margin-top:2px" id="panel-ev-meta">—</div>
+        </div>
+        <select class="inp" id="ev-status" style="width:auto;padding:7px 28px 7px 10px;font-size:12px" onchange="changeStatus(this.value)">
+          <option value="setup">Setting up</option>
+          <option value="live">Live now</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="metric-l">Given</div><div class="metric-v" id="bm-given">0</div></div>
+      <div class="metric"><div class="metric-l">Used</div><div class="metric-v mv-a" id="bm-used">0</div></div>
+      <div class="metric"><div class="metric-l">Left</div><div class="metric-v mv-g" id="bm-left">0</div></div>
+      <div class="metric"><div class="metric-l">Done</div><div class="metric-v mv-r" id="bm-done">0</div></div>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:var(--fm);margin-bottom:10px">Live consumption — tap to update</div>
+    <div id="drink-cards"></div>
+
+    <!-- ADD NEW DRINK MID-EVENT -->
+    <div class="card" style="border-color:#c8f56025">
+      <div class="card-title" style="color:var(--acc)">+ Client gave a new drink mid-event</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.6">Use this when the client brings a completely new drink type that was not in the opening stock.</div>
+      <div class="field"><label>Drink name</label><input class="inp" id="live-add-name" placeholder="e.g. Black Dog Whiskey"/></div>
+      <div style="display:grid;grid-template-columns:1fr 80px;gap:8px">
+        <div class="field"><label>Category</label>
+          <select class="inp" id="live-add-cat">
+            <option value="whiskey">Whiskey</option><option value="gin">Gin</option>
+            <option value="vodka">Vodka</option><option value="beer">Beer</option>
+            <option value="wine">Wine</option><option value="rum">Rum</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Qty</label><input class="inp" id="live-add-qty" type="number" min="1" value="1" style="text-align:center"/></div>
+      </div>
+      <button class="btn btn-ghost" style="border-color:#c8f56030;color:var(--acc);padding:11px;font-size:13px" onclick="addNewDrinkLive()">+ Add to live stock</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Notify client</div>
+      <button class="btn btn-acc" onclick="saveAndNotify()">💾 Save + send WhatsApp update</button>
+      <button class="btn btn-wa" onclick="sendManualWA()">📱 Send status on WhatsApp now</button>
+      <button class="btn btn-red" onclick="closeEventFn()">🔒 Close event + final report</button>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:0.5px solid var(--b1)"><div class="card-title" style="margin:0">WhatsApp messages sent</div></div>
+      <div class="wa-feed" id="wa-feed">
+        <div style="text-align:center;padding:16px;font-size:12px;color:var(--t3)" id="wa-empty">Messages appear here as you update</div>
+      </div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:0.5px solid var(--b1)"><div class="card-title" style="margin:0">Activity log</div></div>
+      <div id="bar-log"></div>
+    </div>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TPLS={
+  wedding:[{name:'Royal Stag Whiskey',cat:'whiskey',qty:3},{name:'Bombay Sapphire Gin',cat:'gin',qty:4},{name:'Absolut Vodka',cat:'vodka',qty:2},{name:'Kingfisher Beer',cat:'beer',qty:32},{name:'Sula Red Wine',cat:'wine',qty:4},{name:'Old Monk Rum',cat:'rum',qty:2}],
+  corporate:[{name:'Johnnie Walker Black',cat:'whiskey',qty:4},{name:'Hendricks Gin',cat:'gin',qty:2},{name:'Grey Goose Vodka',cat:'vodka',qty:2},{name:'Corona Beer',cat:'beer',qty:24},{name:'Prosecco',cat:'wine',qty:3}],
+  birthday:[{name:'Jack Daniels',cat:'whiskey',qty:2},{name:"Gordon's Gin",cat:'gin',qty:2},{name:'Magic Moments Vodka',cat:'vodka',qty:3},{name:'Budweiser Beer',cat:'beer',qty:48}],
+  cocktail:[{name:'Bacardi White Rum',cat:'rum',qty:4},{name:'Absolut Vodka',cat:'vodka',qty:3},{name:'Bombay Sapphire Gin',cat:'gin',qty:3},{name:'Cointreau',cat:'other',qty:2},{name:'Kingfisher Beer',cat:'beer',qty:20}],
+  sangeet:[{name:'Royal Stag Whiskey',cat:'whiskey',qty:5},{name:'Kingfisher Beer',cat:'beer',qty:48},{name:'Magic Moments Vodka',cat:'vodka',qty:3},{name:'Old Monk Rum',cat:'rum',qty:2},{name:'Sula Wine',cat:'wine',qty:6}],
+  blank:[]
+};
+const COLORS={whiskey:'#c8860a',gin:'#0e9e80',vodka:'#7c5cc4',beer:'#3a7a20',wine:'#aa3870',rum:'#c04020',other:'#888'};
+
+let EVENTS=[];
+let curEv=null;
+let setupDrinks=[];
+let waLog=[];
+
+function gid(id){return document.getElementById(id);}
+function toast(msg,dur=2200){const t=gid('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+function nowTime(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
+function nowISO(){return new Date().toISOString();}
+function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';}catch(e){return d||'—';}}
+function getRem(it){return Math.max(0,it.qty-(it.used||0));}
+function getSt(it){const r=getRem(it);if(r===0)return 'empty';return(r/it.qty)<=0.25?'low':'ok';}
+
+function loadEvents(){try{const s=localStorage.getItem('rblz_ev');return s?JSON.parse(s):[];}catch(e){return [];}}
+function saveEvents(){try{localStorage.setItem('rblz_ev',JSON.stringify(EVENTS));}catch(e){}}
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));gid(id).classList.add('active');}
+
+// ── INIT FROM URL ──
+window.addEventListener('DOMContentLoaded',()=>{
+  EVENTS=loadEvents();
+  const params=new URLSearchParams(window.location.search);
+  const evId=params.get('ev');
+  if(!evId){showScreen('scr-error');return;}
+  const ev=EVENTS.find(e=>e.id===evId);
+  if(!ev){showScreen('scr-error');return;}
+  curEv=ev;
+  // Pre-fill login screen
+  gid('login-ev-label').textContent=ev.id;
+  gid('login-ev-name').textContent=ev.event_name;
+  gid('login-ev-date').textContent=ev.client_name+' · '+fmtDate(ev.event_date);
+  showScreen('scr-login');
+  gid('l-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  // Listen for data changes from admin
+  window.addEventListener('storage',e=>{
+    if(e.key==='rblz_ev'){EVENTS=loadEvents();const updated=EVENTS.find(ev=>ev.id===evId);if(updated&&curEv){Object.assign(curEv,updated);}}
+  });
+});
+
+// ── LOGIN ──
+function doLogin(){
+  const pin=gid('l-pin').value.trim();
+  const err=gid('l-err');err.style.display='none';
+  if(!pin){err.textContent='Enter your PIN';err.style.display='block';return;}
+  if(curEv.bartender_pin.toString()!==pin.toString()){err.textContent='Wrong PIN. Try again.';err.style.display='block';return;}
+  waLog=[];
+  if(curEv.stock_confirmed){
+    showPanel();
+  } else {
+    showSetup();
+  }
+  toast('Logged in!');
+}
+
+// ── STOCK SETUP ──
+function showSetup(){
+  showScreen('scr-setup');
+  gid('setup-ev-label').textContent=curEv.event_name;
+  setupDrinks=[];
+  selTplById('wedding');
+}
+
+function selTpl(el){
+  document.querySelectorAll('#setup-chips .tpl-chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  selTplById(el.dataset.id);
+}
+
+function selTplById(id){
+  setupDrinks=(TPLS[id]||[]).map(d=>({...d,used:0}));
+  renderSetupItems();
+}
+
+function renderSetupItems(){
+  const el=gid('setup-items');
+  if(!setupDrinks.length){
+    el.innerHTML='<div style="text-align:center;padding:14px;font-size:12px;color:var(--t3);font-family:var(--fm)">No drinks yet — add below</div>';
+    updateSetupSummary();return;
+  }
+  el.innerHTML=setupDrinks.map((d,i)=>{
+    const col=COLORS[d.cat]||'#888';
+    return `<div class="tpl-item">
+      <div style="width:9px;height:9px;border-radius:50%;background:${col};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</div>
+        <div style="font-size:10px;color:var(--t3);font-family:var(--fm)">${d.cat}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="qty-btn" onclick="setupQty(${i},-1)">−</button>
+        <div class="qty-num" id="sqty-${i}">${d.qty}</div>
+        <button class="qty-btn" onclick="setupQty(${i},1)">+</button>
+      </div>
+      <button class="remove-x" onclick="setupRemove(${i})">✕</button>
+    </div>`;
+  }).join('');
+  updateSetupSummary();
+}
+
+function setupQty(i,delta){
+  setupDrinks[i].qty=Math.max(1,setupDrinks[i].qty+delta);
+  const el=gid('sqty-'+i);if(el)el.textContent=setupDrinks[i].qty;
+  updateSetupSummary();
+}
+
+function setupRemove(i){setupDrinks.splice(i,1);renderSetupItems();}
+
+function setupAdd(){
+  const name=gid('sa-name').value.trim();
+  if(!name){toast('Enter drink name');gid('sa-name').focus();return;}
+  const qty=parseInt(gid('sa-qty').value)||1;
+  const cat=gid('sa-cat').value;
+  setupDrinks.push({name,cat,qty,used:0});
+  gid('sa-name').value='';gid('sa-qty').value='1';
+  renderSetupItems();toast('Added!');
+}
+
+function clearSetup(){setupDrinks=[];renderSetupItems();}
+
+function updateSetupSummary(){
+  const el=gid('setup-summary');
+  if(!setupDrinks.length){el.textContent='No drinks added yet.';return;}
+  const total=setupDrinks.reduce((s,d)=>s+d.qty,0);
+  el.innerHTML=setupDrinks.map(d=>`${d.qty}× ${d.name}`).join('<br/>')+'<br/><strong style="color:var(--t1)">Total: '+total+' bottles / cans</strong>';
+}
+
+// ── CONFIRM STOCK ── (NO confirm() dialog - uses inline button only)
+function confirmStock(){
+  if(!setupDrinks.length){toast('Add at least one drink first');return;}
+  curEv.stock=setupDrinks.map(d=>({...d,used:0}));
+  curEv.stock_confirmed=true;
+  curEv.status='live';
+  addLog('Opening stock confirmed — '+setupDrinks.length+' drinks, '+setupDrinks.reduce((s,d)=>s+d.qty,0)+' total bottles');
+  saveToStorage();
+  showPanel();
+  toast('Stock confirmed! Event is now live.');
+}
+
+// ── MAIN PANEL ──
+function showPanel(){
+  showScreen('scr-panel');
+  gid('panel-ev-label').textContent=curEv.event_name;
+  gid('panel-ev-name').textContent=curEv.event_name;
+  gid('panel-ev-meta').textContent=curEv.client_name+' · '+fmtDate(curEv.event_date)+' · '+(curEv.city||'');
+  gid('ev-status').value=curEv.status;
+  renderCards();renderLog();
+}
+
+function renderMetrics(){
+  const tot=curEv.stock.reduce((s,i)=>s+i.qty,0);
+  const used=curEv.stock.reduce((s,i)=>s+(i.used||0),0);
+  gid('bm-given').textContent=tot;gid('bm-used').textContent=used;
+  gid('bm-left').textContent=Math.max(0,tot-used);
+  gid('bm-done').textContent=curEv.stock.filter(i=>getRem(i)===0).length;
+}
+
+function renderCards(){
+  renderMetrics();
+  const el=gid('drink-cards');
+  if(!curEv.stock.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">🍾</div><div class="empty-title">No stock</div></div>';return;}
+  el.innerHTML=curEv.stock.map((item,i)=>{
+    const rem=getRem(item);const st=getSt(item);
+    const pct=Math.round((rem/item.qty)*100);
+    const col=COLORS[item.cat]||'#888';
+    return `<div class="dc ${st}" id="dc-${i}">
+      <div class="dc-top">
+        <div class="dc-dot" style="background:${col}"></div>
+        <div class="dc-info">
+          <div class="dc-name">${item.name}</div>
+          <div class="dc-sub">${item.cat} · used: ${item.used||0} · left: ${rem} of ${item.qty}</div>
+        </div>
+        <div class="dc-rem ${st}">${rem}</div>
+      </div>
+      <div class="dc-prog"><div class="dc-fill ${st}" style="width:${pct}%"></div></div>
+      <div class="dc-btns">
+        <button class="tap minus" onclick="consumeOne(${i})" ${st==='empty'?'disabled style="opacity:.3"':''}>
+          <div class="tap-icon">−</div><div class="tap-lbl">1 consumed</div>
+        </button>
+        <button class="tap" onclick="undoOne(${i})" ${(item.used||0)===0?'disabled style="opacity:.3"':''}>
+          <div class="tap-icon">↩</div><div class="tap-lbl">Undo</div>
+        </button>
+        <button class="tap done-tap" onclick="${st==='empty'?'restoreItem('+i+')':'markAllDone('+i+')'}">
+          <div class="tap-icon">${st==='empty'?'↺':'✓'}</div>
+          <div class="tap-lbl">${st==='empty'?'Restore':'All done'}</div>
+        </button>
+      </div>
+      <div style="padding:6px 14px 10px;border-top:0.5px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:10px;color:var(--t3);font-family:var(--fm)">
+          ${item.restocked?`<span class="restock-badge">+${item.restocked} added mid-event</span>`:''}
+        </div>
+        <button style="background:#c8f56012;border:0.5px solid #c8f56030;border-radius:7px;padding:5px 12px;font-size:11px;color:var(--acc);cursor:pointer;font-family:var(--fh);font-weight:700" onclick="toggleAddBottles(${i})">
+          + Add bottles
+        </button>
+      </div>
+      <div class="add-btl-row" id="abtl-${i}">
+        <div class="add-btl-label">How many extra bottles<br/>did client give?</div>
+        <input class="add-btl-inp" id="abtl-qty-${i}" type="number" min="1" value="1"/>
+        <button class="add-btl-confirm" onclick="addExtraBottles(${i})">Add</button>
+        <button class="add-btl-cancel" onclick="toggleAddBottles(${i})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function flashDc(i){const el=gid('dc-'+i);if(el){el.style.borderColor='var(--acc)';setTimeout(()=>el.style.borderColor='',600);}}
+
+function consumeOne(i){
+  const it=curEv.stock[i];if(!it||getRem(it)===0)return;
+  if(!it.used)it.used=0;it.used++;
+  flashDc(i);renderCards();
+  const rem=getRem(it);const st=getSt(it);
+  let msg=`🍸 *Rebelz Bartending — ${curEv.event_name}*\n\n*Update (${nowTime()}):*\n`;
+  if(st==='empty')msg+=`🔴 *${it.name}* fully consumed — all ${it.qty} done.`;
+  else if(st==='low')msg+=`⚠️ *${it.name}* running low — only *${rem}* left!`;
+  else msg+=`✅ 1 *${it.name}* consumed — *${rem}* remaining.`;
+  addLog(it.name+' — 1 consumed, '+rem+' remaining');
+  addWAMsg(msg);
+}
+
+function undoOne(i){
+  const it=curEv.stock[i];if(!it||!it.used)return;
+  it.used=Math.max(0,it.used-1);flashDc(i);renderCards();addLog('Undo: '+it.name);toast('Undone');
+}
+
+function markAllDone(i){
+  const it=curEv.stock[i];if(!it)return;it.used=it.qty;flashDc(i);renderCards();
+  addWAMsg(`🔴 *${curEv.event_name}* — *${it.name}* fully consumed! All ${it.qty} done. _(${nowTime()})_`);
+  addLog(it.name+' — all done');
+}
+
+function restoreItem(i){
+  const it=curEv.stock[i];if(!it)return;it.used=0;flashDc(i);renderCards();addLog(it.name+' — restored');toast('Restored');
+}
+
+// ── ADD EXTRA BOTTLES MID-EVENT ──
+function toggleAddBottles(i){
+  const row=gid('abtl-'+i);
+  if(!row)return;
+  const isOpen=row.classList.contains('open');
+  // Close all others first
+  document.querySelectorAll('.add-btl-row').forEach(r=>r.classList.remove('open'));
+  if(!isOpen){
+    row.classList.add('open');
+    setTimeout(()=>{const inp=gid('abtl-qty-'+i);if(inp){inp.value='1';inp.focus();}},100);
+  }
+}
+
+function addExtraBottles(i){
+  const it=curEv.stock[i];if(!it)return;
+  const inp=gid('abtl-qty-'+i);
+  const extra=parseInt(inp?inp.value:1)||1;
+  if(extra<1){toast('Enter at least 1');return;}
+  // Add to opening qty so remaining increases
+  it.qty+=extra;
+  if(!it.restocked)it.restocked=0;
+  it.restocked+=extra;
+  // Close the row
+  const row=gid('abtl-'+i);if(row)row.classList.remove('open');
+  flashDc(i);renderCards();
+  const msg=`🍾 *Rebelz Bartending — ${curEv.event_name}*\n\n*Mid-event restock (${nowTime()}):*\n✅ ${extra} extra ${it.cat==='beer'?'cans':'bottle'+(extra>1?'s':'')} of *${it.name}* added by client.\n📦 Total now: ${it.qty} · Remaining: ${getRem(it)}`;
+  addWAMsg(msg);
+  addLog(`${it.name} — ${extra} extra bottle${extra>1?'s':''} added mid-event by client. Total now ${it.qty}`);
+  saveToStorage();
+  toast(`+${extra} ${it.name} added!`);
+}
+
+// ── ADD NEW DRINK MID-EVENT ──
+function addNewDrinkLive(){
+  const name=gid('live-add-name').value.trim();
+  const qty=parseInt(gid('live-add-qty').value)||1;
+  const cat=gid('live-add-cat').value;
+  if(!name){toast('Enter drink name');gid('live-add-name').focus();return;}
+  curEv.stock.push({name,cat,qty,used:0,restocked:0,addedLive:true});
+  gid('live-add-name').value='';
+  gid('live-add-qty').value='1';
+  renderCards();
+  const msg=`🍾 *Rebelz Bartending — ${curEv.event_name}*\n\n*New drink added (${nowTime()}):*\n✅ *${qty}x ${name}* added mid-event by client.`;
+  addWAMsg(msg);
+  addLog(`New drink added live: ${qty}x ${name} (${cat})`);
+  saveToStorage();
+  toast(`${name} added to live stock!`);
+}
+
+function buildSummaryMsg(){
+  const lines=curEv.stock.map(i=>`  • ${i.name}: ${i.used||0} used / ${getRem(i)} remaining`).join('\n');
+  return `🍸 *Rebelz Bartending — ${curEv.event_name}*\n*Update (${nowTime()}):*\n\n${lines}\n\n📊 Total: ${curEv.stock.reduce((s,i)=>s+(i.used||0),0)} consumed · ${curEv.stock.reduce((s,i)=>s+getRem(i),0)} remaining`;
+}
+
+function buildClosingMsg(){
+  const consumed=curEv.stock.filter(i=>(i.used||0)>0).map(i=>`  • ${i.name}: ${i.used} consumed`).join('\n');
+  const leftover=curEv.stock.filter(i=>getRem(i)>0).map(i=>`  • ${i.name}: ${getRem(i)} returned`).join('\n');
+  return `✅ *Rebelz Bartending Services*\n*CLOSING REPORT*\n*${curEv.event_name} — ${fmtDate(curEv.event_date)}*\n\n🥃 *Consumed:*\n${consumed||'  None'}\n\n📦 *Returned/Leftover:*\n${leftover||'  None'}\n\n📊 *Final summary:*\n  Given: ${curEv.stock.reduce((s,i)=>s+i.qty,0)}\n  Consumed: ${curEv.stock.reduce((s,i)=>s+(i.used||0),0)}\n  Returned: ${curEv.stock.reduce((s,i)=>s+getRem(i),0)}\n\n_Verified by Rebelz Bartending Services_\n_Vijayawada · Hyderabad · Vizag_`;
+}
+
+function openWA(msg,phone){window.open('https://wa.me/'+(phone||'').replace(/\D/g,'')+'?text='+encodeURIComponent(msg),'_blank');}
+
+function saveAndNotify(){
+  saveToStorage();
+  const msg=buildSummaryMsg();addWAMsg(msg);
+  addLog('Saved — '+curEv.stock.reduce((s,i)=>s+(i.used||0),0)+' consumed');
+  toast('Saved! Tap WhatsApp to send.');
+}
+
+function sendManualWA(){
+  const msg=buildSummaryMsg();
+  if(curEv.client_wa)openWA(msg,curEv.client_wa);
+  if(curEv.owner_wa)setTimeout(()=>openWA(msg,curEv.owner_wa),700);
+  if(!curEv.client_wa&&!curEv.owner_wa)openWA(msg,'');
+}
+
+function closeEventFn(){
+  curEv.status='closed';gid('ev-status').value='closed';saveToStorage();
+  const msg=buildClosingMsg();addWAMsg(msg);addLog('Event closed — final report sent');
+  if(curEv.client_wa)openWA(msg,curEv.client_wa);
+  if(curEv.owner_wa)setTimeout(()=>openWA(msg,curEv.owner_wa),700);
+  if(!curEv.client_wa&&!curEv.owner_wa)openWA(msg,'');
+  toast('Event closed!');
+}
+
+function changeStatus(val){
+  curEv.status=val;saveToStorage();addLog('Status: '+val);
+  toast(val==='live'?'Event is LIVE!':val==='closed'?'Event closed':'Setting up');
+}
+
+function addWAMsg(msg){
+  waLog.push({msg,time:nowTime()});
+  const feed=gid('wa-feed');
+  gid('wa-empty').style.display='none';
+  const div=document.createElement('div');div.className='wa-msg';
+  div.innerHTML=msg.replace(/\*(.*?)\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>')+'<div class="wa-time">'+nowTime()+'</div>';
+  feed.insertBefore(div,feed.firstChild);
+}
+
+function addLog(msg){
+  if(!curEv.log)curEv.log=[];
+  curEv.log.unshift({msg,time:nowISO()});
+  saveToStorage();renderLog();
+}
+
+function renderLog(){
+  const el=gid('bar-log');
+  if(!curEv||!curEv.log||!curEv.log.length){el.innerHTML='<div style="padding:14px;text-align:center;font-size:12px;color:var(--t3)">No activity yet</div>';return;}
+  el.innerHTML=curEv.log.slice(0,20).map(l=>{
+    const t=new Date(l.time).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="log-item"><span style="color:var(--t2);flex:1">${l.msg}</span><span style="color:var(--t3);font-family:var(--fm);font-size:10px;flex-shrink:0">${t}</span></div>`;
+  }).join('');
+}
+
+function saveToStorage(){
+  // Update EVENTS array with curEv changes
+  const idx=EVENTS.findIndex(e=>e.id===curEv.id);
+  if(idx>=0)EVENTS[idx]=curEv;
+  else EVENTS.unshift(curEv);
+  try{localStorage.setItem('rblz_ev',JSON.stringify(EVENTS));}catch(e){}
+}
+</script>
+</body>
+</html>

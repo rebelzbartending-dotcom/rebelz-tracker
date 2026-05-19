@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Rebelz — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0c0c0a;--s1:#161614;--s2:#202020;--s3:#2a2a28;--b1:#303030;--b2:#3c3c38;--t1:#f2efe8;--t2:#a09c92;--t3:#606058;--acc:#c8f560;--acc2:#a8d840;--amber:#f5a623;--red:#e84040;--wa:#25d366;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh}
+.topbar{background:var(--s1);border-bottom:0.5px solid var(--b1);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{font-family:var(--fh);font-size:17px;font-weight:800;letter-spacing:-.4px}.logo em{color:var(--acc);font-style:normal}
+.topbar-tag{font-size:9px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+.wrap{padding:14px;max-width:600px;margin:0 auto}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:14px;border-radius:10px;font-size:14px;font-family:var(--fh);font-weight:700;cursor:pointer;border:none;width:100%;transition:all .15s;margin-bottom:8px}
+.btn-acc{background:var(--acc);color:#0c0c0a}.btn-acc:active{background:var(--acc2);transform:scale(.97)}
+.btn-ghost{background:transparent;border:0.5px solid var(--b2);color:var(--t2)}.btn-ghost:active{background:var(--s2)}
+.btn-red{background:transparent;border:0.5px solid #e8404045;color:var(--red)}.btn-red:active{background:#e8404015}
+.btn-wa{background:var(--wa);color:#fff;margin-bottom:0}.btn-wa:active{background:#1db954}
+.btn-sm{padding:9px 14px;font-size:12px;width:auto;border-radius:8px;margin-bottom:0}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-family:var(--fm);margin-bottom:5px}
+.inp{width:100%;background:var(--s2);border:0.5px solid var(--b1);border-radius:9px;padding:12px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;-webkit-appearance:none}
+.inp:focus{border-color:var(--acc)}.inp::placeholder{color:var(--t3)}
+select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23606058' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.card{background:var(--s1);border:0.5px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:10px}
+.card-title{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:var(--fm);margin-bottom:13px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.metric{background:var(--s1);border:0.5px solid var(--b1);border-radius:9px;padding:10px 6px;text-align:center}
+.metric-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;font-family:var(--fm);margin-bottom:3px}
+.metric-v{font-family:var(--fh);font-size:22px;font-weight:800}
+.mv-g{color:var(--acc)}.mv-a{color:var(--amber)}.mv-r{color:var(--red)}
+.tpl-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}
+.tpl-chip{padding:7px 13px;border-radius:20px;border:0.5px solid var(--b2);font-size:12px;color:var(--t2);cursor:pointer;background:transparent}
+.tpl-chip.sel{background:var(--acc);color:#0c0c0a;border-color:var(--acc);font-weight:600}
+.ev-card{background:var(--s1);border:0.5px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:8px}
+.ev-card.live{border-color:#c8f56035}
+.spill{font-size:10px;font-family:var(--fm);padding:3px 9px;border-radius:10px}
+.spill-live{background:#c8f56015;color:var(--acc);border:0.5px solid #c8f56030}
+.spill-setup{background:#f5a62315;color:var(--amber);border:0.5px solid #f5a62330}
+.spill-closed{background:var(--s2);color:var(--t3);border:0.5px solid var(--b1)}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;align-items:flex-end}
+.modal-bg.open{display:flex}
+.modal{background:var(--s1);border:0.5px solid var(--b2);border-radius:18px 18px 0 0;padding:18px 16px 40px;width:100%;max-height:94vh;overflow-y:auto}
+.modal-handle{width:38px;height:4px;background:var(--b2);border-radius:2px;margin:0 auto 18px}
+.pin-box{background:var(--s3);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;border:0.5px solid var(--b2)}
+.pin-val{font-family:var(--fh);font-size:28px;font-weight:800;color:var(--acc);letter-spacing:6px}
+.link-box{background:var(--s2);border:0.5px solid var(--b1);border-radius:10px;padding:13px 14px;margin-bottom:10px}
+.link-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--fm);margin-bottom:5px}
+.link-url{font-size:11px;color:var(--acc);font-family:var(--fm);line-height:1.6;margin-bottom:9px;word-break:break-all;background:var(--s3);padding:8px 10px;border-radius:7px}
+.link-btns{display:flex;gap:7px;flex-wrap:wrap}
+.lbtn{padding:7px 14px;border-radius:7px;font-size:12px;cursor:pointer;border:0.5px solid var(--b2);background:transparent;color:var(--t2);font-family:var(--fb)}
+.lbtn:active{background:var(--s3)}
+.lbtn-wa{border-color:#25d36650;color:var(--wa)}
+.lbtn-copy{border-color:var(--b2);color:var(--t1)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--acc);color:#0c0c0a;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--fh);opacity:0;transition:all .2s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty-state{text-align:center;padding:36px 20px;color:var(--t3)}
+.empty-icon{font-size:30px;margin-bottom:10px;opacity:.4}
+.empty-title{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t2);margin-bottom:5px}
+.empty-sub{font-size:12px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><div class="logo">Rebelz<em>.</em></div><div class="topbar-tag">Admin Panel</div></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="btn btn-ghost btn-sm" onclick="exportData()">💾</button>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('imp').click()">📂</button>
+  </div>
+</div>
+<input type="file" id="imp" accept=".json" style="display:none" onchange="importData(this)"/>
+
+<div class="wrap">
+  <div class="metrics">
+    <div class="metric"><div class="metric-l">Total</div><div class="metric-v" id="st-total">0</div></div>
+    <div class="metric"><div class="metric-l">Live</div><div class="metric-v mv-g" id="st-live">0</div></div>
+    <div class="metric"><div class="metric-l">Done</div><div class="metric-v" id="st-done">0</div></div>
+    <div class="metric"><div class="metric-l">Setup</div><div class="metric-v mv-a" id="st-setup">0</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Create new event</div>
+    <div class="field"><label>Client name *</label><input class="inp" id="f-client" placeholder="e.g. Sharma Family"/></div>
+    <div class="field"><label>Event name *</label><input class="inp" id="f-event" placeholder="e.g. Wedding Reception"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field"><label>Date *</label><input class="inp" id="f-date" type="date"/></div>
+      <div class="field"><label>City</label><select class="inp" id="f-city"><option>Vijayawada</option><option>Hyderabad</option><option>Vizag</option></select></div>
+    </div>
+    <div class="field"><label>Venue</label><input class="inp" id="f-venue" placeholder="e.g. Hotel Vijay Grand"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field"><label>Client WhatsApp</label><input class="inp" id="f-cwa" type="tel" placeholder="+91 98765 43210"/></div>
+      <div class="field"><label>Your WhatsApp</label><input class="inp" id="f-owa" type="tel" placeholder="+91 XXXXX XXXXX"/></div>
+    </div>
+    <div class="field"><label>Bartender PIN (4–6 digits)</label><input class="inp" id="f-pin" type="number" placeholder="e.g. 2580"/></div>
+    <div style="height:12px"></div>
+    <button class="btn btn-acc" onclick="createNewEvent()">Create event + generate links</button>
+    <button class="btn btn-ghost" style="font-size:13px;padding:11px" onclick="clearForm()">Clear form</button>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:var(--fm)" id="admin-count">0 events</div>
+  </div>
+  <div id="event-list"></div>
+  <div style="height:20px"></div>
+</div>
+
+<!-- LINKS MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="font-family:var(--fh);font-size:20px;font-weight:800;margin-bottom:4px">Event created ✓</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:18px" id="modal-sub">Links are ready to share</div>
+    <div class="pin-box">
+      <div><div style="font-size:10px;color:var(--t3);font-family:var(--fm)">Bartender PIN</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Share with your team only</div></div>
+      <div class="pin-val" id="modal-pin">----</div>
+    </div>
+    <!-- BARTENDER LINK -->
+    <div class="link-box">
+      <div class="link-lbl">🍸 Bartender link — send to your bartender</div>
+      <div class="link-url" id="modal-bar-url">—</div>
+      <div class="link-btns">
+        <button class="lbtn lbtn-copy" onclick="copyLink('bar')">Copy link</button>
+        <button class="lbtn lbtn-wa" onclick="waShare('bar')">Send on WhatsApp</button>
+      </div>
+    </div>
+    <!-- CUSTOMER LINK -->
+    <div class="link-box">
+      <div class="link-lbl">👁 Customer link — send to client</div>
+      <div class="link-url" id="modal-cust-url">—</div>
+      <div class="link-btns">
+        <button class="lbtn lbtn-copy" onclick="copyLink('cust')">Copy link</button>
+        <button class="lbtn lbtn-wa" onclick="waShare('cust')">Send on WhatsApp</button>
+      </div>
+    </div>
+    <div style="background:var(--s2);border-radius:9px;padding:11px 13px;font-size:11px;color:var(--t3);font-family:var(--fm);line-height:1.7;margin-bottom:16px">
+      Bartender opens their link → enters PIN → sets stock → tracks live<br/>
+      Client opens their link → sees live dashboard immediately
+    </div>
+    <button class="btn btn-acc" onclick="closeModal()">Done</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TPLS={
+  wedding:[{name:'Royal Stag Whiskey',cat:'whiskey',qty:3},{name:'Bombay Sapphire Gin',cat:'gin',qty:4},{name:'Absolut Vodka',cat:'vodka',qty:2},{name:'Kingfisher Beer',cat:'beer',qty:32},{name:'Sula Red Wine',cat:'wine',qty:4},{name:'Old Monk Rum',cat:'rum',qty:2}],
+  corporate:[{name:'Johnnie Walker Black',cat:'whiskey',qty:4},{name:'Hendricks Gin',cat:'gin',qty:2},{name:'Grey Goose Vodka',cat:'vodka',qty:2},{name:'Corona Beer',cat:'beer',qty:24},{name:'Prosecco',cat:'wine',qty:3}],
+  birthday:[{name:'Jack Daniels',cat:'whiskey',qty:2},{name:"Gordon's Gin",cat:'gin',qty:2},{name:'Magic Moments Vodka',cat:'vodka',qty:3},{name:'Budweiser Beer',cat:'beer',qty:48}],
+  cocktail:[{name:'Bacardi White Rum',cat:'rum',qty:4},{name:'Absolut Vodka',cat:'vodka',qty:3},{name:'Bombay Sapphire Gin',cat:'gin',qty:3},{name:'Cointreau',cat:'other',qty:2},{name:'Kingfisher Beer',cat:'beer',qty:20}],
+  sangeet:[{name:'Royal Stag Whiskey',cat:'whiskey',qty:5},{name:'Kingfisher Beer',cat:'beer',qty:48},{name:'Magic Moments Vodka',cat:'vodka',qty:3},{name:'Old Monk Rum',cat:'rum',qty:2},{name:'Sula Wine',cat:'wine',qty:6}],
+  blank:[]
+};
+
+let EVENTS=[];
+let modalEv=null;
+let selTplId='wedding';
+
+function gid(id){return document.getElementById(id);}
+function toast(msg,dur=2400){const t=gid('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';}catch(e){return d||'—';}}
+function genId(c){return 'EVT-'+c.replace(/\s+/g,'-').toUpperCase().replace(/[^A-Z0-9-]/g,'').slice(0,8)+'-'+Date.now().toString().slice(-4);}
+function nowISO(){return new Date().toISOString();}
+function tryAutoSave(){try{localStorage.setItem('rblz_ev',JSON.stringify(EVENTS));}catch(e){}}
+
+function baseUrl(){
+  // Get current page URL base (works both local and hosted)
+  const url=window.location.href;
+  return url.replace(/admin\.html.*/,'');
+}
+
+function barLink(evId){return baseUrl()+'bartender.html?ev='+evId;}
+function custLink(evId){return baseUrl()+'customer.html?ev='+evId;}
+
+function copyText(txt){
+  try{navigator.clipboard.writeText(txt);}
+  catch(e){const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+  toast('Copied!');
+}
+function copyLink(type){copyText(type==='bar'?gid('modal-bar-url').textContent:gid('modal-cust-url').textContent);}
+
+function waShare(type){
+  if(!modalEv)return;
+  let msg,phone;
+  if(type==='bar'){
+    const url=gid('modal-bar-url').textContent;
+    msg=`*Bartender Details — ${modalEv.event_name}*\n\nClient: ${modalEv.client_name}\nDate: ${fmtDate(modalEv.event_date)}\nVenue: ${modalEv.venue||'—'}\n\n*PIN:* ${modalEv.bartender_pin}\n\n*Your link (tap to open):*\n${url}\n\nOpen the link → enter PIN → set stock → start tracking.\n\n_Rebelz Bartending Services_`;
+    phone=(modalEv.owner_wa||'').replace(/\D/g,'');
+  } else {
+    const url=gid('modal-cust-url').textContent;
+    msg=`Hello,\n\nYour *live alcohol tracker* for *${modalEv.event_name}* is ready!\n\nTap this link to view your bottles in real time:\n${url}\n\n_Rebelz Bartending Services_\nVijayawada · Hyderabad · Vizag`;
+    phone=(modalEv.client_wa||'').replace(/\D/g,'');
+  }
+  window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+function clearForm(){
+  ['f-client','f-event','f-date','f-venue','f-cwa','f-owa','f-pin'].forEach(id=>{const e=gid(id);if(e)e.value='';});
+  gid('f-date').value=new Date().toISOString().split('T')[0];
+}
+
+function createNewEvent(){
+  const client=gid('f-client').value.trim();
+  const evName=gid('f-event').value.trim();
+  const date=gid('f-date').value;
+  if(!client){toast('Enter client name');gid('f-client').focus();return;}
+  if(!evName){toast('Enter event name');gid('f-event').focus();return;}
+  if(!date){toast('Select a date');return;}
+  const pin=(gid('f-pin').value.trim()||'2580').toString();
+  const ev={
+    id:genId(client),
+    client_name:client,event_name:evName,event_date:date,
+    venue:gid('f-venue').value.trim(),city:gid('f-city').value,
+    bartender_pin:pin,
+    client_wa:gid('f-cwa').value.trim(),
+    owner_wa:gid('f-owa').value.trim(),
+    status:'setup',
+    stock:[],
+    stock_confirmed:false,
+    log:[{msg:'Event created',time:nowISO()}],
+    created_at:nowISO()
+  };
+  EVENTS.unshift(ev);
+  tryAutoSave();
+  renderList();updateStats();
+  showModal(ev);clearForm();
+  toast('Event created!');
+}
+
+function showModal(ev){
+  modalEv=ev;
+  gid('modal-sub').textContent=ev.event_name+' · '+ev.client_name;
+  gid('modal-pin').textContent=ev.bartender_pin;
+  gid('modal-bar-url').textContent=barLink(ev.id);
+  gid('modal-cust-url').textContent=custLink(ev.id);
+  gid('modal').classList.add('open');
+}
+
+function showModalById(id){const ev=EVENTS.find(e=>e.id===id);if(ev)showModal(ev);}
+function closeModal(){gid('modal').classList.remove('open');}
+
+function deleteEvt(id){
+  if(!confirm('Delete this event?'))return;
+  EVENTS=EVENTS.filter(e=>e.id!==id);
+  tryAutoSave();renderList();updateStats();toast('Deleted');
+}
+
+function renderList(){
+  const el=gid('event-list');
+  gid('admin-count').textContent=EVENTS.length+' event'+(EVENTS.length!==1?'s':'');
+  if(!EVENTS.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">🍸</div><div class="empty-title">No events yet</div><div class="empty-sub">Fill the form above and tap Create</div></div>';
+    return;
+  }
+  el.innerHTML=EVENTS.map(ev=>{
+    const tot=ev.stock.reduce((s,i)=>s+i.qty,0);
+    const used=ev.stock.reduce((s,i)=>s+(i.used||0),0);
+    return `<div class="ev-card ${ev.status==='live'?'live':''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+        <div style="min-width:0">
+          <div style="font-family:var(--fh);font-size:15px;font-weight:800;margin-bottom:3px">${ev.event_name}</div>
+          <div style="font-size:11px;color:var(--t3);font-family:var(--fm);line-height:1.7">${ev.client_name} · ${fmtDate(ev.event_date)}<br>${ev.city||''}${ev.venue?' · '+ev.venue:''}</div>
+        </div>
+        <div class="spill spill-${ev.status}" style="flex-shrink:0">${ev.status==='setup'?'Setup':ev.status==='live'?'Live':'Closed'}</div>
+      </div>
+      <div style="font-size:11px;font-family:var(--fm);margin-bottom:10px;color:${ev.stock_confirmed?'var(--t3)':'var(--amber)'}">
+        ${ev.stock_confirmed?tot+' bottles · '+used+' consumed':'⚠ Bartender yet to set stock'} · PIN: ${ev.bartender_pin}
+      </div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="showModalById('${ev.id}')">Links</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyText(barLink('${ev.id}'))">Copy bartender link</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyText(custLink('${ev.id}'))">Copy client link</button>
+        <button class="btn btn-red btn-sm" onclick="deleteEvt('${ev.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStats(){
+  gid('st-total').textContent=EVENTS.length;
+  gid('st-live').textContent=EVENTS.filter(e=>e.status==='live').length;
+  gid('st-done').textContent=EVENTS.filter(e=>e.status==='closed').length;
+  gid('st-setup').textContent=EVENTS.filter(e=>e.status==='setup').length;
+}
+
+function exportData(){
+  const json=JSON.stringify({events:EVENTS,exported:nowISO()},null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='rebelz-backup-'+Date.now()+'.json';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+  toast('Backup saved!');
+}
+
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.events&&Array.isArray(d.events)){EVENTS=d.events;tryAutoSave();renderList();updateStats();toast('Loaded — '+EVENTS.length+' events');}
+      else toast('Invalid backup file');
+    }catch(err){toast('Could not read file');}
+  };
+  r.readAsText(file);input.value='';
+}
+
+// Share data with bartender.html and customer.html via localStorage
+function syncToOtherPages(){tryAutoSave();}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  try{const s=localStorage.getItem('rblz_ev');if(s){EVENTS=JSON.parse(s);}}catch(e){}
+  renderList();updateStats();
+  gid('f-date').value=new Date().toISOString().split('T')[0];
+  // Listen for changes from bartender page
+  window.addEventListener('storage',e=>{
+    if(e.key==='rblz_ev'){try{EVENTS=JSON.parse(e.newValue)||[];}catch(er){}renderList();updateStats();}
+  });
+});
+</script>
+</body>
+</html>
