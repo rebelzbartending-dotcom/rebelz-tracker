@@ -4,269 +4,293 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>Rebelz — Live Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
-  --gold:#c8a020;--gold2:#f5c842;--acc:#c8f560;
-  --grn:#1a6035;--amb:#7a4e00;--red:#7a1818;
+  --bg:#080806;--s1:#0f0f0c;--s2:#161612;--s3:#1e1e18;
+  --b1:#2a2a22;--b2:#383830;
+  --t1:#f5f0e8;--t2:#b8b0a0;--t3:#706858;--t4:#454038;
+  --gold:#c8981e;--gold2:#e8b830;--gold3:#f5d060;--gold-dim:#c8981e40;
+  --grn:#40c870;--amb:#f5a020;--red:#e84040;
+  --fh:'Cormorant Garamond',serif;--fb:'Outfit',sans-serif;--fm:'DM Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:#0e0e0c;color:#f2efe8;font-family:var(--fb);font-size:14px;min-height:100vh}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh;overflow-x:hidden}
 
-/* ── HERO HEADER ── */
-.hero{background:linear-gradient(160deg,#1a1400 0%,#0e0e0c 40%,#0a1a0a 100%);border-bottom:1px solid #c8a02030;padding:20px 16px 0;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:300px;height:300px;background:radial-gradient(circle,#c8a02018 0%,transparent 70%);pointer-events:none}
-.logo-wrap{position:relative;display:inline-block;margin-bottom:10px}
-.logo-img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);box-shadow:0 0 24px #c8a02060,0 0 60px #c8a02020}
-.logo-ring{position:absolute;inset:-6px;border-radius:50%;border:1px dashed #c8a02040;animation:spin 12s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.hero-brand{font-family:var(--fh);font-size:22px;font-weight:800;color:#f5f2ec;margin-bottom:4px}
+/* NOISE */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+
+/* HERO */
+.hero{background:linear-gradient(160deg,#1a1200 0%,#0f0c00 30%,#080806 70%,#060a06 100%);border-bottom:1px solid var(--b1);padding:24px 16px 0;text-align:center;position:relative;overflow:hidden;z-index:1}
+.hero::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:400px;height:400px;background:radial-gradient(circle,#c8981e12 0%,transparent 65%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+
+/* LOGO */
+.logo-stage{position:relative;display:inline-block;margin-bottom:14px}
+.logo-img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);box-shadow:0 0 30px #c8981e50,0 0 80px #c8981e18;position:relative;z-index:2}
+.logo-ring1{position:absolute;inset:-8px;border-radius:50%;border:1px dashed #c8981e40;animation:spin1 15s linear infinite}
+.logo-ring2{position:absolute;inset:-16px;border-radius:50%;border:0.5px dashed #c8981e20;animation:spin1 25s linear infinite reverse}
+@keyframes spin1{to{transform:rotate(360deg)}}
+
+.hero-brand{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--t1);margin-bottom:5px;letter-spacing:.02em}
 .hero-brand span{color:var(--gold2)}
-.hero-tag{font-size:10px;color:var(--gold);font-family:var(--fm);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
-.hero-ev-wrap{background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;margin-bottom:0;text-align:left}
-.hero-ev-label{font-size:9px;color:rgba(245,242,236,.3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
-.hero-ev-name{font-family:var(--fh);font-size:19px;font-weight:800;color:#f5f2ec;line-height:1.15;margin-bottom:3px}
-.hero-ev-meta{font-size:11px;color:rgba(245,242,236,.4);font-family:var(--fm)}
+.hero-tag{font-size:9px;color:var(--gold);font-family:var(--fm);letter-spacing:.18em;text-transform:uppercase;margin-bottom:16px}
 
 /* STATUS CHIPS */
-.chip-live{display:inline-flex;align-items:center;gap:5px;background:#c8f56018;border:0.5px solid #c8f56040;border-radius:20px;padding:4px 12px}
-.chip-dot{width:6px;height:6px;border-radius:50%;background:#c8f560;animation:blink 1.4s infinite}
-.chip-txt{font-size:10px;color:#c8f560;font-family:var(--fm);font-weight:500}
-.chip-setup{display:inline-flex;align-items:center;gap:5px;background:#f5a62318;border:0.5px solid #f5a62340;border-radius:20px;padding:4px 12px}
-.chip-setup-dot{width:6px;height:6px;border-radius:50%;background:#f5a623}
-.chip-setup-txt{font-size:10px;color:#f5a623;font-family:var(--fm)}
-.chip-closed{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:0.5px solid rgba(255,255,255,.12);border-radius:20px;padding:4px 12px}
-.chip-closed-txt{font-size:10px;color:rgba(245,242,236,.4);font-family:var(--fm)}
+.chip-live{display:inline-flex;align-items:center;gap:6px;background:#c8981e18;border:0.5px solid var(--gold-dim);border-radius:20px;padding:5px 14px;margin-bottom:16px}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--gold2);animation:blink 1.4s infinite}
+.chip-txt{font-size:10px;color:var(--gold2);font-family:var(--fm);letter-spacing:.06em}
+.chip-setup{display:inline-flex;align-items:center;gap:6px;background:#f5a02018;border:0.5px solid #f5a02035;border-radius:20px;padding:5px 14px;margin-bottom:16px}
+.chip-setup-dot{width:6px;height:6px;border-radius:50%;background:var(--amb)}
+.chip-setup-txt{font-size:10px;color:var(--amb);font-family:var(--fm)}
+.chip-closed{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 14px;margin-bottom:16px}
+.chip-closed-txt{font-size:10px;color:var(--t3);font-family:var(--fm)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* STATS BAR */
-.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#c8a02018;margin-top:14px;border-top:0.5px solid #c8a02025}
-.stat{padding:13px 6px;background:#0e0e0c;text-align:center}
-.stat-l{font-size:9px;color:rgba(245,242,236,.28);text-transform:uppercase;letter-spacing:.06em;font-family:var(--fm);margin-bottom:3px}
-.stat-v{font-family:var(--fh);font-size:22px;font-weight:800;color:#f5f2ec}
+/* EVENT INFO */
+.ev-info-box{background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:16px;padding:14px;text-align:left;margin-bottom:0}
+.ev-info-label{font-size:8px;color:rgba(245,240,232,.3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px}
+.ev-info-name{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--t1);line-height:1.15;margin-bottom:4px}
+.ev-info-meta{font-size:10px;color:rgba(245,240,232,.4);font-family:var(--fm);line-height:1.6}
+
+/* STATS */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#c8981e15;border-top:0.5px solid #c8981e20}
+.stat{padding:14px 6px;background:var(--bg);text-align:center}
+.stat-l{font-size:8px;color:rgba(245,240,232,.25);text-transform:uppercase;letter-spacing:.08em;font-family:var(--fm);margin-bottom:4px}
+.stat-v{font-family:var(--fh);font-size:24px;font-weight:700;color:var(--t1)}
 .stat-v.hi{color:var(--gold2)}
 
-/* MAIN CONTENT */
-.main{padding:14px;max-width:600px;margin:0 auto}
-.sec-lbl{font-size:10px;font-weight:700;color:#706860;text-transform:uppercase;letter-spacing:.07em;font-family:var(--fm);margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.sec-lbl::after{content:'';flex:1;height:.5px;background:#2a2820}
+/* MAIN */
+.main{padding:16px;max-width:600px;margin:0 auto;position:relative;z-index:1}
+
+.sec-lbl{font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec-lbl::after{content:'';flex:1;height:.5px;background:linear-gradient(90deg,var(--b2),transparent)}
 
 /* BOTTLE CARDS */
-.bc{background:#161412;border:0.5px solid #2a2820;border-radius:14px;padding:14px;margin-bottom:8px;position:relative;overflow:hidden}
+.bc{background:var(--s1);border:0.5px solid var(--b1);border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden}
 .bc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.bc.ok::before{background:linear-gradient(90deg,#1a6035,#c8f560)}
-.bc.low::before{background:linear-gradient(90deg,#7a4e00,#f5a623)}
-.bc.empty::before{background:linear-gradient(90deg,#7a1818,#e84040)}
+.bc.ok::before{background:linear-gradient(90deg,#1a5028,var(--grn))}
+.bc.low::before{background:linear-gradient(90deg,#5a3800,var(--amb))}
+.bc.empty::before{background:linear-gradient(90deg,#5a1010,var(--red))}
 .bc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.bc-left{display:flex;align-items:center;gap:9px}
-.bc-dot{width:10px;height:10px;border-radius:50%}
-.bc-name{font-size:14px;font-weight:500;color:#f2efe8}
-.bc-rem{font-family:var(--fh);font-size:28px;font-weight:800}
-.bc-rem.ok{color:#4dd886}.bc-rem.low{color:#f5a623}.bc-rem.empty{color:#e84040}
-.bc-rem-l{font-size:9px;color:#606058;font-family:var(--fm);text-align:right}
-.bc-bottles{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px}
-.btl{width:13px;height:26px;border-radius:3px 3px 4px 4px;transition:background .5s}
-.bc-prog{height:5px;background:#2a2820;border-radius:3px;margin-bottom:7px}
-.bc-fill{height:5px;border-radius:3px;transition:width .6s ease}
-.bc-fill.ok{background:linear-gradient(90deg,#1a6035,#4dd886)}
-.bc-fill.low{background:linear-gradient(90deg,#7a4e00,#f5a623)}
-.bc-fill.empty{background:#e84040}
-.bc-nums{display:flex;justify-content:space-between;font-size:10px;font-family:var(--fm);color:#606058}
+.bc-left{display:flex;align-items:center;gap:10px}
+.bc-dot{width:11px;height:11px;border-radius:50%}
+.bc-name{font-size:15px;font-weight:500;color:var(--t1)}
+.bc-rem{font-family:var(--fh);font-size:32px;font-weight:700}
+.bc-rem.ok{color:var(--grn)}.bc-rem.low{color:var(--amb)}.bc-rem.empty{color:var(--red)}
+.bc-rem-l{font-size:9px;color:var(--t3);font-family:var(--fm);text-align:right;margin-top:2px}
+.bc-bottles{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:10px}
+.btl{width:13px;height:26px;border-radius:3px 3px 4px 4px}
+.bc-prog{height:5px;background:var(--s3);border-radius:3px;margin-bottom:8px;overflow:hidden}
+.bc-fill{height:5px;border-radius:3px;transition:width .8s ease}
+.bc-fill.ok{background:linear-gradient(90deg,#1a5028,var(--grn))}
+.bc-fill.low{background:linear-gradient(90deg,#5a3800,var(--amb))}
+.bc-fill.empty{background:var(--red)}
+.bc-nums{display:flex;justify-content:space-between;font-size:10px;font-family:var(--fm);color:var(--t3)}
 
 /* TIMELINE */
-.tl-card{background:#161412;border:0.5px solid #2a2820;border-radius:14px;overflow:hidden;margin-bottom:10px}
-.tl-item{display:flex;gap:10px;padding:11px 14px;border-bottom:.5px solid #1e1c18;align-items:flex-start}
+.tl-wrap{background:var(--s1);border:0.5px solid var(--b1);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.tl-item{display:flex;gap:12px;padding:11px 16px;border-bottom:.5px solid var(--s2);align-items:flex-start}
 .tl-item:last-child{border-bottom:none}
 .tl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.tl-dot.ok{background:#4dd886}.tl-dot.low{background:#f5a623}.tl-dot.empty{background:#e84040}.tl-dot.info{background:#606058}
-.tl-msg{font-size:12px;flex:1;line-height:1.5;color:#a09c92}
-.tl-time{font-size:10px;color:#606058;font-family:var(--fm);white-space:nowrap}
+.tl-dot.ok{background:var(--grn)}.tl-dot.low{background:var(--amb)}.tl-dot.empty{background:var(--red)}.tl-dot.info{background:var(--t3)}
+.tl-msg{font-size:12px;flex:1;line-height:1.6;color:var(--t2)}
+.tl-time{font-size:9px;color:var(--t3);font-family:var(--fm);white-space:nowrap}
 
 /* NOTICES */
-.setup-notice{background:#fef4e010;border:0.5px solid #f5a62330;border-radius:12px;padding:14px 16px;text-align:center;margin-bottom:12px}
-.close-banner{background:linear-gradient(135deg,#1a4020,#0a2a10);border:0.5px solid #4dd88640;border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.close-icon{width:44px;height:44px;border-radius:50%;background:#4dd88620;border:1px solid #4dd88640;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.setup-notice{background:#f5a02010;border:0.5px solid #f5a02030;border-radius:14px;padding:16px;text-align:center;margin-bottom:14px}
+.close-banner{background:linear-gradient(135deg,#0a1e0e,#122010);border:0.5px solid #40c87040;border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.close-icon{width:48px;height:48px;border-radius:50%;background:#40c87018;border:1px solid #40c87040;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 
-/* ── FEEDBACK FORM ── */
-.fb-section{background:linear-gradient(160deg,#1a1400,#0e0e0c);border:1px solid #c8a02030;border-radius:16px;padding:20px 16px;margin-bottom:14px;position:relative;overflow:hidden}
-.fb-section::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,#c8a02015 0%,transparent 70%)}
-.fb-title{font-family:var(--fh);font-size:18px;font-weight:800;color:var(--gold2);margin-bottom:4px}
-.fb-sub{font-size:12px;color:#a09c92;margin-bottom:18px;line-height:1.6}
-.fb-q{font-size:11px;font-weight:700;color:#c8a020;text-transform:uppercase;letter-spacing:.06em;font-family:var(--fm);margin-bottom:8px}
-.stars{display:flex;gap:8px;margin-bottom:16px}
-.star{font-size:32px;cursor:pointer;opacity:.3;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.star.active{opacity:1;transform:scale(1.1)}
-.fb-inp{width:100%;background:#1a1814;border:0.5px solid #3a3630;border-radius:10px;padding:12px 14px;color:#f2efe8;font-size:14px;font-family:var(--fb);outline:none;resize:none;-webkit-appearance:none;margin-bottom:12px}
-.fb-inp:focus{border-color:#c8a020}
-.fb-inp::placeholder{color:#505048}
-.fb-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
-.fb-tag{padding:7px 14px;border-radius:20px;border:0.5px solid #3a3630;font-size:12px;color:#a09c92;cursor:pointer;background:transparent;transition:all .15s}
-.fb-tag.sel{background:#c8a02020;border-color:#c8a020;color:var(--gold2);font-weight:600}
-.fb-submit{width:100%;padding:15px;border-radius:12px;background:linear-gradient(135deg,#c8a020,#f5c842);color:#0e0e0c;font-family:var(--fh);font-size:15px;font-weight:800;border:none;cursor:pointer;letter-spacing:.02em}
+/* FEEDBACK FORM */
+.fb-wrap{background:linear-gradient(160deg,#1a1200,#0f0c00,#080806);border:1px solid var(--gold-dim);border-radius:18px;padding:22px 18px;margin-bottom:16px;position:relative;overflow:hidden}
+.fb-wrap::before{content:'';position:absolute;top:-50px;right:-50px;width:150px;height:150px;background:radial-gradient(circle,#c8981e12 0%,transparent 70%)}
+.fb-wrap::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.fb-title{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--gold2);margin-bottom:5px}
+.fb-sub{font-size:12px;color:var(--t2);margin-bottom:22px;line-height:1.7}
+.fb-q{font-size:9px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:10px}
+.stars{display:flex;gap:10px;margin-bottom:18px}
+.star{font-size:34px;cursor:pointer;opacity:.25;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none}
+.star.on{opacity:1;transform:scale(1.1)}
+.fb-inp{width:100%;background:#161612;border:0.5px solid var(--b2);border-radius:12px;padding:13px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;resize:none;-webkit-appearance:none;margin-bottom:12px;transition:border-color .2s}
+.fb-inp:focus{border-color:var(--gold)}
+.fb-inp::placeholder{color:var(--t4)}
+.fb-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+.fb-tag{padding:8px 14px;border-radius:20px;border:0.5px solid var(--b2);font-size:11px;color:var(--t2);cursor:pointer;background:transparent;transition:all .15s;font-family:var(--fb)}
+.fb-tag.on{background:#c8981e18;border-color:var(--gold-dim);color:var(--gold2);font-weight:600}
+.book-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.book-btn{padding:13px;border-radius:12px;border:0.5px solid var(--b2);background:transparent;color:var(--t2);font-size:13px;font-family:var(--fb);cursor:pointer;text-align:center;transition:all .15s}
+.book-btn.yes.on{background:#40c87018;border-color:#40c87040;color:var(--grn)}
+.book-btn.no.on{background:#e8404018;border-color:#e8404040;color:var(--red)}
+.fb-submit{width:100%;padding:16px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;font-family:var(--fb);font-size:15px;font-weight:700;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 8px 24px var(--gold-dim)}
 .fb-submit:active{transform:scale(.97)}
-.fb-done{text-align:center;padding:20px}
-.fb-done-icon{font-size:48px;margin-bottom:12px}
-.fb-done-title{font-family:var(--fh);font-size:20px;font-weight:800;color:var(--gold2);margin-bottom:6px}
-.fb-done-sub{font-size:13px;color:#a09c92;line-height:1.6}
+.fb-done{text-align:center;padding:24px 16px}
+.fb-done-icon{font-size:56px;margin-bottom:16px}
+.fb-done-title{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--gold2);margin-bottom:8px}
+.fb-done-sub{font-size:13px;color:var(--t2);line-height:1.8}
 
 /* FOOTER */
-.footer{text-align:center;padding:20px 14px 36px;border-top:.5px solid #2a2820;margin-top:4px}
-.footer-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #c8a02040;margin-bottom:8px}
-.footer-brand{font-family:var(--fh);font-size:13px;font-weight:800;color:#706860;margin-bottom:3px}
-.footer-tag{font-size:10px;color:#c8a020;font-family:var(--fm);letter-spacing:.1em;margin-bottom:4px}
-.footer-sub{font-size:10px;color:#505048;font-family:var(--fm)}
+.footer{text-align:center;padding:24px 16px 40px;border-top:.5px solid var(--b1);margin-top:4px}
+.footer-logo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid var(--gold-dim);margin-bottom:10px}
+.footer-brand{font-family:var(--fh);font-size:15px;font-weight:600;color:var(--t3);margin-bottom:4px}
+.footer-tag{font-size:9px;color:var(--gold);font-family:var(--fm);letter-spacing:.14em;margin-bottom:6px}
+.footer-sub{font-size:9px;color:var(--t4);font-family:var(--fm)}
 
 /* ERROR / LOADING */
-.error-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:#0e0e0c}
+.full-center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--bg);position:relative;z-index:1}
+@keyframes glow{0%,100%{box-shadow:0 0 30px #c8981e50}50%{box-shadow:0 0 60px #c8981e80}}
 </style>
 </head>
 <body>
 
 <!-- ERROR -->
-<div id="error-view" style="display:none">
-  <div class="error-wrap">
+<div id="v-error" style="display:none">
+  <div class="full-center">
     <div>
-      <img src="rebelz%20bartending%20logo.png" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #c8a020;margin-bottom:16px"/>
-      <div style="font-family:var(--fh);font-size:18px;font-weight:800;margin-bottom:8px;color:#f2efe8">Invalid link</div>
-      <div style="font-size:13px;color:#706860;line-height:1.6">This link is not valid.<br/>Ask Rebelz Bartending team for your tracker link.</div>
+      <img src="rebelz%20bartending%20logo.png" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);margin-bottom:18px"/>
+      <div style="font-family:var(--fh);font-size:22px;font-weight:700;margin-bottom:8px;color:var(--t1)">Invalid Link</div>
+      <div style="font-size:13px;color:var(--t3);line-height:1.7">This link is not valid.<br/>Ask Rebelz Bartending team for your tracker link.</div>
     </div>
   </div>
 </div>
 
 <!-- LOADING -->
-<div id="loading-view" style="display:flex;min-height:100vh;align-items:center;justify-content:center;background:#0e0e0c">
-  <div style="text-align:center">
-    <img src="rebelz%20bartending%20logo.png" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #c8a020;box-shadow:0 0 24px #c8a02040;margin-bottom:14px;animation:pulse 2s infinite"/>
-    <style>@keyframes pulse{0%,100%{box-shadow:0 0 24px #c8a02040}50%{box-shadow:0 0 40px #c8a02080}}</style>
-    <div style="font-family:var(--fh);font-size:16px;font-weight:800;color:#f2efe8">Loading your tracker...</div>
-    <div style="font-size:10px;color:#c8a020;font-family:'DM Mono',monospace;margin-top:6px;letter-spacing:.1em">REBELZ BARTENDING SERVICES</div>
+<div id="v-loading" style="display:flex">
+  <div class="full-center">
+    <div>
+      <img src="rebelz%20bartending%20logo.png" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);animation:glow 2s infinite;margin-bottom:16px"/>
+      <div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--t1);margin-bottom:6px">Loading your tracker...</div>
+      <div style="font-size:9px;color:var(--gold);font-family:var(--fm);letter-spacing:.15em">REBELZ BARTENDING SERVICES</div>
+    </div>
   </div>
 </div>
 
-<!-- MAIN VIEW -->
-<div id="main-view" style="display:none">
+<!-- MAIN -->
+<div id="v-main" style="display:none">
 
-  <!-- HERO HEADER -->
+  <!-- HERO -->
   <div class="hero">
-    <div class="logo-wrap">
+    <div class="logo-stage">
       <img src="rebelz%20bartending%20logo.png" class="logo-img"/>
-      <div class="logo-ring"></div>
+      <div class="logo-ring1"></div>
+      <div class="logo-ring2"></div>
     </div>
     <div class="hero-brand">Rebelz <span>Bartending</span> Services</div>
     <div class="hero-tag">✦ Think of Party, Think of Us ✦</div>
-    <div style="display:flex;justify-content:center;margin-bottom:14px">
-      <div id="cust-chip"></div>
-    </div>
-    <div class="hero-ev-wrap">
-      <div class="hero-ev-label">Your alcohol tracker</div>
-      <div class="hero-ev-name" id="c-evname">—</div>
-      <div class="hero-ev-meta" id="c-evmeta">—</div>
+    <div id="c-chip"></div>
+    <div class="ev-info-box">
+      <div class="ev-info-label">Your Live Alcohol Tracker</div>
+      <div class="ev-info-name" id="c-evname">—</div>
+      <div class="ev-info-meta" id="c-evmeta">—</div>
     </div>
     <div class="stats-bar">
       <div class="stat"><div class="stat-l">Given</div><div class="stat-v" id="c-given">—</div></div>
       <div class="stat"><div class="stat-l">Used</div><div class="stat-v" id="c-used">—</div></div>
       <div class="stat"><div class="stat-l">Left</div><div class="stat-v hi" id="c-left">—</div></div>
-      <div class="stat"><div class="stat-l">Updated</div><div class="stat-v" style="font-size:11px;padding-top:5px" id="c-time">—</div></div>
+      <div class="stat"><div class="stat-l">Updated</div><div class="stat-v" style="font-size:11px;padding-top:6px" id="c-time">—</div></div>
     </div>
   </div>
 
   <div class="main">
 
     <!-- Setup notice -->
-    <div id="c-setup-notice" style="display:none" class="setup-notice">
-      <div style="font-size:14px;font-weight:500;color:#f5a623;margin-bottom:4px">⏳ Setting up</div>
-      <div style="font-size:12px;color:#a09c92">Your bartender is confirming the opening stock. This updates automatically.</div>
+    <div id="c-setup" style="display:none" class="setup-notice">
+      <div style="font-size:16px;margin-bottom:6px">⏳</div>
+      <div style="font-size:14px;font-weight:500;color:var(--amb);margin-bottom:4px;font-family:var(--fh)">Bartender is setting up</div>
+      <div style="font-size:12px;color:var(--t2)">Confirming opening stock. This updates automatically.</div>
     </div>
 
-    <!-- Closing banner -->
-    <div id="c-close-banner" style="display:none" class="close-banner">
+    <!-- Close banner -->
+    <div id="c-close" style="display:none" class="close-banner">
       <div class="close-icon">✓</div>
       <div>
-        <div style="font-family:var(--fh);font-size:14px;font-weight:800;color:#4dd886;margin-bottom:3px">Event Completed!</div>
-        <div style="font-size:11px;color:rgba(77,216,134,.6)">Final closing report — Verified by Rebelz Bartending Services</div>
+        <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--grn);margin-bottom:3px">Event Completed</div>
+        <div style="font-size:11px;color:#40c87070;font-family:var(--fm)">Final report verified · Rebelz Bartending Services</div>
       </div>
     </div>
 
     <!-- Bottles -->
     <div id="c-bottles-wrap">
-      <div class="sec-lbl">Bottle status</div>
+      <div class="sec-lbl">Bottle Status</div>
       <div id="c-bottles"></div>
     </div>
 
     <!-- Timeline -->
-    <div class="sec-lbl">Activity timeline</div>
-    <div class="tl-card" id="c-timeline"></div>
+    <div class="sec-lbl">Activity Timeline</div>
+    <div class="tl-wrap" id="c-timeline"></div>
 
-    <!-- FEEDBACK SECTION — shown only when closed -->
-    <div id="c-feedback-wrap" style="display:none">
-      <div class="sec-lbl">Rate your experience</div>
-      <div class="fb-section">
-        <div id="fb-form-view">
-          <div style="text-align:center;margin-bottom:16px">
-            <div style="font-size:28px;margin-bottom:8px">🍸</div>
+    <!-- FEEDBACK -->
+    <div id="c-fb-wrap" style="display:none">
+      <div class="sec-lbl">Rate Your Experience</div>
+      <div class="fb-wrap">
+        <div id="fb-form">
+          <div style="text-align:center;margin-bottom:20px">
+            <div style="font-size:32px;margin-bottom:10px">🍸</div>
             <div class="fb-title">How was the service?</div>
-            <div class="fb-sub">Your feedback helps us serve you better at future events. Takes just 30 seconds!</div>
+            <div class="fb-sub">Your feedback helps us serve better at future events.<br/>Takes only 30 seconds!</div>
           </div>
 
-          <!-- Overall rating -->
-          <div class="fb-q">Overall Rating</div>
-          <div class="stars" id="stars-overall">
-            <span class="star" data-v="1" onclick="setStar('overall',1)">⭐</span>
-            <span class="star" data-v="2" onclick="setStar('overall',2)">⭐</span>
-            <span class="star" data-v="3" onclick="setStar('overall',3)">⭐</span>
-            <span class="star" data-v="4" onclick="setStar('overall',4)">⭐</span>
-            <span class="star" data-v="5" onclick="setStar('overall',5)">⭐</span>
+          <div class="fb-q">Overall Experience</div>
+          <div class="stars" id="st-overall">
+            <span class="star" onclick="setStar('overall',1)">⭐</span>
+            <span class="star" onclick="setStar('overall',2)">⭐</span>
+            <span class="star" onclick="setStar('overall',3)">⭐</span>
+            <span class="star" onclick="setStar('overall',4)">⭐</span>
+            <span class="star" onclick="setStar('overall',5)">⭐</span>
           </div>
 
-          <!-- Bartender rating -->
           <div class="fb-q">Bartender Performance</div>
-          <div class="stars" id="stars-bartender">
-            <span class="star" data-v="1" onclick="setStar('bartender',1)">⭐</span>
-            <span class="star" data-v="2" onclick="setStar('bartender',2)">⭐</span>
-            <span class="star" data-v="3" onclick="setStar('bartender',3)">⭐</span>
-            <span class="star" data-v="4" onclick="setStar('bartender',4)">⭐</span>
-            <span class="star" data-v="5" onclick="setStar('bartender',5)">⭐</span>
+          <div class="stars" id="st-bartender">
+            <span class="star" onclick="setStar('bartender',1)">⭐</span>
+            <span class="star" onclick="setStar('bartender',2)">⭐</span>
+            <span class="star" onclick="setStar('bartender',3)">⭐</span>
+            <span class="star" onclick="setStar('bartender',4)">⭐</span>
+            <span class="star" onclick="setStar('bartender',5)">⭐</span>
           </div>
 
-          <!-- Cocktail rating -->
           <div class="fb-q">Cocktails & Drinks</div>
-          <div class="stars" id="stars-cocktails">
-            <span class="star" data-v="1" onclick="setStar('cocktails',1)">⭐</span>
-            <span class="star" data-v="2" onclick="setStar('cocktails',2)">⭐</span>
-            <span class="star" data-v="3" onclick="setStar('cocktails',3)">⭐</span>
-            <span class="star" data-v="4" onclick="setStar('cocktails',4)">⭐</span>
-            <span class="star" data-v="5" onclick="setStar('cocktails',5)">⭐</span>
+          <div class="stars" id="st-cocktails">
+            <span class="star" onclick="setStar('cocktails',1)">⭐</span>
+            <span class="star" onclick="setStar('cocktails',2)">⭐</span>
+            <span class="star" onclick="setStar('cocktails',3)">⭐</span>
+            <span class="star" onclick="setStar('cocktails',4)">⭐</span>
+            <span class="star" onclick="setStar('cocktails',5)">⭐</span>
           </div>
 
-          <!-- Quick tags -->
           <div class="fb-q">What did you love?</div>
           <div class="fb-tags" id="fb-tags">
-            <div class="fb-tag" onclick="toggleTag(this)">🍹 Amazing cocktails</div>
-            <div class="fb-tag" onclick="toggleTag(this)">⚡ Fast service</div>
-            <div class="fb-tag" onclick="toggleTag(this)">😊 Friendly staff</div>
-            <div class="fb-tag" onclick="toggleTag(this)">🎨 Creative presentation</div>
-            <div class="fb-tag" onclick="toggleTag(this)">🎉 Made the event special</div>
-            <div class="fb-tag" onclick="toggleTag(this)">💯 Professional</div>
-            <div class="fb-tag" onclick="toggleTag(this)">🔥 Would recommend</div>
+            <div class="fb-tag" onclick="this.classList.toggle('on')">🍹 Amazing cocktails</div>
+            <div class="fb-tag" onclick="this.classList.toggle('on')">⚡ Fast service</div>
+            <div class="fb-tag" onclick="this.classList.toggle('on')">😊 Friendly staff</div>
+            <div class="fb-tag" onclick="this.classList.toggle('on')">🎨 Creative presentation</div>
+            <div class="fb-tag" onclick="this.classList.toggle('on')">🎉 Made event special</div>
+            <div class="fb-tag" onclick="this.classList.toggle('on')">💯 Very professional</div>
+            <div class="fb-tag" onclick="this.classList.toggle('on')">🔥 Exceeded expectations</div>
           </div>
 
-          <!-- Comment -->
           <div class="fb-q">Your Comments</div>
           <textarea class="fb-inp" id="fb-comment" rows="3" placeholder="Tell us about your experience..."></textarea>
 
-          <!-- Name (optional) -->
-          <input class="fb-inp" id="fb-name" placeholder="Your name (optional)" style="margin-bottom:16px"/>
+          <input class="fb-inp" id="fb-name" placeholder="Your name (optional)" style="margin-bottom:18px"/>
 
-          <button class="fb-submit" onclick="submitFeedback()">⭐ Submit Feedback</button>
-          <div id="fb-err" style="color:#e84040;font-size:12px;text-align:center;margin-top:10px;display:none">Please give at least an overall rating!</div>
+          <div class="fb-q">Would you book Rebelz again?</div>
+          <div class="book-row">
+            <div class="book-btn yes" id="book-yes" onclick="setBook(true)">✅ Yes, definitely!</div>
+            <div class="book-btn no" id="book-no" onclick="setBook(false)">❌ Not sure</div>
+          </div>
+
+          <button class="fb-submit" onclick="submitFb()">✦ Submit Feedback</button>
+          <div id="fb-err" style="color:var(--red);font-size:12px;text-align:center;margin-top:10px;display:none">Please give at least an overall star rating!</div>
         </div>
 
-        <!-- Thank you view -->
-        <div id="fb-done-view" style="display:none" class="fb-done">
+        <div id="fb-done" style="display:none" class="fb-done">
           <div class="fb-done-icon">🎉</div>
           <div class="fb-done-title">Thank You!</div>
-          <div class="fb-done-sub">Your feedback has been received.<br/>We're glad to have served you!<br/><br/><span style="color:var(--gold)">✦ Think of Party, Think of Us ✦</span></div>
+          <div class="fb-done-sub">
+            Your feedback has been received.<br/>
+            We're so glad to have served you!<br/><br/>
+            <span style="color:var(--gold)">✦ Think of Party, Think of Us ✦</span>
+          </div>
         </div>
       </div>
     </div>
@@ -286,136 +310,98 @@ body{background:#0e0e0c;color:#f2efe8;font-family:var(--fb);font-size:14px;min-h
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const firebaseConfig = {
-  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app"
-};
+const firebaseConfig = { databaseURL:"https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app" };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 const COLORS={whiskey:'#c8860a',gin:'#0e9e80',vodka:'#7c5cc4',beer:'#3a7a20',wine:'#aa3870',rum:'#c04020',other:'#888'};
-
 function gid(id){return document.getElementById(id);}
 function nowTime(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
 function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}):'—';}catch(e){return d||'—';}}
 function getRem(it){return Math.max(0,it.qty-(it.used||0));}
 function getSt(it){const r=getRem(it);if(r===0)return 'empty';return(r/it.qty)<=0.25?'low':'ok';}
 
-// Feedback state
-const ratings = {overall:0, bartender:0, cocktails:0};
-let currentEvId = null;
+const ratings={overall:0,bartender:0,cocktails:0};
+let bookAgain=null,curEvId=null;
 
-window.setStar = function(type, val){
-  ratings[type] = val;
-  const stars = gid('stars-'+type).querySelectorAll('.star');
-  stars.forEach((s,i) => s.classList.toggle('active', i < val));
+window.setStar=function(type,val){
+  ratings[type]=val;
+  gid('st-'+type).querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('on',i<val));
 };
-
-window.toggleTag = function(el){
-  el.classList.toggle('sel');
+window.setBook=function(val){
+  bookAgain=val;
+  gid('book-yes').classList.toggle('on',val===true);
+  gid('book-no').classList.toggle('on',val===false);
 };
-
-window.submitFeedback = function(){
-  if(!ratings.overall){
-    gid('fb-err').style.display='block';
-    return;
-  }
+window.submitFb=function(){
+  if(!ratings.overall){gid('fb-err').style.display='block';return;}
   gid('fb-err').style.display='none';
-  const tags = Array.from(document.querySelectorAll('.fb-tag.sel')).map(t=>t.textContent.trim());
-  const feedback = {
-    overall: ratings.overall,
-    bartender: ratings.bartender,
-    cocktails: ratings.cocktails,
-    tags,
-    comment: gid('fb-comment').value.trim(),
-    name: gid('fb-name').value.trim() || 'Guest',
-    submitted_at: new Date().toISOString()
+  const tags=Array.from(document.querySelectorAll('.fb-tag.on')).map(t=>t.textContent.trim());
+  const fb={
+    overall:ratings.overall,bartender:ratings.bartender,cocktails:ratings.cocktails,
+    tags,book_again:bookAgain,
+    comment:gid('fb-comment').value.trim(),
+    name:gid('fb-name').value.trim()||'Guest',
+    submitted_at:new Date().toISOString()
   };
-  // Save to Firebase
-  if(currentEvId){
-    set(ref(db, 'feedback/'+currentEvId), feedback);
-  }
-  gid('fb-form-view').style.display='none';
-  gid('fb-done-view').style.display='block';
+  if(curEvId){set(ref(db,'feedback/'+curEvId),fb);}
+  localStorage.setItem('fb_done_'+curEvId,'1');
+  gid('fb-form').style.display='none';
+  gid('fb-done').style.display='block';
 };
 
-const params = new URLSearchParams(window.location.search);
-const evId = params.get('ev');
-currentEvId = evId;
+const params=new URLSearchParams(window.location.search);
+const evId=params.get('ev');
+curEvId=evId;
 
 if(!evId){
-  gid('loading-view').style.display='none';
-  gid('error-view').style.display='block';
+  gid('v-loading').style.display='none';
+  gid('v-error').style.display='block';
 } else {
-  // Check if feedback already submitted
-  const fbKey = 'fb_submitted_'+evId;
-
-  const evRef = ref(db, 'events/'+evId);
-  onValue(evRef, (snapshot) => {
-    gid('loading-view').style.display='none';
-    const ev = snapshot.val();
-    if(!ev){
-      gid('error-view').style.display='block';
-      gid('main-view').style.display='none';
-      return;
-    }
+  onValue(ref(db,'events/'+evId),(snap)=>{
+    gid('v-loading').style.display='none';
+    const ev=snap.val();
+    if(!ev){gid('v-error').style.display='flex';gid('v-main').style.display='none';return;}
     renderDash(ev);
-    // Show feedback form if event is closed
-    const fbWrap = gid('c-feedback-wrap');
-    if(ev.status === 'closed'){
-      fbWrap.style.display = 'block';
-      // If already submitted, show thank you
-      if(localStorage.getItem(fbKey)){
-        gid('fb-form-view').style.display='none';
-        gid('fb-done-view').style.display='block';
-      }
-    } else {
-      fbWrap.style.display = 'none';
-    }
+    const fbWrap=gid('c-fb-wrap');
+    if(ev.status==='closed'){
+      fbWrap.style.display='block';
+      if(localStorage.getItem('fb_done_'+evId)){gid('fb-form').style.display='none';gid('fb-done').style.display='block';}
+    } else fbWrap.style.display='none';
   });
-
-  // Mark as submitted after submit
-  const origSubmit = window.submitFeedback;
-  window.submitFeedback = function(){
-    origSubmit();
-    localStorage.setItem(fbKey, '1');
-  };
 }
 
 function renderDash(ev){
-  gid('error-view').style.display='none';
-  gid('main-view').style.display='block';
-  document.title = ev.event_name + ' — Rebelz Tracker';
+  gid('v-error').style.display='none';gid('v-main').style.display='block';
+  document.title=ev.event_name+' — Rebelz Tracker';
+  gid('c-evname').textContent=ev.event_name+' — '+ev.client_name;
+  gid('c-evmeta').textContent=fmtDate(ev.event_date)+' · '+(ev.venue||ev.city||'')+(ev.guests?' · '+ev.guests+' guests':'');
 
-  gid('c-evname').textContent = ev.event_name + ' — ' + ev.client_name;
-  gid('c-evmeta').textContent = fmtDate(ev.event_date) + ' · ' + (ev.venue||ev.city||'');
-
-  const chip = gid('cust-chip');
-  if(ev.status==='live') chip.innerHTML='<div class="chip-live"><div class="chip-dot"></div><div class="chip-txt">Live now</div></div>';
+  const chip=gid('c-chip');
+  if(ev.status==='live') chip.innerHTML='<div class="chip-live"><div class="chip-dot"></div><div class="chip-txt">Live Now</div></div>';
   else if(ev.status==='closed') chip.innerHTML='<div class="chip-closed"><div class="chip-closed-txt">Event Closed</div></div>';
-  else chip.innerHTML='<div class="chip-setup"><div class="chip-setup-dot"></div><div class="chip-setup-txt">Setting up</div></div>';
+  else chip.innerHTML='<div class="chip-setup"><div class="chip-setup-dot"></div><div class="chip-setup-txt">Setting Up</div></div>';
 
-  const stock = ev.stock || [];
-  const tot = stock.reduce((s,i)=>s+i.qty,0);
-  const used = stock.reduce((s,i)=>s+(i.used||0),0);
-  gid('c-given').textContent = tot||'—';
-  gid('c-used').textContent = used||'—';
-  gid('c-left').textContent = tot ? Math.max(0,tot-used) : '—';
-  gid('c-time').textContent = nowTime();
+  const stock=ev.stock||[];
+  const tot=stock.reduce((s,i)=>s+i.qty,0);
+  const used=stock.reduce((s,i)=>s+(i.used||0),0);
+  gid('c-given').textContent=tot||'—';gid('c-used').textContent=used||'—';
+  gid('c-left').textContent=tot?Math.max(0,tot-used):'—';gid('c-time').textContent=nowTime();
 
-  gid('c-close-banner').style.display = ev.status==='closed' ? 'flex' : 'none';
-  gid('c-setup-notice').style.display = (!ev.stock_confirmed) ? 'block' : 'none';
+  gid('c-close').style.display=ev.status==='closed'?'flex':'none';
+  gid('c-setup').style.display=(!ev.stock_confirmed)?'block':'none';
 
-  const bottlesEl = gid('c-bottles');
-  if(!ev.stock_confirmed || !stock.length){
-    bottlesEl.innerHTML='<div style="text-align:center;padding:28px;color:#606058;font-size:13px">Bartender is confirming stock...<br/>This will update automatically.</div>';
+  const bEl=gid('c-bottles');
+  if(!ev.stock_confirmed||!stock.length){
+    bEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--t3);font-size:13px;background:var(--s1);border-radius:14px;border:0.5px solid var(--b1)">Bartender is confirming stock...<br/>This updates automatically.</div>';
   } else {
-    bottlesEl.innerHTML = stock.map(item=>{
+    bEl.innerHTML=stock.map(item=>{
       const rem=getRem(item);const st=getSt(item);
       const pct=Math.round((rem/item.qty)*100);
       const col=COLORS[item.cat]||'#888';
       const maxShow=Math.min(item.qty,20);
       const filled=Math.round((rem/item.qty)*maxShow);
-      const bottles=Array.from({length:maxShow},(_,i)=>`<div class="btl" style="background:${i<filled?col:'#2a2820'}"></div>`).join('');
+      const bottles=Array.from({length:maxShow},(_,i)=>`<div class="btl" style="background:${i<filled?col:'#1e1e18'}"></div>`).join('');
       return `<div class="bc ${st}">
         <div class="bc-top">
           <div class="bc-left"><div class="bc-dot" style="background:${col}"></div><div class="bc-name">${item.name}</div></div>
@@ -428,7 +414,7 @@ function renderDash(ev){
     }).join('');
   }
 
-  const tl = gid('c-timeline');
+  const tl=gid('c-timeline');
   if(!ev.log||!ev.log.length){
     tl.innerHTML='<div class="tl-item"><div class="tl-dot info"></div><div class="tl-msg">Waiting for first update from your bartender...</div><div class="tl-time">—</div></div>';
   } else {

@@ -4,246 +4,308 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>Rebelz — Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#0c0c0a;--s1:#161614;--s2:#202020;--s3:#2a2a28;--b1:#303030;--b2:#3c3c38;--t1:#f2efe8;--t2:#a09c92;--t3:#606058;--acc:#c8f560;--acc2:#a8d840;--amber:#f5a623;--red:#e84040;--wa:#25d366;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;}
+:root{
+  --bg:#080806;--s1:#0f0f0c;--s2:#161612;--s3:#1e1e18;--s4:#252520;
+  --b1:#2a2a22;--b2:#383830;--b3:#454540;
+  --t1:#f5f0e8;--t2:#b8b0a0;--t3:#706858;--t4:#454038;
+  --gold:#c8981e;--gold2:#e8b830;--gold3:#f5d060;--gold-dim:#c8981e40;
+  --acc:#d4f040;--red:#e84040;--grn:#40c870;--amb:#f5a020;
+  --fh:'Cormorant Garamond',serif;--fb:'Outfit',sans-serif;--fm:'DM Mono',monospace;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh}
-.topbar{background:var(--s1);border-bottom:0.5px solid var(--b1);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.logo{font-family:var(--fh);font-size:17px;font-weight:800;letter-spacing:-.4px}.logo em{color:var(--acc);font-style:normal}
-.topbar-tag{font-size:9px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
-.wrap{padding:14px;max-width:600px;margin:0 auto}
-.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:14px;border-radius:10px;font-size:14px;font-family:var(--fh);font-weight:700;cursor:pointer;border:none;width:100%;transition:all .15s;margin-bottom:8px}
-.btn-acc{background:var(--acc);color:#0c0c0a}.btn-acc:active{background:var(--acc2);transform:scale(.97)}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh;overflow-x:hidden}
+
+/* NOISE TEXTURE */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+
+/* HEADER */
+.hdr{background:linear-gradient(180deg,#0f0f0a 0%,#080806 100%);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100;overflow:hidden}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.hdr-inner{padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.brand-wrap{display:flex;align-items:center;gap:12px}
+.brand-logo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid var(--gold);box-shadow:0 0 20px var(--gold-dim)}
+.brand-text{}
+.brand-name{font-family:var(--fh);font-size:20px;font-weight:700;color:var(--t1);line-height:1;letter-spacing:.02em}
+.brand-name span{color:var(--gold2)}
+.brand-tag{font-size:8px;color:var(--gold);font-family:var(--fm);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
+.sync-badge{display:flex;align-items:center;gap:6px;background:var(--s2);border:0.5px solid var(--b2);border-radius:20px;padding:5px 10px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #40c87040}50%{opacity:.7;box-shadow:0 0 0 4px #40c87000}}
+.sync-txt{font-size:9px;color:var(--t3);font-family:var(--fm);letter-spacing:.06em}
+.page-tag{font-size:9px;color:var(--t4);font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:6px;border-top:0.5px solid var(--b1)}
+
+/* WRAP */
+.wrap{padding:16px;max-width:640px;margin:0 auto;position:relative;z-index:1}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.stat-box{background:var(--s1);border:0.5px solid var(--b1);border-radius:14px;padding:14px 8px;text-align:center;position:relative;overflow:hidden}
+.stat-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-box:nth-child(1)::before{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.stat-box:nth-child(2)::before{background:linear-gradient(90deg,#1a6035,var(--grn))}
+.stat-box:nth-child(3)::before{background:linear-gradient(90deg,#303030,#606060)}
+.stat-box:nth-child(4)::before{background:linear-gradient(90deg,#5a3800,var(--amb))}
+.stat-l{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:6px}
+.stat-v{font-family:var(--fh);font-size:32px;font-weight:700;line-height:1}
+.sv-gold{color:var(--gold2)}.sv-grn{color:var(--grn)}.sv-wht{color:var(--t2)}.sv-amb{color:var(--amb)}
+
+/* SECTION LABEL */
+.sec-lbl{font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec-lbl::after{content:'';flex:1;height:.5px;background:linear-gradient(90deg,var(--b2),transparent)}
+
+/* CARD */
+.card{background:var(--s1);border:0.5px solid var(--b1);border-radius:16px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.card-title{font-size:9px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:16px}
+
+/* FORM */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--fm);margin-bottom:6px}
+.inp{width:100%;background:var(--s2);border:0.5px solid var(--b2);border-radius:10px;padding:12px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;-webkit-appearance:none;transition:border-color .2s}
+.inp:focus{border-color:var(--gold)}
+.inp::placeholder{color:var(--t4)}
+select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23454038' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;font-size:13px;font-family:var(--fb);font-weight:600;cursor:pointer;border:none;width:100%;transition:all .15s;margin-bottom:8px;letter-spacing:.02em}
+.btn:last-child{margin-bottom:0}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806}.btn-gold:active{transform:scale(.97);filter:brightness(.9)}
 .btn-ghost{background:transparent;border:0.5px solid var(--b2);color:var(--t2)}.btn-ghost:active{background:var(--s2)}
-.btn-red{background:transparent;border:0.5px solid #e8404045;color:var(--red)}.btn-red:active{background:#e8404015}
-.btn-wa{background:var(--wa);color:#fff;margin-bottom:0}.btn-wa:active{background:#1db954}
-.btn-sm{padding:9px 14px;font-size:12px;width:auto;border-radius:8px;margin-bottom:0}
-.field{margin-bottom:11px}
-.field label{display:block;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-family:var(--fm);margin-bottom:5px}
-.inp{width:100%;background:var(--s2);border:0.5px solid var(--b1);border-radius:9px;padding:12px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;-webkit-appearance:none}
-.inp:focus{border-color:var(--acc)}.inp::placeholder{color:var(--t3)}
-select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23606058' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.card{background:var(--s1);border:0.5px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:10px}
-.card-title{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:var(--fm);margin-bottom:13px}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
-.metric{background:var(--s1);border:0.5px solid var(--b1);border-radius:9px;padding:10px 6px;text-align:center}
-.metric-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;font-family:var(--fm);margin-bottom:3px}
-.metric-v{font-family:var(--fh);font-size:22px;font-weight:800}
-.mv-g{color:var(--acc)}.mv-a{color:var(--amber)}.mv-r{color:var(--red)}
-.ev-card{background:var(--s1);border:0.5px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:8px}
-.ev-card.live{border-color:#c8f56035}
-.spill{font-size:10px;font-family:var(--fm);padding:3px 9px;border-radius:10px}
-.spill-live{background:#c8f56015;color:var(--acc);border:0.5px solid #c8f56030}
-.spill-setup{background:#f5a62315;color:var(--amber);border:0.5px solid #f5a62330}
-.spill-closed{background:var(--s2);color:var(--t3);border:0.5px solid var(--b1)}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;align-items:flex-end}
+.btn-red{background:transparent;border:0.5px solid #e8404030;color:var(--red)}.btn-red:active{background:#e8404010}
+.btn-sm{padding:8px 14px;font-size:11px;width:auto;border-radius:8px;margin-bottom:0}
+
+/* EVENT CARDS */
+.ev-card{background:var(--s1);border:0.5px solid var(--b1);border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden;transition:border-color .2s}
+.ev-card.live{border-color:var(--gold-dim)}
+.ev-card.live::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.status-pill{font-size:9px;font-family:var(--fm);padding:4px 10px;border-radius:20px;letter-spacing:.06em}
+.sp-live{background:#c8981e15;color:var(--gold2);border:0.5px solid var(--gold-dim)}
+.sp-setup{background:#f5a02015;color:var(--amb);border:0.5px solid #f5a02030}
+.sp-closed{background:var(--s2);color:var(--t3);border:0.5px solid var(--b1)}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:200;align-items:flex-end;backdrop-filter:blur(4px)}
 .modal-bg.open{display:flex}
-.modal{background:var(--s1);border:0.5px solid var(--b2);border-radius:18px 18px 0 0;padding:18px 16px 40px;width:100%;max-height:94vh;overflow-y:auto}
-.modal-handle{width:38px;height:4px;background:var(--b2);border-radius:2px;margin:0 auto 18px}
-.pin-box{background:var(--s3);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;border:0.5px solid var(--b2)}
-.pin-val{font-family:var(--fh);font-size:28px;font-weight:800;color:var(--acc);letter-spacing:6px}
-.link-box{background:var(--s2);border:0.5px solid var(--b1);border-radius:10px;padding:13px 14px;margin-bottom:10px}
-.link-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--fm);margin-bottom:5px}
-.link-url{font-size:11px;color:var(--acc);font-family:var(--fm);line-height:1.6;margin-bottom:9px;word-break:break-all;background:var(--s3);padding:8px 10px;border-radius:7px}
+.modal{background:var(--s1);border:0.5px solid var(--b2);border-top:1px solid var(--gold-dim);border-radius:22px 22px 0 0;padding:20px 16px 44px;width:100%;max-height:92vh;overflow-y:auto}
+.modal-handle{width:36px;height:3px;background:var(--b3);border-radius:2px;margin:0 auto 20px}
+.pin-display{background:var(--s2);border:0.5px solid var(--gold-dim);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pin-val{font-family:var(--fm);font-size:32px;font-weight:500;color:var(--gold2);letter-spacing:8px}
+.link-row{background:var(--s2);border:0.5px solid var(--b2);border-radius:12px;padding:13px 14px;margin-bottom:10px}
+.link-lbl{font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:6px}
+.link-url{font-size:10px;color:var(--t2);font-family:var(--fm);line-height:1.7;margin-bottom:10px;word-break:break-all;background:var(--s3);padding:8px 10px;border-radius:8px;border:0.5px solid var(--b1)}
 .link-btns{display:flex;gap:7px;flex-wrap:wrap}
-.lbtn{padding:7px 14px;border-radius:7px;font-size:12px;cursor:pointer;border:0.5px solid var(--b2);background:transparent;color:var(--t2);font-family:var(--fb)}
+.lbtn{padding:7px 14px;border-radius:8px;font-size:11px;cursor:pointer;border:0.5px solid var(--b2);background:transparent;color:var(--t2);font-family:var(--fb);font-weight:500}
 .lbtn:active{background:var(--s3)}
-.lbtn-wa{border-color:#25d36650;color:var(--wa)}
-.lbtn-copy{border-color:var(--b2);color:var(--t1)}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--acc);color:#0c0c0a;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--fh);opacity:0;transition:all .2s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center}
+.lbtn-wa{border-color:#25d36640;color:#25d366}
+.lbtn-copy{border-color:var(--gold-dim);color:var(--gold2)}
+
+/* FEEDBACK VIEW IN ADMIN */
+.fb-card{background:var(--s2);border:0.5px solid var(--b1);border-radius:12px;padding:14px;margin-top:10px}
+.fb-stars{color:var(--gold2);font-size:14px;margin-bottom:4px}
+.fb-comment{font-size:12px;color:var(--t2);font-style:italic;line-height:1.6;margin-bottom:8px}
+.fb-tag-wrap{display:flex;gap:5px;flex-wrap:wrap}
+.fb-badge{font-size:10px;background:var(--gold-dim);color:var(--gold2);border-radius:10px;padding:2px 8px;font-family:var(--fm)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--fb);opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center;box-shadow:0 8px 32px var(--gold-dim)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.empty-state{text-align:center;padding:36px 20px;color:var(--t3)}
-.empty-icon{font-size:30px;margin-bottom:10px;opacity:.4}
-.empty-title{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t2);margin-bottom:5px}
-.empty-sub{font-size:12px}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);display:inline-block;margin-right:5px;animation:blink 2s infinite}
+
+.empty-state{text-align:center;padding:44px 20px;color:var(--t3)}
+.empty-icon{font-size:32px;margin-bottom:12px;opacity:.3}
+.empty-title{font-family:var(--fh);font-size:18px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.empty-sub{font-size:12px;line-height:1.6}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 </style>
 </head>
 <body>
-<!-- BRAND HEADER -->
-<div style="background:var(--s1);border-bottom:0.5px solid var(--b1);padding:14px 16px;text-align:center;position:sticky;top:0;z-index:50">
-  <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:4px">
-    <img src="rebelz%20bartending%20logo.png" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1.5px solid #c8a020;box-shadow:0 0 12px #c8a02040"/>
-    <div>
-      <div style="font-family:var(--fh);font-size:20px;font-weight:800;color:var(--t1);letter-spacing:-.3px">Rebelz <span style="color:var(--acc)">Bartending</span> Services</div>
-      <div style="font-size:10px;color:var(--amber);font-family:var(--fm);letter-spacing:.12em;text-transform:uppercase;margin-top:2px">✦ Think of Party, Think of Us ✦</div>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="brand-wrap">
+      <img src="rebelz%20bartending%20logo.png" class="brand-logo"/>
+      <div class="brand-text">
+        <div class="brand-name">Rebelz <span>Bartending</span></div>
+        <div class="brand-tag">✦ Think of Party, Think of Us ✦</div>
+      </div>
+    </div>
+    <div class="sync-badge">
+      <div class="sync-dot" id="sync-dot"></div>
+      <div class="sync-txt" id="sync-txt">Connecting</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--b1)">
-    <div style="font-size:9px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em">Admin Panel</div>
-    <span style="font-size:10px;color:var(--t3);font-family:var(--fm);display:flex;align-items:center"><span class="sync-dot" id="sync-dot"></span><span id="sync-txt">Connecting...</span></span>
-  </div>
+  <div class="page-tag">Admin Control Panel</div>
 </div>
 
 <div class="wrap">
-  <div class="metrics">
-    <div class="metric"><div class="metric-l">Total</div><div class="metric-v" id="st-total">0</div></div>
-    <div class="metric"><div class="metric-l">Live</div><div class="metric-v mv-g" id="st-live">0</div></div>
-    <div class="metric"><div class="metric-l">Done</div><div class="metric-v" id="st-done">0</div></div>
-    <div class="metric"><div class="metric-l">Setup</div><div class="metric-v mv-a" id="st-setup">0</div></div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-l">Total</div><div class="stat-v sv-gold" id="st-total">0</div></div>
+    <div class="stat-box"><div class="stat-l">Live</div><div class="stat-v sv-grn" id="st-live">0</div></div>
+    <div class="stat-box"><div class="stat-l">Done</div><div class="stat-v sv-wht" id="st-done">0</div></div>
+    <div class="stat-box"><div class="stat-l">Setup</div><div class="stat-v sv-amb" id="st-setup">0</div></div>
   </div>
 
+  <!-- CREATE EVENT -->
+  <div class="sec-lbl">Create New Event</div>
   <div class="card">
-    <div class="card-title">Create new event</div>
-    <div class="field"><label>Client name *</label><input class="inp" id="f-client" placeholder="e.g. Sharma Family"/></div>
-    <div class="field"><label>Event name *</label><input class="inp" id="f-event" placeholder="e.g. Wedding Reception"/></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="field"><label>Date *</label><input class="inp" id="f-date" type="date"/></div>
-      <div class="field"><label>City</label><select class="inp" id="f-city"><option>Vijayawada</option><option>Hyderabad</option><option>Vizag</option></select></div>
+    <div class="card-title">Event Details</div>
+    <div class="grid2">
+      <div class="field"><label>Client Name *</label><input class="inp" id="f-client" placeholder="e.g. Sharma Family"/></div>
+      <div class="field"><label>Event Name *</label><input class="inp" id="f-event" placeholder="e.g. Wedding Reception"/></div>
     </div>
-    <div class="field"><label>Venue</label><input class="inp" id="f-venue" placeholder="e.g. Hotel Vijay Grand"/></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="grid3">
+      <div class="field"><label>Date *</label><input class="inp" id="f-date" type="date"/></div>
+      <div class="field"><label>City</label>
+        <select class="inp" id="f-city">
+          <option>Vijayawada</option><option>Hyderabad</option><option>Vizag</option><option>Guntur</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Guests</label><input class="inp" id="f-guests" type="number" placeholder="e.g. 150"/></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Venue</label><input class="inp" id="f-venue" placeholder="e.g. Hotel Vijay Grand"/></div>
+      <div class="field"><label>Package</label>
+        <select class="inp" id="f-package">
+          <option>Basic</option><option>Premium</option><option>Luxury</option><option>Custom</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid2">
       <div class="field"><label>Client WhatsApp</label><input class="inp" id="f-cwa" type="tel" placeholder="+91 98765 43210"/></div>
       <div class="field"><label>Your WhatsApp</label><input class="inp" id="f-owa" type="tel" placeholder="+91 XXXXX XXXXX"/></div>
     </div>
-    <div class="field"><label>Bartender PIN (4–6 digits)</label><input class="inp" id="f-pin" type="number" placeholder="e.g. 2580"/></div>
-    <div style="height:12px"></div>
-    <button class="btn btn-acc" onclick="createNewEvent()">Create event + generate links</button>
-    <button class="btn btn-ghost" style="font-size:13px;padding:11px" onclick="clearForm()">Clear form</button>
+    <div class="field"><label>Bartender PIN (4–6 digits)</label><input class="inp" id="f-pin" type="number" placeholder="e.g. 2580" style="letter-spacing:6px;font-family:var(--fm);font-size:18px"/></div>
+    <div style="height:4px"></div>
+    <button class="btn btn-gold" onclick="createNewEvent()">✦ Create Event + Generate Links</button>
+    <button class="btn btn-ghost" onclick="clearForm()">Clear Form</button>
   </div>
 
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:var(--fm)" id="admin-count">0 events</div>
+  <!-- EVENT LIST -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="sec-lbl" style="margin-bottom:0;flex:1">All Events</div>
+    <div style="font-size:9px;color:var(--t4);font-family:var(--fm)" id="admin-count">0 events</div>
   </div>
   <div id="event-list"></div>
-  <div style="height:20px"></div>
+  <div style="height:30px"></div>
 </div>
 
 <!-- LINKS MODAL -->
-<div class="modal-bg" id="modal">
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div style="font-family:var(--fh);font-size:20px;font-weight:800;margin-bottom:4px">Event created ✓</div>
-    <div style="font-size:13px;color:var(--t2);margin-bottom:18px" id="modal-sub">Links are ready to share</div>
-    <div class="pin-box">
-      <div><div style="font-size:10px;color:var(--t3);font-family:var(--fm)">Bartender PIN</div><div style="font-size:11px;color:var(--t3);margin-top:1px">Share with your team only</div></div>
+    <div style="font-family:var(--fh);font-size:26px;font-weight:700;margin-bottom:4px;color:var(--gold2)">Event Created ✦</div>
+    <div style="font-size:13px;color:var(--t3);margin-bottom:20px;font-family:var(--fm)" id="modal-sub">Links ready to share</div>
+    <div class="pin-display">
+      <div>
+        <div style="font-size:9px;color:var(--t3);font-family:var(--fm);letter-spacing:.08em;text-transform:uppercase">Bartender PIN</div>
+        <div style="font-size:10px;color:var(--t4);margin-top:2px;font-family:var(--fm)">Share with bartender only</div>
+      </div>
       <div class="pin-val" id="modal-pin">----</div>
     </div>
-    <div class="link-box">
-      <div class="link-lbl">🍸 Bartender link — send to your bartender</div>
+    <div class="link-row">
+      <div class="link-lbl">🍸 Bartender Link</div>
       <div class="link-url" id="modal-bar-url">—</div>
       <div class="link-btns">
-        <button class="lbtn lbtn-copy" onclick="copyLink('bar')">Copy link</button>
+        <button class="lbtn lbtn-copy" onclick="copyLink('bar')">Copy Link</button>
         <button class="lbtn lbtn-wa" onclick="waShare('bar')">Send on WhatsApp</button>
       </div>
     </div>
-    <div class="link-box">
-      <div class="link-lbl">👁 Customer link — send to client</div>
+    <div class="link-row">
+      <div class="link-lbl">👁 Customer Link</div>
       <div class="link-url" id="modal-cust-url">—</div>
       <div class="link-btns">
-        <button class="lbtn lbtn-copy" onclick="copyLink('cust')">Copy link</button>
+        <button class="lbtn lbtn-copy" onclick="copyLink('cust')">Copy Link</button>
         <button class="lbtn lbtn-wa" onclick="waShare('cust')">Send on WhatsApp</button>
       </div>
     </div>
-    <div style="background:var(--s2);border-radius:9px;padding:11px 13px;font-size:11px;color:var(--t3);font-family:var(--fm);line-height:1.7;margin-bottom:16px">
-      Bartender opens their link → enters PIN → sets stock → tracks live<br/>
-      Client opens their link → sees live dashboard immediately
+    <div style="background:var(--s2);border-radius:10px;padding:12px 14px;font-size:11px;color:var(--t3);font-family:var(--fm);line-height:1.8;margin-bottom:16px;border:0.5px solid var(--b1)">
+      Bartender → opens link → enters PIN → sets stock → tracks live<br/>
+      Customer → opens link → sees live tracker → gives feedback after closing
     </div>
-    <button class="btn btn-acc" onclick="closeModal()">Done</button>
+    <button class="btn btn-gold" onclick="closeModal()">Done ✓</button>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="modal-bg" id="fb-modal" onclick="if(event.target===this)closeFbModal()">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--gold2);margin-bottom:16px">Customer Feedback ✦</div>
+    <div id="fb-modal-content"></div>
+    <button class="btn btn-ghost" onclick="closeFbModal()" style="margin-top:8px">Close</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const firebaseConfig = {
-  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app"
-};
+const firebaseConfig = { databaseURL:"https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app" };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let EVENTS = [];
-let modalEv = null;
+let EVENTS=[], modalEv=null, feedbackData={};
 
 function gid(id){return document.getElementById(id);}
 function toast(msg,dur=2400){const t=gid('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
 function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';}catch(e){return d||'—';}}
 function genId(c){return 'EVT-'+c.replace(/\s+/g,'-').toUpperCase().replace(/[^A-Z0-9-]/g,'').slice(0,8)+'-'+Date.now().toString().slice(-4);}
 function nowISO(){return new Date().toISOString();}
+function baseUrl(){return window.location.href.replace(/admin\.html.*/,'');}
+function barLink(id){return baseUrl()+'bartender.html?ev='+id;}
+function custLink(id){return baseUrl()+'customer.html?ev='+id;}
+function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
 
-function baseUrl(){
-  const url = window.location.href;
-  return url.replace(/admin\.html.*/,'');
-}
-function barLink(evId){return baseUrl()+'bartender.html?ev='+evId;}
-function custLink(evId){return baseUrl()+'customer.html?ev='+evId;}
-
-function setSyncStatus(connected){
-  const dot = gid('sync-dot');
-  const txt = gid('sync-txt');
-  if(connected){
-    dot.style.background='var(--acc)';
-    txt.textContent='Live sync';
-  } else {
-    dot.style.background='var(--amber)';
-    txt.textContent='Reconnecting...';
-  }
-}
-
-// Listen to Firebase for real-time updates
-const eventsRef = ref(db, 'events');
-onValue(eventsRef, (snapshot) => {
-  setSyncStatus(true);
-  const data = snapshot.val();
-  if(data){
-    EVENTS = Object.values(data).sort((a,b)=> new Date(b.created_at) - new Date(a.created_at));
-  } else {
-    EVENTS = [];
-  }
+// Firebase listeners
+onValue(ref(db,'events'),(snap)=>{
+  gid('sync-dot').style.background='var(--grn)';
+  gid('sync-txt').textContent='Live';
+  const d=snap.val();
+  EVENTS=d?Object.values(d).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)):[];
+  renderList();updateStats();
+});
+onValue(ref(db,'feedback'),(snap)=>{
+  feedbackData=snap.val()||{};
   renderList();
-  updateStats();
-}, (error) => {
-  setSyncStatus(false);
 });
 
-function saveEvent(ev){
-  set(ref(db, 'events/' + ev.id), ev);
-}
-
-function deleteEvt(id){
-  if(!confirm('Delete this event?')) return;
-  remove(ref(db, 'events/' + id));
-  toast('Deleted');
-}
-window.deleteEvt = deleteEvt;
+function saveEvent(ev){set(ref(db,'events/'+ev.id),ev);}
 
 function copyText(txt){
   try{navigator.clipboard.writeText(txt);}
   catch(e){const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);}
   toast('Copied!');
 }
-function copyLink(type){copyText(type==='bar'?gid('modal-bar-url').textContent:gid('modal-cust-url').textContent);}
-window.copyLink = copyLink;
+window.copyText=copyText;
+window.copyLink=function(type){copyText(type==='bar'?gid('modal-bar-url').textContent:gid('modal-cust-url').textContent);}
+window.barLink=barLink;window.custLink=custLink;
 
-function waShare(type){
-  if(!modalEv) return;
-  let msg, phone;
+window.waShare=function(type){
+  if(!modalEv)return;
+  let msg,phone;
   if(type==='bar'){
-    const url=gid('modal-bar-url').textContent;
-    msg=`*Bartender Details — ${modalEv.event_name}*\n\nClient: ${modalEv.client_name}\nDate: ${fmtDate(modalEv.event_date)}\nVenue: ${modalEv.venue||'—'}\n\n*PIN:* ${modalEv.bartender_pin}\n\n*Your link (tap to open):*\n${url}\n\nOpen the link → enter PIN → set stock → start tracking.\n\n_Rebelz Bartending Services_`;
+    msg=`*Rebelz Bartending Services*\n✦ Think of Party, Think of Us ✦\n\n*Event: ${modalEv.event_name}*\nClient: ${modalEv.client_name}\nDate: ${fmtDate(modalEv.event_date)}\nVenue: ${modalEv.venue||'—'}\nGuests: ${modalEv.guests||'—'}\nPackage: ${modalEv.package||'—'}\n\n*Your PIN:* ${modalEv.bartender_pin}\n\n*Bartender Link:*\n${barLink(modalEv.id)}\n\nOpen link → Enter PIN → Set stock → Track live\n\n_Rebelz Bartending Services_`;
     phone=(modalEv.owner_wa||'').replace(/\D/g,'');
   } else {
-    const url=gid('modal-cust-url').textContent;
-    msg=`Hello,\n\nYour *live alcohol tracker* for *${modalEv.event_name}* is ready!\n\nTap this link to view your bottles in real time:\n${url}\n\n_Rebelz Bartending Services_\nVijayawada · Hyderabad · Vizag`;
+    msg=`Hello! 🍸\n\nYour *live alcohol tracker* for *${modalEv.event_name}* is ready!\n\nTrack your bottles live:\n${custLink(modalEv.id)}\n\n_Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦`;
     phone=(modalEv.client_wa||'').replace(/\D/g,'');
   }
   window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
-}
-window.waShare = waShare;
+};
 
-function clearForm(){
-  ['f-client','f-event','f-date','f-venue','f-cwa','f-owa','f-pin'].forEach(id=>{const e=gid(id);if(e)e.value='';});
+window.clearForm=function(){
+  ['f-client','f-event','f-date','f-venue','f-cwa','f-owa','f-pin','f-guests'].forEach(id=>{const e=gid(id);if(e)e.value='';});
   gid('f-date').value=new Date().toISOString().split('T')[0];
-}
-window.clearForm = clearForm;
+};
 
-function createNewEvent(){
+window.createNewEvent=function(){
   const client=gid('f-client').value.trim();
   const evName=gid('f-event').value.trim();
   const date=gid('f-date').value;
@@ -252,24 +314,15 @@ function createNewEvent(){
   if(!date){toast('Select a date');return;}
   const pin=(gid('f-pin').value.trim()||'2580').toString();
   const ev={
-    id:genId(client),
-    client_name:client, event_name:evName, event_date:date,
-    venue:gid('f-venue').value.trim(), city:gid('f-city').value,
-    bartender_pin:pin,
-    client_wa:gid('f-cwa').value.trim(),
-    owner_wa:gid('f-owa').value.trim(),
-    status:'setup',
-    stock:[],
-    stock_confirmed:false,
-    log:[{msg:'Event created',time:nowISO()}],
-    created_at:nowISO()
+    id:genId(client),client_name:client,event_name:evName,event_date:date,
+    venue:gid('f-venue').value.trim(),city:gid('f-city').value,
+    guests:gid('f-guests').value.trim(),package:gid('f-package').value,
+    bartender_pin:pin,client_wa:gid('f-cwa').value.trim(),owner_wa:gid('f-owa').value.trim(),
+    status:'setup',stock:[],stock_confirmed:false,
+    log:[{msg:'Event created',time:nowISO()}],created_at:nowISO()
   };
-  saveEvent(ev);
-  showModal(ev);
-  clearForm();
-  toast('Event created!');
-}
-window.createNewEvent = createNewEvent;
+  saveEvent(ev);showModal(ev);window.clearForm();toast('Event created!');
+};
 
 function showModal(ev){
   modalEv=ev;
@@ -279,38 +332,81 @@ function showModal(ev){
   gid('modal-cust-url').textContent=custLink(ev.id);
   gid('modal').classList.add('open');
 }
+window.showModalById=function(id){const ev=EVENTS.find(e=>e.id===id);if(ev)showModal(ev);}
+window.closeModal=function(){gid('modal').classList.remove('open');}
+window.closeFbModal=function(){gid('fb-modal').classList.remove('open');}
 
-function showModalById(id){const ev=EVENTS.find(e=>e.id===id);if(ev)showModal(ev);}
-window.showModalById = showModalById;
+window.deleteEvt=function(id){
+  if(!confirm('Delete this event?'))return;
+  remove(ref(db,'events/'+id));toast('Deleted');
+};
 
-function closeModal(){gid('modal').classList.remove('open');}
-window.closeModal = closeModal;
+window.viewFeedback=function(id){
+  const fb=feedbackData[id];
+  const el=gid('fb-modal-content');
+  if(!fb){
+    el.innerHTML=`<div style="text-align:center;padding:32px;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px">💬</div><div style="font-family:var(--fh);font-size:16px;color:var(--t2)">No feedback yet</div><div style="font-size:12px;margin-top:6px">Customer hasn't submitted feedback yet</div></div>`;
+  } else {
+    const bookAgain=fb.book_again?'✅ Yes, will book again':'❌ Will not book again';
+    el.innerHTML=`
+      <div class="fb-card">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+          <div style="text-align:center;background:var(--s3);border-radius:10px;padding:10px">
+            <div style="font-size:9px;color:var(--t3);font-family:var(--fm);margin-bottom:4px">OVERALL</div>
+            <div style="font-size:22px;font-family:var(--fh);font-weight:700;color:var(--gold2)">${fb.overall||0}/5</div>
+            <div style="font-size:12px;color:var(--gold)">${stars(fb.overall||0)}</div>
+          </div>
+          <div style="text-align:center;background:var(--s3);border-radius:10px;padding:10px">
+            <div style="font-size:9px;color:var(--t3);font-family:var(--fm);margin-bottom:4px">BARTENDER</div>
+            <div style="font-size:22px;font-family:var(--fh);font-weight:700;color:var(--gold2)">${fb.bartender||0}/5</div>
+            <div style="font-size:12px;color:var(--gold)">${stars(fb.bartender||0)}</div>
+          </div>
+          <div style="text-align:center;background:var(--s3);border-radius:10px;padding:10px">
+            <div style="font-size:9px;color:var(--t3);font-family:var(--fm);margin-bottom:4px">COCKTAILS</div>
+            <div style="font-size:22px;font-family:var(--fh);font-weight:700;color:var(--gold2)">${fb.cocktails||0}/5</div>
+            <div style="font-size:12px;color:var(--gold)">${stars(fb.cocktails||0)}</div>
+          </div>
+        </div>
+        <div style="background:var(--s3);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--grn);font-family:var(--fm)">${bookAgain}</div>
+        ${fb.comment?`<div style="font-size:13px;color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:12px;padding:12px;background:var(--s3);border-radius:10px;border-left:2px solid var(--gold)">"${fb.comment}"</div>`:''}
+        ${fb.tags&&fb.tags.length?`<div class="fb-tag-wrap">${fb.tags.map(t=>`<span class="fb-badge">${t}</span>`).join('')}</div>`:''}
+        <div style="font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:10px">By: ${fb.name||'Guest'}</div>
+      </div>`;
+  }
+  gid('fb-modal').classList.add('open');
+};
 
 function renderList(){
   const el=gid('event-list');
   gid('admin-count').textContent=EVENTS.length+' event'+(EVENTS.length!==1?'s':'');
   if(!EVENTS.length){
-    el.innerHTML='<div class="empty-state"><div class="empty-icon">🍸</div><div class="empty-title">No events yet</div><div class="empty-sub">Fill the form above and tap Create</div></div>';
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🍸</div><div class="empty-title">No events yet</div><div class="empty-sub">Fill the form above to create your first event</div></div>`;
     return;
   }
   el.innerHTML=EVENTS.map(ev=>{
     const tot=ev.stock?ev.stock.reduce((s,i)=>s+i.qty,0):0;
     const used=ev.stock?ev.stock.reduce((s,i)=>s+(i.used||0),0):0;
+    const fb=feedbackData[ev.id];
+    const fbBadge=fb?`<span style="font-size:10px;color:var(--gold2);font-family:var(--fm);background:var(--gold-dim);padding:2px 8px;border-radius:10px">⭐ ${fb.overall}/5</span>`:'';
     return `<div class="ev-card ${ev.status==='live'?'live':''}">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
         <div style="min-width:0">
-          <div style="font-family:var(--fh);font-size:15px;font-weight:800;margin-bottom:3px">${ev.event_name}</div>
-          <div style="font-size:11px;color:var(--t3);font-family:var(--fm);line-height:1.7">${ev.client_name} · ${fmtDate(ev.event_date)}<br>${ev.city||''}${ev.venue?' · '+ev.venue:''}</div>
+          <div style="font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:3px;color:var(--t1)">${ev.event_name}</div>
+          <div style="font-size:10px;color:var(--t3);font-family:var(--fm);line-height:1.8">${ev.client_name} · ${fmtDate(ev.event_date)}<br/>${ev.city||''}${ev.venue?' · '+ev.venue:''} ${ev.guests?'· '+ev.guests+' guests':''}</div>
         </div>
-        <div class="spill spill-${ev.status}" style="flex-shrink:0">${ev.status==='setup'?'Setup':ev.status==='live'?'Live':'Closed'}</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+          <div class="status-pill sp-${ev.status}">${ev.status==='setup'?'Setup':ev.status==='live'?'● Live':'✓ Done'}</div>
+          ${fbBadge}
+        </div>
       </div>
-      <div style="font-size:11px;font-family:var(--fm);margin-bottom:10px;color:${ev.stock_confirmed?'var(--t3)':'var(--amber)'}">
-        ${ev.stock_confirmed?tot+' bottles · '+used+' consumed':'⚠ Bartender yet to set stock'} · PIN: ${ev.bartender_pin}
+      <div style="font-size:10px;font-family:var(--fm);color:${ev.stock_confirmed?'var(--t3)':'var(--amb)'};margin-bottom:12px;padding:8px;background:var(--s2);border-radius:8px">
+        ${ev.stock_confirmed?`📦 ${tot} bottles · ${used} consumed · ${tot-used} remaining`:'⚠ Bartender yet to confirm opening stock'} · PIN: <span style="color:var(--gold2)">${ev.bartender_pin}</span> · ${ev.package||'Basic'}
       </div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" onclick="showModalById('${ev.id}')">Links</button>
-        <button class="btn btn-ghost btn-sm" onclick="copyText(barLink('${ev.id}'))">Copy bartender link</button>
-        <button class="btn btn-ghost btn-sm" onclick="copyText(custLink('${ev.id}'))">Copy client link</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="showModalById('${ev.id}')">🔗 Links</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyText(barLink('${ev.id}'))">Copy Bartender</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyText(custLink('${ev.id}'))">Copy Client</button>
+        <button class="btn btn-ghost btn-sm" onclick="viewFeedback('${ev.id}')" style="color:var(--gold2);border-color:var(--gold-dim)">⭐ Feedback</button>
         <button class="btn btn-red btn-sm" onclick="deleteEvt('${ev.id}')">Delete</button>
       </div>
     </div>`;
@@ -324,13 +420,7 @@ function updateStats(){
   gid('st-setup').textContent=EVENTS.filter(e=>e.status==='setup').length;
 }
 
-// Make copyText & barLink & custLink globally accessible
-window.copyText = copyText;
-window.barLink = barLink;
-window.custLink = custLink;
-
-// Init
-gid('f-date').value = new Date().toISOString().split('T')[0];
+gid('f-date').value=new Date().toISOString().split('T')[0];
 </script>
 </body>
 </html>
