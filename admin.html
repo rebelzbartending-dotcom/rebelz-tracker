@@ -211,8 +211,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           </div>
         </div>
       </div>
-      <button class="btn-gold" onclick="createEvent()">✦ CREATE EVENT + GENERATE LINKS</button>
+      <button class="btn-gold" id="createBtn" onclick="createEvent()">✦ CREATE EVENT + GENERATE LINKS</button>
       <button class="btn-clear" onclick="clearForm()">Clear Form</button>
+      <div id="errMsg" style="display:none;margin-top:10px;padding:10px;background:#1a0f0f;border:1px solid #6b2e2e;border-radius:9px;font-size:12px;color:#ff9999"></div>
 
       <!-- WA PREVIEW -->
       <div class="wa-box" id="waPreview" style="display:none">
@@ -347,8 +348,8 @@ window.createEvent = async () => {
     alert('Please fill all required fields (*)'); return;
   }
 
-  const btn = document.querySelector('.btn-gold');
-  btn.textContent = 'Creating...'; btn.disabled = true;
+  const btn = document.getElementById('createBtn');
+  btn.innerHTML = 'Creating event...'; btn.disabled = true;
 
   try {
     const eventId = await generateEventId();
@@ -390,14 +391,14 @@ window.createEvent = async () => {
     window._waMsg = msg;
     window._waNum = bartWA;
 
-    btn.textContent = '✦ CREATE EVENT + GENERATE LINKS';
+    btn.innerHTML = '✦ CREATE EVENT + GENERATE LINKS';
     btn.disabled = false;
-    alert(`Event created! ID: ${eventId}`);
+    alert('Event created!\nID: ' + eventId + '\n\nLinks are ready below.');
 
   } catch(e) {
-    console.error(e);
-    alert('Error creating event: ' + e.message);
-    btn.textContent = '✦ CREATE EVENT + GENERATE LINKS';
+    console.error('Firebase error:', e);
+    alert('ERROR: ' + e.message + '\n\nMake sure Firebase Database rules are set to allow read/write.');
+    btn.innerHTML = '✦ CREATE EVENT + GENERATE LINKS';
     btn.disabled = false;
   }
 };
@@ -432,6 +433,13 @@ window.clearForm = () => {
 };
 
 // ── LOAD EVENTS ──
+// Test Firebase connection
+get(ref(db, 'eventCounter')).then(() => {
+  console.log('Firebase connected OK');
+}).catch(e => {
+  document.getElementById('eventsList').innerHTML = '<div style="padding:14px;background:#1a0f0f;border:1px solid #6b2e2e;border-radius:9px;font-size:12px;color:#ff9999">⚠ Firebase connection error: ' + e.message + '<br><br>Please update Database Rules to allow read/write.</div>';
+});
+
 onValue(ref(db, 'events'), snap => {
   allEvents = snap.exists() ? snap.val() : {};
   renderEvents(allEvents);
