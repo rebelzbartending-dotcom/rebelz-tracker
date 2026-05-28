@@ -1,564 +1,426 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>Rebelz — Admin</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#080806;--bg2:#13110a;--bg3:#0c0b07;--gold:#C9A84C;--gold-hi:#E8D089;--gold-lo:#9a7d2e;--line:#2a2415;--ink:#f5f0e4;--muted:#8a8268}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a08;min-height:100vh;color:var(--ink)}
-.wrap{max-width:520px;margin:0 auto;background:var(--bg);min-height:100vh}
-.top{background:linear-gradient(160deg,#15130c,#0c0b07);padding:18px 16px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
-.top::after{content:'';position:absolute;top:-50px;right:20px;width:160px;height:160px;background:radial-gradient(circle,#C9A84C15,transparent 70%);border-radius:50%;pointer-events:none}
-.top-row{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);box-shadow:0 0 18px #C9A84C44;background:#C9A84C;flex-shrink:0}
-.brand-name{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:0.08em;line-height:1.1}
-.brand-name b{background:linear-gradient(135deg,var(--gold-hi),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.brand-tag{font-size:9px;color:var(--gold);letter-spacing:0.16em;text-transform:uppercase;margin-top:2px;font-style:italic}
-.admin-pill{font-size:10px;color:#0c0b07;background:linear-gradient(135deg,var(--gold-hi),var(--gold));border-radius:20px;padding:5px 12px;font-weight:700}
-.cities{display:flex;align-items:center;gap:6px;margin-top:12px;position:relative;z-index:1;flex-wrap:wrap}
-.cities-lbl{font-size:9px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase}
-.chip{font-size:10px;color:var(--gold);border:1px solid #C9A84C44;background:#C9A84C0e;border-radius:16px;padding:3px 10px}
-.body{padding:16px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.stat{background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:12px 8px;text-align:center;position:relative;overflow:hidden}
-.stat .n{font-size:22px;font-weight:700;line-height:1;color:var(--gold)}
-.stat .l{font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:0.1em;text-transform:uppercase}
-.stat.lv .n{color:#d4b75f}.stat.dn .n{color:#e8d089}.stat.st .n{color:#b89a3e}
-.stat .bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-lo),var(--gold),var(--gold-hi))}
-.export-all{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#1a3a28,#0f2419);color:#a7e8c4;border:1px solid #2e6b4866;border-radius:11px;padding:12px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:14px;border:none}
-.card{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#C9A84C44,transparent)}
-.card-title{font-size:11px;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;font-weight:700;margin-bottom:14px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.field{display:flex;flex-direction:column}
-.field.full{grid-column:1/-1}
-.field label{font-size:10px;color:var(--muted);margin-bottom:5px;letter-spacing:0.03em}
-.field label .new{color:var(--gold);font-size:8px;margin-left:3px;font-weight:700}
-.field input,.field select{width:100%;padding:9px 11px;font-size:13px;border:1px solid var(--line);border-radius:9px;background:var(--bg3);color:var(--ink);font-family:inherit;-webkit-appearance:none}
-.field input::placeholder{color:#5a5440}
-.field input:focus,.field select:focus{outline:none;border-color:var(--gold)}
-.phone-wrap{display:flex}
-.phone-code{display:flex;align-items:center;padding:0 10px;background:linear-gradient(135deg,var(--gold-hi),var(--gold));color:#0c0b07;font-size:12px;font-weight:700;border-radius:9px 0 0 9px;white-space:nowrap}
-.phone-wrap input{border-radius:0 9px 9px 0;border-left:none}
-.loc-wrap{position:relative}
-.loc-wrap input{padding-right:36px}
-.na-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg3);border:1px solid var(--line);border-radius:9px;grid-column:1/-1}
-.na-row span{font-size:11px;color:var(--muted)}
-.na-toggle{display:flex;gap:6px}
-.na-btn{padding:5px 14px;border-radius:8px;border:1px solid var(--line);background:var(--bg2);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer}
-.na-btn.yes-on{background:linear-gradient(135deg,#1a3a28,#0f2419);color:#5fd99a;border-color:#2e6b4866}
-.na-btn.no-on{background:linear-gradient(135deg,#3a1a1a,#1a0f0f);color:#ff9999;border-color:#6b2e2e66}
-.btn-gold{background:linear-gradient(135deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));color:#0c0b07;border:none;border-radius:11px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:14px;letter-spacing:0.03em;box-shadow:0 4px 14px #C9A84C33}
-.btn-gold:active{filter:brightness(0.9)}
-.btn-clear{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px;cursor:pointer;width:100%;margin-top:8px}
-.msg-box{margin-top:10px;padding:12px;border-radius:9px;font-size:12px;display:none}
-.msg-box.error{background:#1a0f0f;border:1px solid #6b2e2e;color:#ff9999}
-.msg-box.success{background:#0f1a0e;border:1px solid #2e6b48;color:#5fd99a}
-.wa-box{background:#0a120e;border:1px solid #16291d;border-radius:11px;padding:12px;margin-top:12px}
-.wa-head{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:10px;color:#7a9b8c;text-transform:uppercase}
-.wa-bubble{background:#005c4b;border-radius:0 9px 9px 9px;padding:10px 12px;font-size:12px;color:#e9fff5;line-height:1.7}
-.wa-bubble .gold{color:#ffd97a;font-weight:700}
-.wa-time{font-size:8px;color:#6a8;text-align:right;margin-top:3px}
-.links-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.link-section label{font-size:10px;color:var(--muted);display:block;margin-bottom:6px}
-.link-btn{width:100%;padding:8px;font-size:11px;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:var(--bg3);color:#bdb393;font-weight:600;margin-bottom:6px}
-.link-btn.wa-btn{background:#0a120e;border-color:#2e6b4844;color:#5fd99a}
-.ev-item{padding:12px 0;border-bottom:1px solid var(--line)}
-.ev-item:last-child{border:none;padding-bottom:0}
-.ev-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.ev-name{font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.ev-type{font-size:9px;padding:2px 8px;border-radius:10px;background:#C9A84C1e;color:var(--gold)}
-.ev-meta{font-size:10px;color:var(--muted);margin-top:2px}
-.ev-id{font-size:9px;color:#5a5440;margin-top:1px}
-.badge{font-size:9px;padding:3px 10px;border-radius:16px;font-weight:700;white-space:nowrap}
-.badge.live{background:#0f1a0e;color:#5fd99a;border:1px solid #2e6b4844}
-.badge.done{background:#C9A84C18;color:var(--gold);border:1px solid #C9A84C44}
-.badge.setup{background:#1a1a35;color:#a5b4fc;border:1px solid #4338ca44}
-.ev-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
-.ev-act{display:flex;align-items:center;gap:4px;font-size:10px;padding:5px 10px;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:var(--bg3);color:#bdb393;font-weight:600}
-.ev-act.photos{border-color:#C9A84C55;color:var(--gold);background:#C9A84C0e}
-.ev-act.excel{border-color:#2e6b4844;color:#5fd99a;background:#0f1a0e}
-.bc{background:linear-gradient(135deg,var(--gold-hi),var(--gold));color:#0c0b07;font-size:8px;font-weight:700;border-radius:8px;padding:1px 5px;margin-left:2px}
-.overlay{position:fixed;inset:0;background:rgba(5,5,3,0.92);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
-.overlay.show{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--line);border-radius:14px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto}
-.modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg2)}
-.modal-title{font-size:12px;color:var(--gold);font-weight:700}
-.modal-close{cursor:pointer;color:var(--muted);font-size:22px;background:none;border:none;line-height:1;padding:0}
-.modal-body{padding:16px}
-.modal-sec{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin:4px 0 8px}
-.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.photo-thumb{aspect-ratio:1;border-radius:9px;background:linear-gradient(135deg,#1a160d,#0c0b07);border:1px solid #C9A84C33;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;overflow:hidden}
-.photo-thumb img{width:100%;height:100%;object-fit:cover}
-.photo-thumb .ph-icon{font-size:22px}
-.photo-thumb .ph-lbl{font-size:9px;color:var(--muted)}
-.fb-row{padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
-.fb-row:last-child{border:none}
-.fb-lbl{font-size:10px;color:var(--muted);margin-bottom:3px}
-.fb-val{color:var(--ink)}
-.empty{text-align:center;padding:30px 20px;color:var(--muted);font-size:12px}
-.foot{text-align:center;padding:14px;border-top:1px solid var(--line);background:linear-gradient(180deg,transparent,#C9A84C08)}
-.foot-name{font-size:11px;color:var(--gold);letter-spacing:0.1em;font-weight:700}
-.foot-url{font-size:9px;color:#6a6450;margin-top:3px}
+:root{
+  --bg:#080806;--s1:#0f0f0c;--s2:#161612;--s3:#1e1e18;--s4:#252520;
+  --b1:#2a2a22;--b2:#383830;--b3:#454540;
+  --t1:#f5f0e8;--t2:#b8b0a0;--t3:#706858;--t4:#454038;
+  --gold:#c8981e;--gold2:#e8b830;--gold3:#f5d060;--gold-dim:#c8981e40;
+  --acc:#d4f040;--red:#e84040;--grn:#40c870;--amb:#f5a020;
+  --fh:'Cormorant Garamond',serif;--fb:'Outfit',sans-serif;--fm:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh;overflow-x:hidden}
+
+/* NOISE TEXTURE */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+
+/* HEADER */
+.hdr{background:linear-gradient(180deg,#0f0f0a 0%,#080806 100%);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100;overflow:hidden}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.hdr-inner{padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.brand-wrap{display:flex;align-items:center;gap:12px}
+.brand-logo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid var(--gold);box-shadow:0 0 20px var(--gold-dim)}
+.brand-text{}
+.brand-name{font-family:var(--fh);font-size:20px;font-weight:700;color:var(--t1);line-height:1;letter-spacing:.02em}
+.brand-name span{color:var(--gold2)}
+.brand-tag{font-size:8px;color:var(--gold);font-family:var(--fm);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
+.sync-badge{display:flex;align-items:center;gap:6px;background:var(--s2);border:0.5px solid var(--b2);border-radius:20px;padding:5px 10px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #40c87040}50%{opacity:.7;box-shadow:0 0 0 4px #40c87000}}
+.sync-txt{font-size:9px;color:var(--t3);font-family:var(--fm);letter-spacing:.06em}
+.page-tag{font-size:9px;color:var(--t4);font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:6px;border-top:0.5px solid var(--b1)}
+
+/* WRAP */
+.wrap{padding:16px;max-width:640px;margin:0 auto;position:relative;z-index:1}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.stat-box{background:var(--s1);border:0.5px solid var(--b1);border-radius:14px;padding:14px 8px;text-align:center;position:relative;overflow:hidden}
+.stat-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-box:nth-child(1)::before{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.stat-box:nth-child(2)::before{background:linear-gradient(90deg,#1a6035,var(--grn))}
+.stat-box:nth-child(3)::before{background:linear-gradient(90deg,#303030,#606060)}
+.stat-box:nth-child(4)::before{background:linear-gradient(90deg,#5a3800,var(--amb))}
+.stat-l{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:6px}
+.stat-v{font-family:var(--fh);font-size:32px;font-weight:700;line-height:1}
+.sv-gold{color:var(--gold2)}.sv-grn{color:var(--grn)}.sv-wht{color:var(--t2)}.sv-amb{color:var(--amb)}
+
+/* SECTION LABEL */
+.sec-lbl{font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec-lbl::after{content:'';flex:1;height:.5px;background:linear-gradient(90deg,var(--b2),transparent)}
+
+/* CARD */
+.card{background:var(--s1);border:0.5px solid var(--b1);border-radius:16px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.card-title{font-size:9px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:16px}
+
+/* FORM */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--fm);margin-bottom:6px}
+.inp{width:100%;background:var(--s2);border:0.5px solid var(--b2);border-radius:10px;padding:12px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;-webkit-appearance:none;transition:border-color .2s}
+.inp:focus{border-color:var(--gold)}
+.inp::placeholder{color:var(--t4)}
+select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23454038' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;font-size:13px;font-family:var(--fb);font-weight:600;cursor:pointer;border:none;width:100%;transition:all .15s;margin-bottom:8px;letter-spacing:.02em}
+.btn:last-child{margin-bottom:0}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806}.btn-gold:active{transform:scale(.97);filter:brightness(.9)}
+.btn-ghost{background:transparent;border:0.5px solid var(--b2);color:var(--t2)}.btn-ghost:active{background:var(--s2)}
+.btn-red{background:transparent;border:0.5px solid #e8404030;color:var(--red)}.btn-red:active{background:#e8404010}
+.btn-sm{padding:8px 14px;font-size:11px;width:auto;border-radius:8px;margin-bottom:0}
+
+/* EVENT CARDS */
+.ev-card{background:var(--s1);border:0.5px solid var(--b1);border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden;transition:border-color .2s}
+.ev-card.live{border-color:var(--gold-dim)}
+.ev-card.live::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.status-pill{font-size:9px;font-family:var(--fm);padding:4px 10px;border-radius:20px;letter-spacing:.06em}
+.sp-live{background:#c8981e15;color:var(--gold2);border:0.5px solid var(--gold-dim)}
+.sp-setup{background:#f5a02015;color:var(--amb);border:0.5px solid #f5a02030}
+.sp-closed{background:var(--s2);color:var(--t3);border:0.5px solid var(--b1)}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:200;align-items:flex-end;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--s1);border:0.5px solid var(--b2);border-top:1px solid var(--gold-dim);border-radius:22px 22px 0 0;padding:20px 16px 44px;width:100%;max-height:92vh;overflow-y:auto}
+.modal-handle{width:36px;height:3px;background:var(--b3);border-radius:2px;margin:0 auto 20px}
+.pin-display{background:var(--s2);border:0.5px solid var(--gold-dim);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pin-val{font-family:var(--fm);font-size:32px;font-weight:500;color:var(--gold2);letter-spacing:8px}
+.link-row{background:var(--s2);border:0.5px solid var(--b2);border-radius:12px;padding:13px 14px;margin-bottom:10px}
+.link-lbl{font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:6px}
+.link-url{font-size:10px;color:var(--t2);font-family:var(--fm);line-height:1.7;margin-bottom:10px;word-break:break-all;background:var(--s3);padding:8px 10px;border-radius:8px;border:0.5px solid var(--b1)}
+.link-btns{display:flex;gap:7px;flex-wrap:wrap}
+.lbtn{padding:7px 14px;border-radius:8px;font-size:11px;cursor:pointer;border:0.5px solid var(--b2);background:transparent;color:var(--t2);font-family:var(--fb);font-weight:500}
+.lbtn:active{background:var(--s3)}
+.lbtn-wa{border-color:#25d36640;color:#25d366}
+.lbtn-copy{border-color:var(--gold-dim);color:var(--gold2)}
+
+/* FEEDBACK VIEW IN ADMIN */
+.fb-card{background:var(--s2);border:0.5px solid var(--b1);border-radius:12px;padding:14px;margin-top:10px}
+.fb-stars{color:var(--gold2);font-size:14px;margin-bottom:4px}
+.fb-comment{font-size:12px;color:var(--t2);font-style:italic;line-height:1.6;margin-bottom:8px}
+.fb-tag-wrap{display:flex;gap:5px;flex-wrap:wrap}
+.fb-badge{font-size:10px;background:var(--gold-dim);color:var(--gold2);border-radius:10px;padding:2px 8px;font-family:var(--fm)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--fb);opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center;box-shadow:0 8px 32px var(--gold-dim)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.empty-state{text-align:center;padding:44px 20px;color:var(--t3)}
+.empty-icon{font-size:32px;margin-bottom:12px;opacity:.3}
+.empty-title{font-family:var(--fh);font-size:18px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.empty-sub{font-size:12px;line-height:1.6}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <div class="top-row">
-      <div class="brand">
-        <img class="logo" src="./rebelz bartending logo.png" alt="Rebelz" onerror="this.style.background='#C9A84C'">
-        <div>
-          <div class="brand-name">REBE<b>LZ</b> BARTENDING</div>
-          <div class="brand-tag">Think of a party, think of us</div>
-        </div>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="brand-wrap">
+      <img src="rebelz%20bartending%20logo.png" class="brand-logo"/>
+      <div class="brand-text">
+        <div class="brand-name">Rebelz <span>Bartending</span></div>
+        <div class="brand-tag">✦ Think of Party, Think of Us ✦</div>
       </div>
-      <div class="admin-pill">⚙ Admin</div>
     </div>
-    <div class="cities">
-      <span class="cities-lbl">Available in</span>
-      <span class="chip">Hyderabad</span>
-      <span class="chip">Vijayawada</span>
-      <span class="chip">Visakhapatnam</span>
+    <div class="sync-badge">
+      <div class="sync-dot" id="sync-dot"></div>
+      <div class="sync-txt" id="sync-txt">Connecting</div>
     </div>
   </div>
-
-  <div class="body">
-    <div class="stats">
-      <div class="stat t"><div class="n" id="statTotal">0</div><div class="l">Total</div><div class="bar"></div></div>
-      <div class="stat lv"><div class="n" id="statLive">0</div><div class="l">Live</div><div class="bar"></div></div>
-      <div class="stat dn"><div class="n" id="statDone">0</div><div class="l">Done</div><div class="bar"></div></div>
-      <div class="stat st"><div class="n" id="statSetup">0</div><div class="l">Setup</div><div class="bar"></div></div>
-    </div>
-
-    <button class="export-all" onclick="exportAllExcel()">📊 EXPORT ALL EVENTS TO EXCEL (4 SHEETS)</button>
-
-    <div class="card">
-      <div class="card-title">✦ Create New Event</div>
-      <div class="grid2">
-        <div class="field"><label>Client Name *</label><input id="fClient" placeholder="eg. Priya Sharma" type="text"></div>
-        <div class="field"><label>Event Name <span style="color:#5a5440">(optional)</span></label><input id="fEvent" placeholder="eg. Priya Wedding" type="text"></div>
-        <div class="field">
-          <label>Event Type * <span class="new">NEW</span></label>
-          <select id="fType">
-            <option value="">-- Select --</option>
-            <option value="Wedding">Wedding</option>
-            <option value="Birthday">Birthday</option>
-            <option value="Get Together">Get Together</option>
-            <option value="Corporate">Corporate</option>
-            <option value="Brand Promotion">Brand Promotion</option>
-            <option value="Anniversary">Anniversary</option>
-            <option value="DJ / Night Party">DJ / Night Party</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>City *</label>
-          <select id="fCity">
-            <option value="">-- Select --</option>
-            <option value="Hyderabad">Hyderabad</option>
-            <option value="Vijayawada">Vijayawada</option>
-            <option value="Visakhapatnam">Visakhapatnam</option>
-            <option value="Others">Others</option>
-          </select>
-        </div>
-        <div class="field full"><label>Venue — Google Maps Link <span class="new">NEW</span></label>
-          <div class="loc-wrap"><input id="fVenue" placeholder="Paste Google Maps link (optional)" type="text"></div>
-        </div>
-        <div class="field"><label>Date *</label><input id="fDate" type="date"></div>
-        <div class="field"><label>Guests</label><input id="fGuests" type="number" placeholder="350" min="0"></div>
-        <div class="field">
-          <label>Client WhatsApp *</label>
-          <div class="phone-wrap"><span class="phone-code">+91</span><input id="fClientWA" placeholder="98480 00000" type="tel" maxlength="10"></div>
-        </div>
-        <div class="field">
-          <label>Bartender WhatsApp *</label>
-          <div class="phone-wrap"><span class="phone-code">+91</span><input id="fBartWA" placeholder="90000 00000" type="tel" maxlength="10"></div>
-        </div>
-        <div class="field"><label>Bartender PIN * (4–6 digits)</label><input id="fPin" type="number" placeholder="4823" min="1000" max="999999"></div>
-        <div class="field"><div style="font-size:9px;color:#5a5440;line-height:1.6;padding-top:16px">PIN is shared with bartender only to unlock the live tracker.</div></div>
-        <div class="na-row">
-          <span>Rebelz providing Non-Alcoholic beverages?</span>
-          <div class="na-toggle">
-            <button class="na-btn" id="naYes" onclick="setNA(true)">YES</button>
-            <button class="na-btn no-on" id="naNo" onclick="setNA(false)">NO</button>
-          </div>
-        </div>
-      </div>
-      <div class="msg-box" id="formMsg"></div>
-      <button class="btn-gold" id="createBtn" onclick="createEvent()">✦ CREATE EVENT + GENERATE LINKS</button>
-      <button class="btn-clear" onclick="clearForm()">Clear Form</button>
-    </div>
-
-    <div class="card" id="linksCard" style="display:none">
-      <div class="card-title">🔗 Event Created — Links Ready</div>
-      <div style="margin-bottom:10px">
-        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">Event ID</div>
-        <div style="font-size:18px;font-weight:700;color:var(--gold);letter-spacing:2px" id="newEventId">—</div>
-      </div>
-      <div style="margin-bottom:10px">
-        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">Bartender PIN</div>
-        <div style="font-size:24px;font-weight:700;color:var(--gold);letter-spacing:6px" id="newPin">—</div>
-      </div>
-      <div class="links-grid">
-        <div>
-          <label>🍸 Bartender Link</label>
-          <button class="link-btn" onclick="copyLink('bart')">📋 Copy Link</button>
-          <button class="link-btn wa-btn" onclick="sendWA()">📲 Send WhatsApp</button>
-        </div>
-        <div>
-          <label>👁 Client Link</label>
-          <button class="link-btn" onclick="copyLink('client')">📋 Copy Link</button>
-        </div>
-      </div>
-      <div class="wa-box" id="waPreview" style="display:none">
-        <div class="wa-head">📲 Auto-message to bartender</div>
-        <div class="wa-bubble" id="waMsg"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">📋 All Events</div>
-      <div id="eventsList"><div class="empty">Loading events...</div></div>
-    </div>
-  </div>
-
-  <div class="foot">
-    <div class="foot-name">🍸 REBELZ BARTENDING</div>
-    <div class="foot-url">rebelzbartending.com · Hyderabad · Vijayawada · Visakhapatnam</div>
-  </div>
+  <div class="page-tag">Admin Control Panel</div>
 </div>
 
-<!-- PHOTOS MODAL -->
-<div class="overlay" id="photosModal">
+<div class="wrap">
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-l">Total</div><div class="stat-v sv-gold" id="st-total">0</div></div>
+    <div class="stat-box"><div class="stat-l">Live</div><div class="stat-v sv-grn" id="st-live">0</div></div>
+    <div class="stat-box"><div class="stat-l">Done</div><div class="stat-v sv-wht" id="st-done">0</div></div>
+    <div class="stat-box"><div class="stat-l">Setup</div><div class="stat-v sv-amb" id="st-setup">0</div></div>
+  </div>
+
+  <!-- CREATE EVENT -->
+  <div class="sec-lbl">Create New Event</div>
+  <div class="card">
+    <div class="card-title">Event Details</div>
+    <div class="grid2">
+      <div class="field"><label>Client Name *</label><input class="inp" id="f-client" placeholder="e.g. Sharma Family"/></div>
+      <div class="field"><label>Event Name *</label><input class="inp" id="f-event" placeholder="e.g. Wedding Reception"/></div>
+    </div>
+    <div class="grid3">
+      <div class="field"><label>Date *</label><input class="inp" id="f-date" type="date"/></div>
+      <div class="field"><label>City</label>
+        <select class="inp" id="f-city">
+          <option>Vijayawada</option><option>Hyderabad</option><option>Vizag</option><option>Guntur</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Guests</label><input class="inp" id="f-guests" type="number" placeholder="e.g. 150"/></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Venue</label><input class="inp" id="f-venue" placeholder="e.g. Hotel Vijay Grand"/></div>
+      <div class="field"><label>Package</label>
+        <select class="inp" id="f-package">
+          <option>Basic</option><option>Premium</option><option>Luxury</option><option>Custom</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Client WhatsApp</label><input class="inp" id="f-cwa" type="tel" placeholder="+91 98765 43210"/></div>
+      <div class="field"><label>Your WhatsApp</label><input class="inp" id="f-owa" type="tel" placeholder="+91 XXXXX XXXXX"/></div>
+    </div>
+    <div class="field"><label>Bartender PIN (4–6 digits)</label><input class="inp" id="f-pin" type="number" placeholder="e.g. 2580" style="letter-spacing:6px;font-family:var(--fm);font-size:18px"/></div>
+    <div style="height:4px"></div>
+    <button class="btn btn-gold" onclick="createNewEvent()">✦ Create Event + Generate Links</button>
+    <button class="btn btn-ghost" onclick="clearForm()">Clear Form</button>
+  </div>
+
+  <!-- EVENT LIST -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="sec-lbl" style="margin-bottom:0;flex:1">All Events</div>
+    <div style="font-size:9px;color:var(--t4);font-family:var(--fm)" id="admin-count">0 events</div>
+  </div>
+  <div id="event-list"></div>
+  <div style="height:30px"></div>
+</div>
+
+<!-- LINKS MODAL -->
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <div class="modal-head">
-      <div class="modal-title" id="photosTitle">Event Photos</div>
-      <button class="modal-close" onclick="closeModal('photosModal')">×</button>
+    <div class="modal-handle"></div>
+    <div style="font-family:var(--fh);font-size:26px;font-weight:700;margin-bottom:4px;color:var(--gold2)">Event Created ✦</div>
+    <div style="font-size:13px;color:var(--t3);margin-bottom:20px;font-family:var(--fm)" id="modal-sub">Links ready to share</div>
+    <div class="pin-display">
+      <div>
+        <div style="font-size:9px;color:var(--t3);font-family:var(--fm);letter-spacing:.08em;text-transform:uppercase">Bartender PIN</div>
+        <div style="font-size:10px;color:var(--t4);margin-top:2px;font-family:var(--fm)">Share with bartender only</div>
+      </div>
+      <div class="pin-val" id="modal-pin">----</div>
     </div>
-    <div class="modal-body">
-      <div class="modal-sec">Opening (by bartender)</div>
-      <div class="photo-grid" id="openingPhotos"></div>
-      <div class="modal-sec">Closing (by bartender)</div>
-      <div class="photo-grid" id="closingPhotos"></div>
-      <div style="font-size:9px;color:#5a5440;text-align:center;margin-top:4px">Admin only — not visible to client</div>
+    <div class="link-row">
+      <div class="link-lbl">🍸 Bartender Link</div>
+      <div class="link-url" id="modal-bar-url">—</div>
+      <div class="link-btns">
+        <button class="lbtn lbtn-copy" onclick="copyLink('bar')">Copy Link</button>
+        <button class="lbtn lbtn-wa" onclick="waShare('bar')">Send on WhatsApp</button>
+      </div>
     </div>
+    <div class="link-row">
+      <div class="link-lbl">👁 Customer Link</div>
+      <div class="link-url" id="modal-cust-url">—</div>
+      <div class="link-btns">
+        <button class="lbtn lbtn-copy" onclick="copyLink('cust')">Copy Link</button>
+        <button class="lbtn lbtn-wa" onclick="waShare('cust')">Send on WhatsApp</button>
+      </div>
+    </div>
+    <div style="background:var(--s2);border-radius:10px;padding:12px 14px;font-size:11px;color:var(--t3);font-family:var(--fm);line-height:1.8;margin-bottom:16px;border:0.5px solid var(--b1)">
+      Bartender → opens link → enters PIN → sets stock → tracks live<br/>
+      Customer → opens link → sees live tracker → gives feedback after closing
+    </div>
+    <button class="btn btn-gold" onclick="closeModal()">Done ✓</button>
   </div>
 </div>
 
 <!-- FEEDBACK MODAL -->
-<div class="overlay" id="feedbackModal">
+<div class="modal-bg" id="fb-modal" onclick="if(event.target===this)closeFbModal()">
   <div class="modal">
-    <div class="modal-head">
-      <div class="modal-title" id="fbTitle">Feedback</div>
-      <button class="modal-close" onclick="closeModal('feedbackModal')">×</button>
-    </div>
-    <div class="modal-body" id="fbBody"></div>
+    <div class="modal-handle"></div>
+    <div style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--gold2);margin-bottom:16px">Customer Feedback ✦</div>
+    <div id="fb-modal-content"></div>
+    <button class="btn btn-ghost" onclick="closeFbModal()" style="margin-top:8px">Close</button>
   </div>
 </div>
 
-<script>
-// ── FIREBASE INIT (Compat SDK) ──
-const firebaseConfig = {
-  apiKey: "AIzaSyDcrx5tOL1Y2TWiz1VFfCAC_OagARggGNE",
-  authDomain: "rebelz-tracker.firebaseapp.com",
-  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "rebelz-tracker",
-  storageBucket: "rebelz-tracker.firebasestorage.app",
-  messagingSenderId: "234156658582",
-  appId: "1:234156658582:web:26597fc333698b0778d7b7"
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = { databaseURL:"https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app" };
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let EVENTS=[], modalEv=null, feedbackData={};
+
+function gid(id){return document.getElementById(id);}
+function toast(msg,dur=2400){const t=gid('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';}catch(e){return d||'—';}}
+function genId(c){return 'EVT-'+c.replace(/\s+/g,'-').toUpperCase().replace(/[^A-Z0-9-]/g,'').slice(0,8)+'-'+Date.now().toString().slice(-4);}
+function nowISO(){return new Date().toISOString();}
+function baseUrl(){return window.location.href.replace(/admin\.html.*/,'');}
+function barLink(id){return baseUrl()+'bartender.html?ev='+id;}
+function custLink(id){return baseUrl()+'customer.html?ev='+id;}
+function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
+
+// Firebase listeners
+onValue(ref(db,'events'),(snap)=>{
+  gid('sync-dot').style.background='var(--grn)';
+  gid('sync-txt').textContent='Live';
+  const d=snap.val();
+  EVENTS=d?Object.values(d).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)):[];
+  renderList();updateStats();
+});
+onValue(ref(db,'feedback'),(snap)=>{
+  feedbackData=snap.val()||{};
+  renderList();
+});
+
+function saveEvent(ev){set(ref(db,'events/'+ev.id),ev);}
+
+function copyText(txt){
+  try{navigator.clipboard.writeText(txt);}
+  catch(e){const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+  toast('Copied!');
+}
+window.copyText=copyText;
+window.copyLink=function(type){copyText(type==='bar'?gid('modal-bar-url').textContent:gid('modal-cust-url').textContent);}
+window.barLink=barLink;window.custLink=custLink;
+
+window.waShare=function(type){
+  if(!modalEv)return;
+  let msg,phone;
+  if(type==='bar'){
+    msg=`*Rebelz Bartending Services*\n✦ Think of Party, Think of Us ✦\n\n*Event: ${modalEv.event_name}*\nClient: ${modalEv.client_name}\nDate: ${fmtDate(modalEv.event_date)}\nVenue: ${modalEv.venue||'—'}\nGuests: ${modalEv.guests||'—'}\nPackage: ${modalEv.package||'—'}\n\n*Your PIN:* ${modalEv.bartender_pin}\n\n*Bartender Link:*\n${barLink(modalEv.id)}\n\nOpen link → Enter PIN → Set stock → Track live\n\n_Rebelz Bartending Services_`;
+    phone=(modalEv.owner_wa||'').replace(/\D/g,'');
+  } else {
+    msg=`Hello! 🍸\n\nYour *live alcohol tracker* for *${modalEv.event_name}* is ready!\n\nTrack your bottles live:\n${custLink(modalEv.id)}\n\n_Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦`;
+    phone=(modalEv.client_wa||'').replace(/\D/g,'');
+  }
+  window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const BASE = "https://tracker.rebelzbartending.com";
-let naEnabled = false;
-let curEventId = null;
-let curPin = null;
-let allEvents = {};
 
-// ── SHOW MESSAGE ──
-function showMsg(msg, type) {
-  const el = document.getElementById('formMsg');
-  el.textContent = msg;
-  el.className = 'msg-box ' + type;
-  el.style.display = 'block';
-  if (type === 'success') setTimeout(() => el.style.display = 'none', 4000);
+window.clearForm=function(){
+  ['f-client','f-event','f-date','f-venue','f-cwa','f-owa','f-pin','f-guests'].forEach(id=>{const e=gid(id);if(e)e.value='';});
+  gid('f-date').value=new Date().toISOString().split('T')[0];
+};
+
+window.createNewEvent=function(){
+  const client=gid('f-client').value.trim();
+  const evName=gid('f-event').value.trim();
+  const date=gid('f-date').value;
+  if(!client){toast('Enter client name');gid('f-client').focus();return;}
+  if(!evName){toast('Enter event name');gid('f-event').focus();return;}
+  if(!date){toast('Select a date');return;}
+  const pin=(gid('f-pin').value.trim()||'2580').toString();
+  const ev={
+    id:genId(client),client_name:client,event_name:evName,event_date:date,
+    venue:gid('f-venue').value.trim(),city:gid('f-city').value,
+    guests:gid('f-guests').value.trim(),package:gid('f-package').value,
+    bartender_pin:pin,client_wa:gid('f-cwa').value.trim(),owner_wa:gid('f-owa').value.trim(),
+    status:'setup',stock:[],stock_confirmed:false,
+    log:[{msg:'Event created',time:nowISO()}],created_at:nowISO()
+  };
+  saveEvent(ev);showModal(ev);window.clearForm();toast('Event created!');
+};
+
+function showModal(ev){
+  modalEv=ev;
+  gid('modal-sub').textContent=ev.event_name+' · '+ev.client_name;
+  gid('modal-pin').textContent=ev.bartender_pin;
+  gid('modal-bar-url').textContent=barLink(ev.id);
+  gid('modal-cust-url').textContent=custLink(ev.id);
+  gid('modal').classList.add('open');
 }
+window.showModalById=function(id){const ev=EVENTS.find(e=>e.id===id);if(ev)showModal(ev);}
+window.closeModal=function(){gid('modal').classList.remove('open');}
+window.closeFbModal=function(){gid('fb-modal').classList.remove('open');}
 
-// ── NA TOGGLE ──
-function setNA(val) {
-  naEnabled = val;
-  document.getElementById('naYes').className = 'na-btn' + (val ? ' yes-on' : '');
-  document.getElementById('naNo').className = 'na-btn' + (!val ? ' no-on' : '');
-}
+window.deleteEvt=function(id){
+  if(!confirm('Delete this event?'))return;
+  remove(ref(db,'events/'+id));toast('Deleted');
+};
 
-// ── GENERATE EVENT ID ──
-async function generateEventId() {
-  const counterRef = db.ref('eventCounter');
-  const snap = await counterRef.once('value');
-  const next = (snap.exists() ? snap.val() : 0) + 1;
-  await counterRef.set(next);
-  return 'RBS-EVT-' + String(next).padStart(4, '0');
-}
-
-// ── CREATE EVENT ──
-async function createEvent() {
-  const client  = (document.getElementById('fClient').value || '').trim();
-  const type    = document.getElementById('fType').value;
-  const city    = document.getElementById('fCity').value;
-  const date    = document.getElementById('fDate').value;
-  const clientWA = (document.getElementById('fClientWA').value || '').trim();
-  const bartWA   = (document.getElementById('fBartWA').value || '').trim();
-  const pin      = (document.getElementById('fPin').value || '').trim();
-
-  if (!client)    { showMsg('⚠ Enter Client Name', 'error'); return; }
-  if (!type)      { showMsg('⚠ Select Event Type', 'error'); return; }
-  if (!city)      { showMsg('⚠ Select City', 'error'); return; }
-  if (!date)      { showMsg('⚠ Select Date', 'error'); return; }
-  if (!clientWA)  { showMsg('⚠ Enter Client WhatsApp number', 'error'); return; }
-  if (!bartWA)    { showMsg('⚠ Enter Bartender WhatsApp number', 'error'); return; }
-  if (!pin)       { showMsg('⚠ Enter Bartender PIN', 'error'); return; }
-
-  const btn = document.getElementById('createBtn');
-  btn.textContent = 'Creating...';
-  btn.disabled = true;
-  document.getElementById('formMsg').style.display = 'none';
-
-  try {
-    const eventId = await generateEventId();
-    const venue = (document.getElementById('fVenue').value || '').trim();
-    const guests = document.getElementById('fGuests').value || 0;
-    const eventName = (document.getElementById('fEvent').value || '').trim();
-
-    const data = {
-      id: eventId,
-      clientName: client,
-      eventName: eventName,
-      eventType: type,
-      city: city,
-      venue: venue,
-      date: date,
-      guests: parseInt(guests) || 0,
-      clientWhatsApp: '+91' + clientWA,
-      bartenderWhatsApp: '+91' + bartWA,
-      pin: pin,
-      nonAlcoholic: naEnabled,
-      status: 'setup',
-      createdAt: Date.now()
-    };
-
-    await db.ref('events/' + eventId).set(data);
-
-    curEventId = eventId;
-    curPin = pin;
-
-    // Build WhatsApp message
-    const bartLink = BASE + '/bartender.html?ev=' + eventId;
-    const venueStr = venue || 'Not provided';
-    const waText = '🍸 *Rebelz Bartending*\n*' + type + ' — ' + city + '*\nClient: *' + client + '*\n📞 Client: *+91' + clientWA + '*\n📍 Venue: ' + venueStr + '\n🔗 Tracker: ' + bartLink + '\n🔐 PIN: *' + pin + '*\n📋 ID: *' + eventId + '*';
-    window._waText = waText;
-    window._waBartNum = bartWA;
-
-    // Show results
-    document.getElementById('newEventId').textContent = eventId;
-    document.getElementById('newPin').textContent = pin;
-    document.getElementById('linksCard').style.display = 'block';
-    document.getElementById('waMsg').innerHTML =
-      '<span class="gold">🍸 Rebelz Bartending</span><br>' +
-      '<b>' + type + ' — ' + city + '</b><br>' +
-      'Client: <b>' + client + '</b><br>' +
-      '📞 +91' + clientWA + '<br>' +
-      '📍 ' + (venue.length > 35 ? venue.slice(0,35)+'...' : venueStr) + '<br>' +
-      '🔗 <span style="color:#9fd8ff">' + bartLink + '</span><br>' +
-      '🔐 PIN: <b>' + pin + '</b><div class="wa-time">delivered ✓✓</div>';
-    document.getElementById('waPreview').style.display = 'block';
-
-    showMsg('✅ Event ' + eventId + ' created successfully!', 'success');
-    btn.textContent = '✦ CREATE EVENT + GENERATE LINKS';
-    btn.disabled = false;
-
-    // Scroll to links
-    document.getElementById('linksCard').scrollIntoView({behavior:'smooth'});
-
-  } catch(err) {
-    console.error('Create event error:', err);
-    showMsg('❌ Error: ' + err.message + ' — Check Firebase rules are set to true.', 'error');
-    btn.textContent = '✦ CREATE EVENT + GENERATE LINKS';
-    btn.disabled = false;
-  }
-}
-
-function sendWA() {
-  if (!window._waText) return;
-  window.open('https://wa.me/91' + window._waBartNum + '?text=' + encodeURIComponent(window._waText), '_blank');
-}
-
-function copyLink(type) {
-  if (!curEventId) return;
-  const link = type === 'bart'
-    ? BASE + '/bartender.html?ev=' + curEventId
-    : BASE + '/customer.html?ev=' + curEventId;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(link).then(() => alert('Copied: ' + link));
+window.viewFeedback=function(id){
+  const fb=feedbackData[id];
+  const el=gid('fb-modal-content');
+  if(!fb){
+    el.innerHTML=`<div style="text-align:center;padding:32px;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px">💬</div><div style="font-family:var(--fh);font-size:16px;color:var(--t2)">No feedback yet</div><div style="font-size:12px;margin-top:6px">Customer hasn't submitted feedback yet</div></div>`;
   } else {
-    const ta = document.createElement('textarea');
-    ta.value = link; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    alert('Copied: ' + link);
+    const bookAgain=fb.book_again?'✅ Yes, will book again':'❌ Will not book again';
+    el.innerHTML=`
+      <div class="fb-card">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+          <div style="text-align:center;background:var(--s3);border-radius:10px;padding:10px">
+            <div style="font-size:9px;color:var(--t3);font-family:var(--fm);margin-bottom:4px">OVERALL</div>
+            <div style="font-size:22px;font-family:var(--fh);font-weight:700;color:var(--gold2)">${fb.overall||0}/5</div>
+            <div style="font-size:12px;color:var(--gold)">${stars(fb.overall||0)}</div>
+          </div>
+          <div style="text-align:center;background:var(--s3);border-radius:10px;padding:10px">
+            <div style="font-size:9px;color:var(--t3);font-family:var(--fm);margin-bottom:4px">BARTENDER</div>
+            <div style="font-size:22px;font-family:var(--fh);font-weight:700;color:var(--gold2)">${fb.bartender||0}/5</div>
+            <div style="font-size:12px;color:var(--gold)">${stars(fb.bartender||0)}</div>
+          </div>
+          <div style="text-align:center;background:var(--s3);border-radius:10px;padding:10px">
+            <div style="font-size:9px;color:var(--t3);font-family:var(--fm);margin-bottom:4px">COCKTAILS</div>
+            <div style="font-size:22px;font-family:var(--fh);font-weight:700;color:var(--gold2)">${fb.cocktails||0}/5</div>
+            <div style="font-size:12px;color:var(--gold)">${stars(fb.cocktails||0)}</div>
+          </div>
+        </div>
+        <div style="background:var(--s3);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--grn);font-family:var(--fm)">${bookAgain}</div>
+        ${fb.comment?`<div style="font-size:13px;color:var(--t2);font-style:italic;line-height:1.7;margin-bottom:12px;padding:12px;background:var(--s3);border-radius:10px;border-left:2px solid var(--gold)">"${fb.comment}"</div>`:''}
+        ${fb.tags&&fb.tags.length?`<div class="fb-tag-wrap">${fb.tags.map(t=>`<span class="fb-badge">${t}</span>`).join('')}</div>`:''}
+        <div style="font-size:10px;color:var(--t4);font-family:var(--fm);margin-top:10px">By: ${fb.name||'Guest'}</div>
+      </div>`;
   }
-}
+  gid('fb-modal').classList.add('open');
+};
 
-function clearForm() {
-  ['fClient','fEvent','fVenue','fGuests','fClientWA','fBartWA','fPin'].forEach(function(id) {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('fType').value = '';
-  document.getElementById('fCity').value = '';
-  document.getElementById('fDate').value = '';
-  setNA(false);
-  document.getElementById('linksCard').style.display = 'none';
-  document.getElementById('waPreview').style.display = 'none';
-  document.getElementById('formMsg').style.display = 'none';
-  curEventId = null;
-}
-
-// ── LOAD EVENTS ──
-db.ref('events').on('value', function(snap) {
-  allEvents = snap.exists() ? snap.val() : {};
-  renderEvents(allEvents);
-  updateStats(allEvents);
-});
-
-function updateStats(events) {
-  var vals = Object.values(events);
-  document.getElementById('statTotal').textContent = vals.length;
-  document.getElementById('statLive').textContent = vals.filter(function(e){return e.status==='live';}).length;
-  document.getElementById('statDone').textContent = vals.filter(function(e){return e.status==='done';}).length;
-  document.getElementById('statSetup').textContent = vals.filter(function(e){return e.status==='setup';}).length;
-}
-
-function renderEvents(events) {
-  var el = document.getElementById('eventsList');
-  var arr = Object.values(events).sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
-  if (!arr.length) { el.innerHTML = '<div class="empty">No events yet.</div>'; return; }
-  el.innerHTML = arr.map(function(ev) {
-    var badge = ev.status==='live' ? '<span class="badge live">● Live</span>'
-      : ev.status==='done' ? '<span class="badge done">✓ Done</span>'
-      : '<span class="badge setup">◌ Setup</span>';
-    var pc = ev.photos ? Object.keys(ev.photos).length : 0;
-    return '<div class="ev-item">' +
-      '<div class="ev-top"><div>' +
-      '<div class="ev-name">' + ev.clientName + ' <span class="ev-type">' + (ev.eventType||'') + '</span></div>' +
-      '<div class="ev-meta">' + (ev.date||'') + ' · ' + (ev.city||'') + ' · ' + (ev.guests||0) + ' guests</div>' +
-      '<div class="ev-id">' + ev.id + '</div></div>' + badge + '</div>' +
-      '<div class="ev-actions">' +
-      '<div class="ev-act photos" onclick="openPhotos(\'' + ev.id + '\')">📸 Photos' + (pc>0?'<span class="bc">'+pc+'</span>':'') + '</div>' +
-      '<div class="ev-act" onclick="openFeedback(\'' + ev.id + '\')">💬 Feedback</div>' +
-      '<div class="ev-act excel" onclick="exportSingle(\'' + ev.id + '\')">📊 Export</div>' +
-      '</div></div>';
-  }).join('');
-}
-
-// ── PHOTOS MODAL ──
-function openPhotos(eventId) {
-  var ev = allEvents[eventId]; if (!ev) return;
-  document.getElementById('photosTitle').textContent = ev.clientName + ' — Photos';
-  var photos = ev.photos || {};
-  var keys = ['opening_1','opening_2'];
-  var labels = ['Entrance','Bar + Team'];
-  document.getElementById('openingPhotos').innerHTML = keys.map(function(k,i) {
-    return photos[k]
-      ? '<div class="photo-thumb" onclick="viewImg(\''+photos[k]+'\')"><img src="'+photos[k]+'" loading="lazy"></div>'
-      : '<div class="photo-thumb"><div class="ph-icon">📷</div><div class="ph-lbl">'+labels[i]+'</div></div>';
-  }).join('');
-  var clKeys = ['closing_1','closing_2','closing_3'];
-  document.getElementById('closingPhotos').innerHTML = clKeys.map(function(k,i) {
-    return photos[k]
-      ? '<div class="photo-thumb" onclick="viewImg(\''+photos[k]+'\')"><img src="'+photos[k]+'" loading="lazy"></div>'
-      : '<div class="photo-thumb"><div class="ph-icon">📷</div><div class="ph-lbl">Photo '+(i+1)+'</div></div>';
-  }).join('');
-  document.getElementById('photosModal').classList.add('show');
-}
-
-function viewImg(src) {
-  window.open(src.startsWith('data:') ? src : src, '_blank');
-}
-
-// ── FEEDBACK MODAL ──
-function openFeedback(eventId) {
-  var ev = allEvents[eventId]; if (!ev) return;
-  document.getElementById('fbTitle').textContent = ev.clientName + ' — Feedback';
-  var fb = ev.feedback;
-  if (!fb) {
-    document.getElementById('fbBody').innerHTML = '<div class="empty">No feedback yet.</div>';
-  } else {
-    var stars = '★'.repeat(fb.rating||0) + '☆'.repeat(5-(fb.rating||0));
-    document.getElementById('fbBody').innerHTML =
-      '<div class="fb-row"><div class="fb-lbl">Rating</div><div class="fb-val" style="color:var(--gold);font-size:18px">'+stars+'</div></div>' +
-      '<div class="fb-row"><div class="fb-lbl">Reaction</div><div class="fb-val">'+(fb.reaction||'—')+'</div></div>' +
-      '<div class="fb-row"><div class="fb-lbl">Comment</div><div class="fb-val">'+(fb.comment||'—')+'</div></div>' +
-      '<div class="fb-row"><div class="fb-lbl">Submitted</div><div class="fb-val">'+(fb.submittedAt ? new Date(fb.submittedAt).toLocaleString() : '—')+'</div></div>';
+function renderList(){
+  const el=gid('event-list');
+  gid('admin-count').textContent=EVENTS.length+' event'+(EVENTS.length!==1?'s':'');
+  if(!EVENTS.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🍸</div><div class="empty-title">No events yet</div><div class="empty-sub">Fill the form above to create your first event</div></div>`;
+    return;
   }
-  document.getElementById('feedbackModal').classList.add('show');
+  el.innerHTML=EVENTS.map(ev=>{
+    const tot=ev.stock?ev.stock.reduce((s,i)=>s+i.qty,0):0;
+    const used=ev.stock?ev.stock.reduce((s,i)=>s+(i.used||0),0):0;
+    const fb=feedbackData[ev.id];
+    const fbBadge=fb?`<span style="font-size:10px;color:var(--gold2);font-family:var(--fm);background:var(--gold-dim);padding:2px 8px;border-radius:10px">⭐ ${fb.overall}/5</span>`:'';
+    return `<div class="ev-card ${ev.status==='live'?'live':''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
+        <div style="min-width:0">
+          <div style="font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:3px;color:var(--t1)">${ev.event_name}</div>
+          <div style="font-size:10px;color:var(--t3);font-family:var(--fm);line-height:1.8">${ev.client_name} · ${fmtDate(ev.event_date)}<br/>${ev.city||''}${ev.venue?' · '+ev.venue:''} ${ev.guests?'· '+ev.guests+' guests':''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+          <div class="status-pill sp-${ev.status}">${ev.status==='setup'?'Setup':ev.status==='live'?'● Live':'✓ Done'}</div>
+          ${fbBadge}
+        </div>
+      </div>
+      <div style="font-size:10px;font-family:var(--fm);color:${ev.stock_confirmed?'var(--t3)':'var(--amb)'};margin-bottom:12px;padding:8px;background:var(--s2);border-radius:8px">
+        ${ev.stock_confirmed?`📦 ${tot} bottles · ${used} consumed · ${tot-used} remaining`:'⚠ Bartender yet to confirm opening stock'} · PIN: <span style="color:var(--gold2)">${ev.bartender_pin}</span> · ${ev.package||'Basic'}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="showModalById('${ev.id}')">🔗 Links</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyText(barLink('${ev.id}'))">Copy Bartender</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyText(custLink('${ev.id}'))">Copy Client</button>
+        <button class="btn btn-ghost btn-sm" onclick="viewFeedback('${ev.id}')" style="color:var(--gold2);border-color:var(--gold-dim)">⭐ Feedback</button>
+        <button class="btn btn-red btn-sm" onclick="deleteEvt('${ev.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
-// ── EXCEL ──
-function exportAllExcel() { exportExcel(Object.values(allEvents)); }
-function exportSingle(id) { var ev = allEvents[id]; if(ev) exportExcel([ev]); }
-
-function exportExcel(events) {
-  if (!events.length) { alert('No events to export.'); return; }
-  var wb = XLSX.utils.book_new();
-
-  // Sheet 1: Events
-  var ev1 = [['Event ID','Client','Type','Date','City','Guests','Venue','Status','Client WA','Bartender WA','Team Leader','Bartenders','Names','Non-Alc']];
-  events.forEach(function(e){ ev1.push([e.id||'',e.clientName||'',e.eventType||'',e.date||'',e.city||'',e.guests||'',e.venue||'',e.status||'',e.clientWhatsApp||'',e.bartenderWhatsApp||'',e.teamLeader||'',e.numBartenders||'',e.bartenderNames||'',e.nonAlcoholic?'Yes':'No']); });
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ev1), 'Events');
-
-  // Sheet 2: Feedback
-  var fb1 = [['Event ID','Client','Date','Rating','Reaction','Comment','Submitted']];
-  events.forEach(function(e){ var f=e.feedback||{}; fb1.push([e.id||'',e.clientName||'',e.date||'',f.rating||'',f.reaction||'',f.comment||'',f.submittedAt?new Date(f.submittedAt).toLocaleString():'']); });
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(fb1), 'Feedback');
-
-  // Sheet 3: Consumption
-  var allItems = [];
-  events.forEach(function(e){ 
-    if(e.drinks) Object.values(e.drinks).forEach(function(d){ if(!allItems.includes(d.name)) allItems.push(d.name); });
-    if(e.nonAlcDrinks) Object.values(e.nonAlcDrinks).forEach(function(d){ if(!allItems.includes(d.name)) allItems.push(d.name); });
-  });
-  var ch = ['Event ID','Client','Date'].concat(allItems.map(function(i){return i+' Given';})).concat(allItems.map(function(i){return i+' Used';}));
-  var cons = [ch];
-  events.forEach(function(e){
-    var row = [e.id||'',e.clientName||'',e.date||''];
-    var dm = {};
-    if(e.drinks) Object.values(e.drinks).forEach(function(d){ dm[d.name]=d; });
-    if(e.nonAlcDrinks) Object.values(e.nonAlcDrinks).forEach(function(d){ dm[d.name]=d; });
-    allItems.forEach(function(i){ row.push(dm[i]?dm[i].opening:0); });
-    allItems.forEach(function(i){ row.push(dm[i]?dm[i].consumed:0); });
-    cons.push(row);
-  });
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(cons), 'Consumption');
-
-  // Sheet 4: Photos
-  var ph = [['Event ID','Client','Date','Opening 1','Opening 2','Closing 1','Closing 2','Closing 3']];
-  events.forEach(function(e){ var p=e.photos||{}; ph.push([e.id||'',e.clientName||'',e.date||'',p.opening_1?'[photo]':'',p.opening_2?'[photo]':'',p.closing_1?'[photo]':'',p.closing_2?'[photo]':'',p.closing_3?'[photo]':'']); });
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ph), 'Photos');
-
-  XLSX.writeFile(wb, 'Rebelz_Events_' + new Date().toISOString().slice(0,10) + '.xlsx');
+function updateStats(){
+  gid('st-total').textContent=EVENTS.length;
+  gid('st-live').textContent=EVENTS.filter(e=>e.status==='live').length;
+  gid('st-done').textContent=EVENTS.filter(e=>e.status==='closed').length;
+  gid('st-setup').textContent=EVENTS.filter(e=>e.status==='setup').length;
 }
 
-// Close overlay on outside click
-document.querySelectorAll('.overlay').forEach(function(o){
-  o.addEventListener('click', function(e){ if(e.target===o) closeModal(o.id); });
-});
+gid('f-date').value=new Date().toISOString().split('T')[0];
 </script>
 </body>
 </html>
