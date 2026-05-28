@@ -296,7 +296,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDcrx5tOL1Y2TWiz1VFfCAC_OagARggGNE",
@@ -327,13 +327,10 @@ window.setNA = (val) => {
 // ── GENERATE EVENT ID ──
 async function generateEventId() {
   const counterRef = ref(db, 'eventCounter');
-  let newId;
-  await runTransaction(counterRef, (curr) => {
-    const next = (curr || 0) + 1;
-    newId = `RBS-EVT-${String(next).padStart(4,'0')}`;
-    return next;
-  });
-  return newId;
+  const snap = await get(counterRef);
+  const next = (snap.exists() ? snap.val() : 0) + 1;
+  await set(counterRef, next);
+  return `RBS-EVT-${String(next).padStart(4,'0')}`;
 }
 
 // ── CREATE EVENT ──
