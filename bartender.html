@@ -303,7 +303,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDcrx5tOL1Y2TWiz1VFfCAC_OagARggGNE",
@@ -317,7 +316,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const storage = getStorage(app);
 const BASE = "https://tracker.rebelzbartending.com";
 
 const params = new URLSearchParams(location.search);
@@ -466,31 +464,53 @@ function loadExistingDrinks() {
   renderAlcList(); renderNaList();
 }
 
-// ── PHOTOS ──
+// ── PHOTOS (base64 — no Storage needed) ──
 window.handlePhoto = async (input, key, boxId) => {
   const file = input.files[0];
   if (!file) return;
   const box = document.getElementById(boxId);
-  box.querySelector('.pb-lbl').textContent = 'Uploading...';
+  box.querySelector('.pb-lbl').textContent = 'Processing...';
   try {
-    const photoRef = sRef(storage, `events/${eventId}/${key}_${Date.now()}.jpg`);
-    await uploadBytes(photoRef, file);
-    const url = await getDownloadURL(photoRef);
-    await update(ref(db, `events/${eventId}/photos`), { [key]: url });
+    // Compress image to max 600px and convert to base64
+    const base64 = await compressImage(file, 600, 0.7);
+    await update(ref(db, `events/${eventId}/photos`), { [key]: base64 });
     photosUploaded[key] = true;
     box.classList.add('done');
     box.querySelector('.pb-icon').textContent = '✓';
-    box.querySelector('.pb-lbl').textContent = 'Uploaded ✓';
-    // Show image preview
+    box.querySelector('.pb-lbl').textContent = 'Saved ✓';
     const img = document.createElement('img');
-    img.src = url;
+    img.src = base64;
     box.appendChild(img);
     checkOpeningPhotos();
   } catch(e) {
     box.querySelector('.pb-lbl').textContent = 'Failed. Tap again.';
-    alert('Upload failed: ' + e.message);
+    alert('Photo save failed: ' + e.message);
   }
 };
+
+function compressImage(file, maxPx, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 function checkOpeningPhotos() {
   const done = photosUploaded.opening_1 && photosUploaded.opening_2;
