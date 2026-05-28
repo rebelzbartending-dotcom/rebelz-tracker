@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Rebelz — Admin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080806;--bg2:#13110a;--bg3:#0c0b07;--gold:#C9A84C;--gold-hi:#E8D089;--gold-lo:#9a7d2e;--line:#2a2415;--ink:#f5f0e4;--muted:#8a8268;--green:#2d7a4f;--red:#7a1f1f}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a08;min-height:100vh;color:var(--ink)}
+.wrap{max-width:520px;margin:0 auto;background:var(--bg);min-height:100vh}
+
+/* TOP */
+.top{background:linear-gradient(160deg,#15130c,#0c0b07);padding:18px 16px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.top::before{content:'';position:absolute;top:-50px;right:20px;width:160px;height:160px;background:radial-gradient(circle,#C9A84C15,transparent 70%);border-radius:50%;pointer-events:none}
+.top::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,#C9A84C08);pointer-events:none}
+.top-row{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);box-shadow:0 0 18px #C9A84C44;background:#000;flex-shrink:0}
+.brand-name{font-size:17px;font-weight:700;color:var(--ink);letter-spacing:0.08em;line-height:1.1}
+.brand-name b{background:linear-gradient(135deg,var(--gold-hi),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.brand-tag{font-size:9px;color:var(--gold);letter-spacing:0.16em;text-transform:uppercase;margin-top:2px;font-style:italic}
+.admin-pill{font-size:10px;color:#0c0b07;background:linear-gradient(135deg,var(--gold-hi),var(--gold));border-radius:20px;padding:5px 12px;font-weight:700}
+.cities{display:flex;align-items:center;gap:6px;margin-top:12px;position:relative;z-index:1;flex-wrap:wrap}
+.cities-lbl{font-size:9px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase}
+.chip{font-size:10px;color:var(--gold);border:1px solid #C9A84C44;background:#C9A84C0e;border-radius:16px;padding:3px 10px}
+
+/* BODY */
+.body{padding:16px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:12px 8px;text-align:center;position:relative;overflow:hidden}
+.stat .n{font-size:22px;font-weight:700;line-height:1;color:var(--gold)}
+.stat .l{font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:0.1em;text-transform:uppercase}
+.stat.lv .n{color:#d4b75f}.stat.dn .n{color:#e8d089}.stat.st .n{color:#b89a3e}
+.stat .bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-lo),var(--gold),var(--gold-hi))}
+
+/* EXPORT ALL */
+.export-all{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#1a3a28,#0f2419);color:#a7e8c4;border:1px solid #2e6b4866;border-radius:11px;padding:12px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:14px;letter-spacing:0.03em;border:none}
+.export-all:hover{background:linear-gradient(135deg,#1f4a33,#143020)}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#C9A84C44,transparent)}
+.card-title{font-size:11px;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+
+/* FORM */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.field{display:flex;flex-direction:column}
+.field.full{grid-column:1/-1}
+.field label{font-size:10px;color:var(--muted);margin-bottom:5px;letter-spacing:0.03em}
+.field label .new{color:var(--gold);font-size:8px;margin-left:3px;font-weight:700}
+.field input,.field select,.field textarea{width:100%;padding:9px 11px;font-size:13px;border:1px solid var(--line);border-radius:9px;background:var(--bg3);color:var(--ink);font-family:inherit}
+.field input::placeholder{color:#5a5440}
+.field input:focus,.field select:focus{outline:none;border-color:var(--gold)}
+.phone-wrap{display:flex}
+.phone-code{display:flex;align-items:center;padding:0 10px;background:linear-gradient(135deg,var(--gold-hi),var(--gold));color:#0c0b07;font-size:12px;font-weight:700;border-radius:9px 0 0 9px;white-space:nowrap}
+.phone-wrap input{border-radius:0 9px 9px 0;border-left:none}
+.loc-wrap{position:relative}
+.loc-wrap input{padding-right:36px}
+.loc-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:14px}
+
+/* NA TOGGLE */
+.na-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg3);border:1px solid var(--line);border-radius:9px;grid-column:1/-1}
+.na-row span{font-size:11px;color:var(--muted)}
+.na-toggle{display:flex;gap:6px}
+.na-btn{padding:4px 14px;border-radius:8px;border:1px solid var(--line);background:var(--bg2);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer}
+.na-btn.active-yes{background:linear-gradient(135deg,#1a3a28,#0f2419);color:#5fd99a;border-color:#2e6b4866}
+.na-btn.active-no{background:linear-gradient(135deg,var(--red),#4a0f0f);color:#ffb3b3;border-color:#8b2e2e66}
+
+/* BUTTONS */
+.btn-gold{background:linear-gradient(135deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));color:#0c0b07;border:none;border-radius:11px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:14px;letter-spacing:0.03em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px #C9A84C33}
+.btn-gold:hover{filter:brightness(1.1)}
+.btn-clear{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px;cursor:pointer;width:100%;margin-top:8px}
+
+/* WA PREVIEW */
+.wa-box{background:#0a120e;border:1px solid #16291d;border-radius:11px;padding:12px;margin-top:12px}
+.wa-head{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:10px;color:#7a9b8c;text-transform:uppercase;letter-spacing:0.05em}
+.wa-bubble{background:#005c4b;border-radius:0 9px 9px 9px;padding:10px 12px;font-size:12px;color:#e9fff5;line-height:1.7;max-width:94%}
+.wa-bubble .gold{color:#ffd97a;font-weight:700}
+.wa-time{font-size:8px;color:#6a8;text-align:right;margin-top:3px}
+
+/* EVENTS */
+.ev-item{padding:12px 0;border-bottom:1px solid var(--line)}
+.ev-item:last-child{border:none;padding-bottom:0}
+.ev-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.ev-name{font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ev-type{font-size:9px;padding:2px 8px;border-radius:10px;background:#C9A84C1e;color:var(--gold)}
+.ev-meta{font-size:10px;color:var(--muted);margin-top:3px}
+.ev-id{font-size:9px;color:#5a5440;margin-top:1px}
+.badge-live{font-size:9px;padding:3px 10px;border-radius:16px;font-weight:700;background:#0f1a0e;color:#5fd99a;border:1px solid #2e6b4844;white-space:nowrap}
+.badge-done{font-size:9px;padding:3px 10px;border-radius:16px;font-weight:700;background:#C9A84C18;color:var(--gold);border:1px solid #C9A84C44;white-space:nowrap}
+.badge-setup{font-size:9px;padding:3px 10px;border-radius:16px;font-weight:700;background:#1a1a35;color:#a5b4fc;border:1px solid #4338ca44;white-space:nowrap}
+.ev-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.ev-act{display:flex;align-items:center;gap:4px;font-size:10px;padding:5px 10px;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:var(--bg3);color:#bdb393;font-weight:600}
+.ev-act:hover{border-color:var(--gold);color:var(--gold)}
+.ev-act.photos{border-color:#C9A84C55;color:var(--gold);background:#C9A84C0e}
+.ev-act.excel{border-color:#2e6b4844;color:#5fd99a;background:#0f1a0e}
+.ev-act.feedback{border-color:#4338ca44;color:#a5b4fc;background:#1a1a3522}
+.bc{background:linear-gradient(135deg,var(--gold-hi),var(--gold));color:#0c0b07;font-size:8px;font-weight:700;border-radius:8px;padding:1px 5px;margin-left:2px}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(5,5,3,0.92);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;backdrop-filter:blur(4px)}
+.overlay.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--line);border-radius:14px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;box-shadow:0 0 40px #C9A84C22}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg2);z-index:1}
+.modal-title{font-size:12px;color:var(--gold);font-weight:700;letter-spacing:0.04em}
+.modal-close{cursor:pointer;color:var(--muted);font-size:20px;background:none;border:none;line-height:1}
+.modal-body{padding:16px}
+.modal-sec{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin:4px 0 8px}
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.photo-thumb{aspect-ratio:1;border-radius:9px;background:linear-gradient(135deg,#1a160d,#0c0b07);border:1px solid #C9A84C33;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;overflow:hidden}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-thumb .ph-icon{font-size:22px;color:var(--gold);opacity:0.5}
+.photo-thumb .ph-lbl{font-size:9px;color:var(--muted)}
+.admin-note{font-size:9px;color:#5a5440;text-align:center;margin-top:4px}
+
+/* FEEDBACK MODAL */
+.fb-row{padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+.fb-row:last-child{border:none}
+.fb-lbl{font-size:10px;color:var(--muted);margin-bottom:3px}
+.fb-val{color:var(--ink)}
+.stars-display{color:var(--gold);font-size:16px;letter-spacing:2px}
+
+/* FOOTER */
+.foot{text-align:center;padding:14px;border-top:1px solid var(--line);background:linear-gradient(180deg,transparent,#C9A84C08)}
+.foot-logo{width:40px;height:40px;border-radius:50%;border:1.5px solid #C9A84C44;margin-bottom:6px;background:#000}
+.foot-name{font-size:11px;color:var(--gold);letter-spacing:0.1em;font-weight:700}
+.foot-url{font-size:9px;color:#6a6450;margin-top:3px}
+
+/* empty state */
+.empty{text-align:center;padding:30px 20px;color:var(--muted);font-size:12px}
+.connecting{text-align:center;padding:20px;color:var(--gold);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- TOP -->
+  <div class="top">
+    <div class="top-row">
+      <div class="brand">
+        <img class="logo" src="./rebelz bartending logo.png" alt="Rebelz" onerror="this.style.background='#C9A84C'">
+        <div>
+          <div class="brand-name">REBE<b>LZ</b> BARTENDING</div>
+          <div class="brand-tag">Think of a party, think of us</div>
+        </div>
+      </div>
+      <div class="admin-pill">⚙ Admin</div>
+    </div>
+    <div class="cities">
+      <span class="cities-lbl">Available in</span>
+      <span class="chip">Hyderabad</span>
+      <span class="chip">Vijayawada</span>
+      <span class="chip">Visakhapatnam</span>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat t"><div class="n" id="statTotal">0</div><div class="l">Total</div><div class="bar"></div></div>
+      <div class="stat lv"><div class="n" id="statLive">0</div><div class="l">Live</div><div class="bar"></div></div>
+      <div class="stat dn"><div class="n" id="statDone">0</div><div class="l">Done</div><div class="bar"></div></div>
+      <div class="stat st"><div class="n" id="statSetup">0</div><div class="l">Setup</div><div class="bar"></div></div>
+    </div>
+
+    <!-- EXPORT ALL -->
+    <button class="export-all" onclick="exportAllToExcel()">📊 EXPORT ALL EVENTS TO EXCEL (4 SHEETS)</button>
+
+    <!-- CREATE EVENT -->
+    <div class="card">
+      <div class="card-title">✦ Create New Event</div>
+      <div class="grid2">
+        <div class="field"><label>Client Name *</label><input id="fClient" placeholder="eg. Priya Sharma"></div>
+        <div class="field"><label>Event Name <span style="color:#5a5440">(optional)</span></label><input id="fEvent" placeholder="eg. Priya Wedding"></div>
+        <div class="field"><label>Event Type * <span class="new">NEW</span></label>
+          <select id="fType">
+            <option value="">Select type</option>
+            <option>Wedding</option><option>Birthday</option><option>Get Together</option>
+            <option>Corporate</option><option>Brand Promotion</option><option>Anniversary</option>
+            <option>DJ / Night Party</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field"><label>City *</label>
+          <select id="fCity">
+            <option value="">Select city</option>
+            <option>Hyderabad</option><option>Vijayawada</option><option>Visakhapatnam</option><option>Others</option>
+          </select>
+        </div>
+        <div class="field full"><label>Venue — Google Maps Link <span class="new">NEW</span></label>
+          <div class="loc-wrap"><input id="fVenue" placeholder="Paste Google Maps link of venue"><span class="loc-icon">📍</span></div>
+        </div>
+        <div class="field"><label>Date *</label><input id="fDate" type="date"></div>
+        <div class="field"><label>Guests</label><input id="fGuests" type="number" placeholder="350"></div>
+        <div class="field"><label>Client WhatsApp *</label>
+          <div class="phone-wrap"><span class="phone-code">+91</span><input id="fClientWA" placeholder="98480 00000" maxlength="10" type="number"></div>
+        </div>
+        <div class="field"><label>Bartender WhatsApp *</label>
+          <div class="phone-wrap"><span class="phone-code">+91</span><input id="fBartWA" placeholder="90000 00000" maxlength="10" type="number"></div>
+        </div>
+        <div class="field"><label>Bartender PIN * <span style="color:#5a5440">(4–6 digits)</span></label><input id="fPin" type="number" placeholder="4823" maxlength="6"></div>
+        <div class="field" style="justify-content:flex-end"><div style="font-size:9px;color:#5a5440;line-height:1.6;margin-top:auto">PIN is shared with bartender only to unlock the live tracker page.</div></div>
+        <!-- NON-ALCOHOLIC TOGGLE -->
+        <div class="na-row">
+          <span>Rebelz providing Non-Alcoholic beverages?</span>
+          <div class="na-toggle">
+            <button class="na-btn" id="naYes" onclick="setNA(true)">YES</button>
+            <button class="na-btn active-no" id="naNo" onclick="setNA(false)">NO</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-gold" id="createBtn" onclick="createEvent()">✦ CREATE EVENT + GENERATE LINKS</button>
+      <button class="btn-clear" onclick="clearForm()">Clear Form</button>
+      <div id="errMsg" style="display:none;margin-top:10px;padding:10px;background:#1a0f0f;border:1px solid #6b2e2e;border-radius:9px;font-size:12px;color:#ff9999"></div>
+
+      <!-- WA PREVIEW -->
+      <div class="wa-box" id="waPreview" style="display:none">
+        <div class="wa-head">📲 Auto-message sent to bartender</div>
+        <div class="wa-bubble" id="waMsgPreview"></div>
+      </div>
+    </div>
+
+    <!-- EVENT LINKS (after create) -->
+    <div class="card" id="linksCard" style="display:none">
+      <div class="card-title">🔗 Event Created — Links Ready</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">Event ID</div>
+        <div style="font-size:16px;font-weight:700;color:var(--gold)" id="newEventId"></div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">Bartender PIN — share with bartender only</div>
+        <div style="font-size:22px;font-weight:700;color:var(--gold);letter-spacing:4px" id="newEventPin"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+        <div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:6px">🍸 Bartender Link</div>
+          <button class="ev-act" style="width:100%;justify-content:center" onclick="copyLink('bart')">Copy Link</button>
+          <button class="ev-act" style="width:100%;justify-content:center;margin-top:6px;background:#0a120e;border-color:#2e6b4844;color:#5fd99a" onclick="sendWA()">Send WhatsApp</button>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:6px">👁 Client Link</div>
+          <button class="ev-act" style="width:100%;justify-content:center" onclick="copyLink('client')">Copy Link</button>
+          <button class="ev-act" style="width:100%;justify-content:center;margin-top:6px" onclick="copyLink('client')">Copy Link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL EVENTS -->
+    <div class="card">
+      <div class="card-title">📋 All Events</div>
+      <div id="eventsList"><div class="connecting">Connecting to Firebase...</div></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="foot">
+    <img class="foot-logo" src="./rebelz bartending logo.png" onerror="this.style.background='#C9A84C'">
+    <div class="foot-name">REBELZ BARTENDING</div>
+    <div class="foot-url">rebelzbartending.com · Hyderabad · Vijayawada · Visakhapatnam</div>
+  </div>
+</div>
+
+<!-- PHOTOS MODAL -->
+<div class="overlay" id="photosModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="photosModalTitle">Event Photos</div>
+      <button class="modal-close" onclick="closeModal('photosModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-sec">Opening Setup (by bartender)</div>
+      <div class="photo-grid" id="openingPhotos"></div>
+      <div class="modal-sec">Closing (by bartender)</div>
+      <div class="photo-grid" id="closingPhotos"></div>
+      <div class="admin-note">Photos visible to admin only — not shown to client</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="overlay" id="feedbackModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="fbModalTitle">Customer Feedback</div>
+      <button class="modal-close" onclick="closeModal('feedbackModal')">×</button>
+    </div>
+    <div class="modal-body" id="fbModalBody"></div>
+  </div>
+</div>
+
+<!-- FULL IMAGE MODAL -->
+<div class="overlay" id="imgModal" onclick="closeModal('imgModal')">
+  <img id="imgFull" style="max-width:100%;max-height:90vh;border-radius:10px;object-fit:contain">
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDcrx5tOL1Y2TWiz1VFfCAC_OagARggGNE",
+  authDomain: "rebelz-tracker.firebaseapp.com",
+  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rebelz-tracker",
+  storageBucket: "rebelz-tracker.firebasestorage.app",
+  messagingSenderId: "234156658582",
+  appId: "1:234156658582:web:26597fc333698b0778d7b7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const BASE = "https://tracker.rebelzbartending.com";
+let naEnabled = false;
+let currentEventId = null;
+let currentPin = null;
+let allEvents = {};
+
+// ── SET NA TOGGLE ──
+window.setNA = (val) => {
+  naEnabled = val;
+  document.getElementById('naYes').className = 'na-btn' + (val ? ' active-yes' : '');
+  document.getElementById('naNo').className = 'na-btn' + (!val ? ' active-no' : '');
+};
+
+// ── GENERATE EVENT ID ──
+async function generateEventId() {
+  const counterRef = ref(db, 'eventCounter');
+  const snap = await get(counterRef);
+  const next = (snap.exists() ? snap.val() : 0) + 1;
+  await set(counterRef, next);
+  return `RBS-EVT-${String(next).padStart(4,'0')}`;
+}
+
+// ── CREATE EVENT ──
+window.createEvent = async () => {
+  const client = document.getElementById('fClient').value.trim();
+  const type = document.getElementById('fType').value;
+  const city = document.getElementById('fCity').value;
+  const date = document.getElementById('fDate').value;
+  const clientWA = document.getElementById('fClientWA').value.trim();
+  const bartWA = document.getElementById('fBartWA').value.trim();
+  const pin = document.getElementById('fPin').value.trim();
+
+  if (!client || !type || !city || !date || !clientWA || !bartWA || !pin) {
+    alert('Please fill all required fields (*)'); return;
+  }
+
+  const btn = document.getElementById('createBtn');
+  btn.innerHTML = 'Creating event...'; btn.disabled = true;
+
+  try {
+    const eventId = await generateEventId();
+    const eventData = {
+      id: eventId,
+      clientName: client,
+      eventName: document.getElementById('fEvent').value.trim() || '',
+      eventType: type,
+      city: city,
+      venue: document.getElementById('fVenue').value.trim() || '',
+      date: date,
+      guests: document.getElementById('fGuests').value || 0,
+      clientWhatsApp: '+91' + clientWA,
+      bartenderWhatsApp: '+91' + bartWA,
+      pin: pin,
+      nonAlcoholic: naEnabled,
+      status: 'setup',
+      createdAt: Date.now()
+    };
+
+    await set(ref(db, `events/${eventId}`), eventData);
+
+    currentEventId = eventId;
+    currentPin = pin;
+
+    // Show links
+    document.getElementById('newEventId').textContent = eventId;
+    document.getElementById('newEventPin').textContent = pin;
+    document.getElementById('linksCard').style.display = 'block';
+
+    // Build and show WA preview
+    const bartLink = `${BASE}/bartender.html?ev=${eventId}`;
+    const venueText = eventData.venue || 'Venue link not provided';
+    const msg = `🍸 *Rebelz Bartending*\n*${type} — ${city}*\nClient: *${client}*\n📞 Client no: *+91${clientWA}*\n📍 Venue: ${venueText}\n🔗 Tracker: ${bartLink}\n🔐 PIN: *${pin}*\n📋 Event ID: *${eventId}*`;
+    document.getElementById('waMsgPreview').innerHTML = `<span class="gold">🍸 Rebelz Bartending</span><br><b>${type} — ${city}</b><br>Client: <b>${client}</b><br>📞 Client no: <b>+91${clientWA}</b><br>📍 Venue: ${venueText.length > 40 ? venueText.slice(0,40)+'...' : venueText}<br>🔗 Tracker: <a href="${bartLink}" style="color:#9fd8ff">${bartLink.slice(0,50)}...</a><br>🔐 PIN: <b>${pin}</b><br>📋 ID: <b>${eventId}</b><div class="wa-time">delivered ✓✓</div>`;
+    document.getElementById('waPreview').style.display = 'block';
+
+    // Store WA message for sending
+    window._waMsg = msg;
+    window._waNum = bartWA;
+
+    btn.innerHTML = '✦ CREATE EVENT + GENERATE LINKS';
+    btn.disabled = false;
+    alert('Event created!\nID: ' + eventId + '\n\nLinks are ready below.');
+
+  } catch(e) {
+    console.error('Firebase error:', e);
+    alert('ERROR: ' + e.message + '\n\nMake sure Firebase Database rules are set to allow read/write.');
+    btn.innerHTML = '✦ CREATE EVENT + GENERATE LINKS';
+    btn.disabled = false;
+  }
+};
+
+window.sendWA = () => {
+  if (!window._waMsg) return;
+  const url = `https://wa.me/91${window._waNum}?text=${encodeURIComponent(window._waMsg)}`;
+  window.open(url, '_blank');
+};
+
+window.copyLink = (type) => {
+  if (!currentEventId) return;
+  const link = type === 'bart'
+    ? `${BASE}/bartender.html?ev=${currentEventId}`
+    : `${BASE}/customer.html?ev=${currentEventId}`;
+  navigator.clipboard.writeText(link).then(() => alert('Link copied!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = link; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('Link copied!');
+  });
+};
+
+window.clearForm = () => {
+  ['fClient','fEvent','fVenue','fDate','fGuests','fClientWA','fBartWA','fPin'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fType').value = '';
+  document.getElementById('fCity').value = '';
+  setNA(false);
+  document.getElementById('waPreview').style.display = 'none';
+  document.getElementById('linksCard').style.display = 'none';
+  currentEventId = null;
+};
+
+// ── LOAD EVENTS ──
+// Test Firebase connection
+get(ref(db, 'eventCounter')).then(() => {
+  console.log('Firebase connected OK');
+}).catch(e => {
+  document.getElementById('eventsList').innerHTML = '<div style="padding:14px;background:#1a0f0f;border:1px solid #6b2e2e;border-radius:9px;font-size:12px;color:#ff9999">⚠ Firebase connection error: ' + e.message + '<br><br>Please update Database Rules to allow read/write.</div>';
+});
+
+onValue(ref(db, 'events'), snap => {
+  allEvents = snap.exists() ? snap.val() : {};
+  renderEvents(allEvents);
+  updateStats(allEvents);
+});
+
+function updateStats(events) {
+  const vals = Object.values(events);
+  document.getElementById('statTotal').textContent = vals.length;
+  document.getElementById('statLive').textContent = vals.filter(e=>e.status==='live').length;
+  document.getElementById('statDone').textContent = vals.filter(e=>e.status==='done').length;
+  document.getElementById('statSetup').textContent = vals.filter(e=>e.status==='setup').length;
+}
+
+function renderEvents(events) {
+  const el = document.getElementById('eventsList');
+  const arr = Object.values(events).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  if (!arr.length) { el.innerHTML = '<div class="empty">No events yet. Create your first event above.</div>'; return; }
+  el.innerHTML = arr.map(ev => {
+    const badge = ev.status === 'live' ? '<span class="badge-live">● Live</span>'
+      : ev.status === 'done' ? '<span class="badge-done">✓ Done</span>'
+      : '<span class="badge-setup">◌ Setup</span>';
+    const photoCount = ev.photos ? Object.keys(ev.photos).length : 0;
+    return `<div class="ev-item">
+      <div class="ev-top">
+        <div>
+          <div class="ev-name">${ev.clientName} <span class="ev-type">${ev.eventType||''}</span></div>
+          <div class="ev-meta">${ev.date||''} · ${ev.city||''} · ${ev.guests||0} guests</div>
+          <div class="ev-id">${ev.id}</div>
+        </div>
+        ${badge}
+      </div>
+      <div class="ev-actions">
+        <div class="ev-act photos" onclick="openPhotos('${ev.id}')">📸 Photos${photoCount>0?`<span class="bc">${photoCount}</span>`:''}</div>
+        <div class="ev-act feedback" onclick="openFeedback('${ev.id}')">💬 Feedback</div>
+        <div class="ev-act excel" onclick="exportSingleEvent('${ev.id}')">📊 Export</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── PHOTOS MODAL ──
+window.openPhotos = async (eventId) => {
+  const ev = allEvents[eventId];
+  if (!ev) return;
+  document.getElementById('photosModalTitle').textContent = `${ev.clientName} — Photos`;
+  const photos = ev.photos || {};
+  const openHtml = ['opening_1','opening_2'].map(k => photos[k]
+    ? `<div class="photo-thumb" onclick="viewImg('${photos[k]}')"><img src="${photos[k]}" loading="lazy"><div class="ph-lbl">${k==='opening_1'?'Entrance':'Bar Setup'}</div></div>`
+    : `<div class="photo-thumb"><div class="ph-icon">📷</div><div class="ph-lbl">Not uploaded</div></div>`
+  ).join('');
+  const closeHtml = ['closing_1','closing_2','closing_3'].map(k => photos[k]
+    ? `<div class="photo-thumb" onclick="viewImg('${photos[k]}')"><img src="${photos[k]}" loading="lazy"></div>`
+    : `<div class="photo-thumb"><div class="ph-icon">📷</div><div class="ph-lbl">Not uploaded</div></div>`
+  ).join('');
+  document.getElementById('openingPhotos').innerHTML = openHtml;
+  document.getElementById('closingPhotos').innerHTML = closeHtml;
+  document.getElementById('photosModal').classList.add('show');
+};
+
+window.viewImg = (url) => {
+  document.getElementById('imgFull').src = url;
+  document.getElementById('imgModal').classList.add('show');
+};
+
+// ── FEEDBACK MODAL ──
+window.openFeedback = async (eventId) => {
+  const ev = allEvents[eventId];
+  if (!ev) return;
+  document.getElementById('fbModalTitle').textContent = `${ev.clientName} — Feedback`;
+  const fb = ev.feedback;
+  if (!fb) {
+    document.getElementById('fbModalBody').innerHTML = '<div class="empty">No feedback submitted yet.</div>';
+  } else {
+    const stars = '★'.repeat(fb.rating||0) + '☆'.repeat(5-(fb.rating||0));
+    document.getElementById('fbModalBody').innerHTML = `
+      <div class="fb-row"><div class="fb-lbl">Rating</div><div class="stars-display">${stars}</div></div>
+      <div class="fb-row"><div class="fb-lbl">Quick Reaction</div><div class="fb-val">${fb.reaction||'—'}</div></div>
+      <div class="fb-row"><div class="fb-lbl">Comment</div><div class="fb-val">${fb.comment||'—'}</div></div>
+      <div class="fb-row"><div class="fb-lbl">Submitted</div><div class="fb-val">${fb.submittedAt ? new Date(fb.submittedAt).toLocaleString() : '—'}</div></div>
+    `;
+  }
+  document.getElementById('feedbackModal').classList.add('show');
+};
+
+window.closeModal = (id) => document.getElementById(id).classList.remove('show');
+
+// ── EXCEL EXPORT ──
+window.exportAllToExcel = () => exportToExcel(Object.values(allEvents));
+window.exportSingleEvent = (id) => exportToExcel([allEvents[id]].filter(Boolean));
+
+function exportToExcel(events) {
+  if (!events.length) { alert('No events to export.'); return; }
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Events
+  const evRows = [['Event ID','Client Name','Event Type','Date','City','Guests','Venue','Status','Client WhatsApp','Bartender WhatsApp','Team Leader','No. of Bartenders','Bartender Names','Non-Alcoholic','Created At']];
+  events.forEach(ev => evRows.push([ev.id||'',ev.clientName||'',ev.eventType||'',ev.date||'',ev.city||'',ev.guests||'',ev.venue||'',ev.status||'',ev.clientWhatsApp||'',ev.bartenderWhatsApp||'',ev.teamLeader||'',ev.numBartenders||'',ev.bartenderNames||'',ev.nonAlcoholic?'Yes':'No',ev.createdAt?new Date(ev.createdAt).toLocaleString():'']));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(evRows), 'Events');
+
+  // Sheet 2: Feedback
+  const fbRows = [['Event ID','Client Name','Date','Rating','Reaction','Comment','Submitted At']];
+  events.forEach(ev => { const fb=ev.feedback||{}; fbRows.push([ev.id||'',ev.clientName||'',ev.date||'',fb.rating||'',fb.reaction||'',fb.comment||'',fb.submittedAt?new Date(fb.submittedAt).toLocaleString():'']); });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(fbRows), 'Feedback');
+
+  // Sheet 3: Consumption
+  const allItems = new Set();
+  events.forEach(ev => { if (ev.drinks) Object.values(ev.drinks).forEach(d => allItems.add(d.name)); if (ev.nonAlcDrinks) Object.values(ev.nonAlcDrinks).forEach(d => allItems.add(d.name)); });
+  const itemArr = [...allItems];
+  const consHeaders = ['Event ID','Client Name','Date',...itemArr.map(i=>`${i} Given`),...itemArr.map(i=>`${i} Consumed`),...itemArr.map(i=>`${i} Left`)];
+  const consRows = [consHeaders];
+  events.forEach(ev => {
+    const row = [ev.id||'',ev.clientName||'',ev.date||''];
+    const drinks = {...(ev.drinks||{}), ...(ev.nonAlcDrinks||{})};
+    const dMap = {};
+    Object.values(drinks).forEach(d => dMap[d.name] = d);
+    itemArr.forEach(i => row.push((dMap[i]?.opening)||0));
+    itemArr.forEach(i => row.push((dMap[i]?.consumed)||0));
+    itemArr.forEach(i => row.push(((dMap[i]?.opening)||0) - ((dMap[i]?.consumed)||0)));
+    consRows.push(row);
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(consRows), 'Consumption');
+
+  // Sheet 4: Photos
+  const phRows = [['Event ID','Client Name','Date','Opening 1','Opening 2','Closing 1','Closing 2','Closing 3']];
+  events.forEach(ev => { const p=ev.photos||{}; phRows.push([ev.id||'',ev.clientName||'',ev.date||'',p.opening_1||'',p.opening_2||'',p.closing_1||'',p.closing_2||'',p.closing_3||'']); });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(phRows), 'Photos');
+
+  XLSX.writeFile(wb, `Rebelz_Events_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// Close overlays on outside click
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target === o && o.id !== 'imgModal') closeModal(o.id); });
+});
+</script>
+</body>
+</html>
