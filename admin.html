@@ -138,6 +138,19 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 </head>
 <body>
 
+<!-- ===== ADMIN LOGIN GATE ===== -->
+<div id="login-gate" style="position:fixed;inset:0;z-index:9999;background:#080806;display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="width:100%;max-width:360px;text-align:center">
+    <img src="rebelz%20bartending%20logo.png" style="width:72px;height:72px;object-fit:contain;margin-bottom:14px"/>
+    <div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--gold2)">Admin Login</div>
+    <div style="font-size:11px;color:var(--t3);font-family:var(--fm);margin:6px 0 22px;letter-spacing:.04em">Rebelz Bartending — authorized staff only</div>
+    <input id="lg-user" class="inp" placeholder="Username" autocomplete="username" autocapitalize="none" spellcheck="false" style="margin-bottom:12px"/>
+    <input id="lg-pass" class="inp" type="password" placeholder="Password" autocomplete="current-password" style="margin-bottom:8px"/>
+    <div id="lg-err" style="color:var(--red);font-size:12px;font-family:var(--fm);min-height:16px;margin-bottom:10px"></div>
+    <button class="btn btn-gold" onclick="doLogin()" style="width:100%">Log In →</button>
+  </div>
+</div>
+
 <div class="hdr">
   <div class="hdr-inner">
     <div class="brand-wrap">
@@ -151,6 +164,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       <div class="sync-dot" id="sync-dot"></div>
       <div class="sync-txt" id="sync-txt">Connecting</div>
     </div>
+    <button id="logout-btn" onclick="doLogout()" style="display:none;margin-left:10px;background:none;border:0.5px solid var(--gold-dim);color:var(--gold2);font-family:var(--fm);font-size:10px;letter-spacing:.05em;padding:6px 12px;border-radius:8px;cursor:pointer">Logout</button>
   </div>
   <div class="page-tag">Admin Control Panel</div>
 </div>
@@ -281,10 +295,20 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const firebaseConfig = { databaseURL:"https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app" };
+const firebaseConfig = {
+  apiKey: "AIzaSyDcrx5tOL1Y2TWiz1VFfCAC_OagARggGNE",
+  authDomain: "rebelz-tracker.firebaseapp.com",
+  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rebelz-tracker",
+  storageBucket: "rebelz-tracker.appspot.com",
+  messagingSenderId: "234156658582",
+  appId: "1:234156658582:web:26597fc333698b0778d7b7"
+};
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
 let EVENTS=[], modalEv=null, feedbackData={};
 
@@ -298,17 +322,57 @@ function barLink(id){return baseUrl()+'bartender.html?ev='+id;}
 function custLink(id){return baseUrl()+'customer.html?ev='+id;}
 function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
 
-// Firebase listeners
-onValue(ref(db,'events'),(snap)=>{
-  gid('sync-dot').style.background='var(--grn)';
-  gid('sync-txt').textContent='Live';
-  const d=snap.val();
-  EVENTS=d?Object.values(d).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)):[];
-  renderList();updateStats();
+// Firebase listeners — attached ONLY after an admin has logged in
+let listenersOn=false;
+function startListeners(){
+  if(listenersOn) return; listenersOn=true;
+  onValue(ref(db,'events'),(snap)=>{
+    gid('sync-dot').style.background='var(--grn)';
+    gid('sync-txt').textContent='Live';
+    const d=snap.val();
+    EVENTS=d?Object.values(d).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)):[];
+    renderList();updateStats();
+  });
+  onValue(ref(db,'feedback'),(snap)=>{
+    feedbackData=snap.val()||{};
+    renderList();
+  });
+}
+
+// ===== ADMIN AUTHENTICATION =====
+// Each admin logs in with a username + password. The username maps to a
+// Firebase Auth email (username + the domain below). Passwords are stored
+// securely by Firebase — never inside this file.
+const ADMIN_EMAIL_DOMAIN='@rebelz-admin.web';
+function showGate(show){
+  gid('login-gate').style.display = show ? 'flex' : 'none';
+  const wrap=document.querySelector('.wrap'); if(wrap) wrap.style.display = show ? 'none' : '';
+  const hdr=document.querySelector('.hdr'); if(hdr) hdr.style.display = show ? 'none' : '';
+  gid('logout-btn').style.display = show ? 'none' : '';
+}
+function doLogin(){
+  const u=(gid('lg-user').value||'').trim().toLowerCase();
+  const p=gid('lg-pass').value||'';
+  const err=gid('lg-err');
+  if(!u||!p){ err.textContent='Enter username and password.'; return; }
+  err.textContent='Checking…';
+  signInWithEmailAndPassword(auth, u+ADMIN_EMAIL_DOMAIN, p)
+    .then(()=>{ err.textContent=''; gid('lg-pass').value=''; })
+    .catch(()=>{ err.textContent='Wrong username or password.'; });
+}
+function doLogout(){ signOut(auth); }
+onAuthStateChanged(auth,(user)=>{
+  // A real admin has providerData (password). Anything else = show login.
+  if(user && user.providerData && user.providerData.length){
+    showGate(false);
+    startListeners();
+  } else {
+    showGate(true);
+  }
 });
-onValue(ref(db,'feedback'),(snap)=>{
-  feedbackData=snap.val()||{};
-  renderList();
+window.doLogin=doLogin; window.doLogout=doLogout;
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Enter' && gid('login-gate') && gid('login-gate').style.display!=='none'){ doLogin(); }
 });
 
 function saveEvent(ev){set(ref(db,'events/'+ev.id),ev);}
