@@ -67,6 +67,20 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .inp{width:100%;background:var(--s2);border:0.5px solid var(--b2);border-radius:10px;padding:12px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;-webkit-appearance:none;transition:border-color .2s}
 .inp:focus{border-color:var(--gold)}
 .inp::placeholder{color:var(--t4)}
+
+/* +91 PHONE INPUT */
+.phone-wrap{display:flex;align-items:stretch;background:var(--s2);border:0.5px solid var(--b2);border-radius:10px;overflow:hidden;transition:border-color .2s}
+.phone-wrap:focus-within{border-color:var(--gold)}
+.phone-prefix{padding:12px 12px;background:#c8981e12;color:var(--gold2);font-family:var(--fm);font-size:14px;font-weight:600;border-right:0.5px solid var(--b2);display:flex;align-items:center;flex-shrink:0;letter-spacing:.04em}
+.phone-inp{flex:1;background:transparent;border:none;padding:12px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;-webkit-appearance:none;width:100%;letter-spacing:.06em}
+.phone-inp::placeholder{color:var(--t4);letter-spacing:normal}
+
+/* YES/NO TOGGLE */
+.toggle-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.toggle-opt{padding:12px;border-radius:10px;border:0.5px solid var(--b2);background:var(--s2);text-align:center;font-size:13px;font-weight:600;font-family:var(--fb);color:var(--t2);cursor:pointer;transition:all .15s;user-select:none}
+.toggle-opt.active-yes{background:linear-gradient(135deg,#1a5028,var(--grn));border-color:transparent;color:#fff}
+.toggle-opt.active-no{background:linear-gradient(135deg,#5a1a1a,var(--red));border-color:transparent;color:#fff}
+.toggle-hint{font-size:10px;color:var(--t3);font-family:var(--fm);margin-top:6px;line-height:1.5}
 select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23454038' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
@@ -157,32 +171,39 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     <div class="card-title">Event Details</div>
     <div class="grid2">
       <div class="field"><label>Client Name *</label><input class="inp" id="f-client" placeholder="e.g. Sharma Family"/></div>
-      <div class="field"><label>Event Name *</label><input class="inp" id="f-event" placeholder="e.g. Wedding Reception"/></div>
+      <div class="field"><label>Event Name (optional)</label><input class="inp" id="f-event" placeholder="e.g. Wedding Reception"/></div>
     </div>
     <div class="grid3">
       <div class="field"><label>Date *</label><input class="inp" id="f-date" type="date"/></div>
       <div class="field"><label>City</label>
         <select class="inp" id="f-city">
-          <option>Vijayawada</option><option>Hyderabad</option><option>Vizag</option><option>Guntur</option><option>Other</option>
+          <option>Vijayawada</option><option>Hyderabad</option><option>Visakhapatnam</option><option>Others</option>
         </select>
       </div>
       <div class="field"><label>Guests</label><input class="inp" id="f-guests" type="number" placeholder="e.g. 150"/></div>
     </div>
+    <div class="field"><label>Venue (Google Maps link preferred)</label><input class="inp" id="f-venue" placeholder="Paste Google Maps location link"/></div>
     <div class="grid2">
-      <div class="field"><label>Venue</label><input class="inp" id="f-venue" placeholder="e.g. Hotel Vijay Grand"/></div>
-      <div class="field"><label>Package</label>
-        <select class="inp" id="f-package">
-          <option>Basic</option><option>Premium</option><option>Luxury</option><option>Custom</option>
-        </select>
+      <div class="field">
+        <label>Client Number *</label>
+        <div class="phone-wrap"><div class="phone-prefix">+91</div><input class="phone-inp" id="f-cwa" type="tel" maxlength="10" placeholder="98765 43210"/></div>
+      </div>
+      <div class="field">
+        <label>Bartender WhatsApp *</label>
+        <div class="phone-wrap"><div class="phone-prefix">+91</div><input class="phone-inp" id="f-owa" type="tel" maxlength="10" placeholder="98765 43210"/></div>
       </div>
     </div>
-    <div class="grid2">
-      <div class="field"><label>Client WhatsApp</label><input class="inp" id="f-cwa" type="tel" placeholder="+91 98765 43210"/></div>
-      <div class="field"><label>Your WhatsApp</label><input class="inp" id="f-owa" type="tel" placeholder="+91 XXXXX XXXXX"/></div>
+    <div class="field">
+      <label>Non-Alcoholic Beverages from Rebelz?</label>
+      <div class="toggle-row">
+        <div class="toggle-opt active-yes" id="tog-yes" onclick="setNonAlc(true)">✓ Yes — We supply</div>
+        <div class="toggle-opt" id="tog-no" onclick="setNonAlc(false)">✕ No — Client brings</div>
+      </div>
+      <div class="toggle-hint">If YES, bartender will see non-alcoholic section to log items. If NO, section is hidden.</div>
     </div>
     <div class="field"><label>Bartender PIN (4–6 digits)</label><input class="inp" id="f-pin" type="number" placeholder="e.g. 2580" style="letter-spacing:6px;font-family:var(--fm);font-size:18px"/></div>
     <div style="height:4px"></div>
-    <button class="btn btn-gold" onclick="createNewEvent()">✦ Create Event + Generate Links</button>
+    <button class="btn btn-gold" onclick="createNewEvent()">✦ Create Event + Send WhatsApp</button>
     <button class="btn btn-ghost" onclick="clearForm()">Clear Form</button>
   </div>
 
@@ -305,33 +326,47 @@ window.waShare=function(type){
   if(!modalEv)return;
   let msg,phone;
   if(type==='bar'){
-    msg=`*Rebelz Bartending Services*\n✦ Think of Party, Think of Us ✦\n\n*Event: ${modalEv.event_name}*\nClient: ${modalEv.client_name}\nDate: ${fmtDate(modalEv.event_date)}\nVenue: ${modalEv.venue||'—'}\nGuests: ${modalEv.guests||'—'}\nPackage: ${modalEv.package||'—'}\n\n*Your PIN:* ${modalEv.bartender_pin}\n\n*Bartender Link:*\n${barLink(modalEv.id)}\n\nOpen link → Enter PIN → Set stock → Track live\n\n_Rebelz Bartending Services_`;
-    phone=(modalEv.owner_wa||'').replace(/\D/g,'');
+    msg=`*Rebelz Bartending Services*\n✦ Think of Party, Think of Us ✦\n\n*NEW EVENT ASSIGNED*\n━━━━━━━━━━━━━━━\n\n📋 *Event:* ${modalEv.event_name}\n👤 *Client:* ${modalEv.client_name}\n📞 *Client Number:* +91 ${modalEv.client_wa||'—'}\n📅 *Date:* ${fmtDate(modalEv.event_date)}\n📍 *Venue:* ${modalEv.venue||'—'}\n🏙️ *City:* ${modalEv.city||'—'}\n👥 *Guests:* ${modalEv.guests||'—'}\n\n🥤 *Non-Alcoholic from Rebelz:* ${modalEv.non_alc?'YES — add non-alcoholic items in your panel':'NO — client brings their own'}\n\n🔐 *Your PIN:* ${modalEv.bartender_pin}\n\n🔗 *Bartender Link:*\n${barLink(modalEv.id)}\n\nOpen link → Enter PIN → Add team → Add stock → 2 photos → Go Live\n\n_Rebelz Bartending Services_`;
+    phone='91'+(modalEv.owner_wa||'').replace(/\D/g,'').slice(-10);
   } else {
     msg=`Hello! 🍸\n\nYour *live alcohol tracker* for *${modalEv.event_name}* is ready!\n\nTrack your bottles live:\n${custLink(modalEv.id)}\n\n_Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦`;
-    phone=(modalEv.client_wa||'').replace(/\D/g,'');
+    phone='91'+(modalEv.client_wa||'').replace(/\D/g,'').slice(-10);
   }
   window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
+};
+
+// ---- NON-ALCOHOLIC TOGGLE ----
+let nonAlc=true;
+window.setNonAlc=function(v){
+  nonAlc=v;
+  gid('tog-yes').className='toggle-opt'+(v?' active-yes':'');
+  gid('tog-no').className='toggle-opt'+(!v?' active-no':'');
 };
 
 window.clearForm=function(){
   ['f-client','f-event','f-date','f-venue','f-cwa','f-owa','f-pin','f-guests'].forEach(id=>{const e=gid(id);if(e)e.value='';});
   gid('f-date').value=new Date().toISOString().split('T')[0];
+  window.setNonAlc(true);
 };
 
 window.createNewEvent=function(){
   const client=gid('f-client').value.trim();
-  const evName=gid('f-event').value.trim();
+  let evName=gid('f-event').value.trim();
   const date=gid('f-date').value;
   if(!client){toast('Enter client name');gid('f-client').focus();return;}
-  if(!evName){toast('Enter event name');gid('f-event').focus();return;}
+  if(!evName)evName=client+"'s Event";
   if(!date){toast('Select a date');return;}
+  const cwa=gid('f-cwa').value.replace(/\D/g,'').slice(-10);
+  const owa=gid('f-owa').value.replace(/\D/g,'').slice(-10);
+  if(cwa.length!==10){toast('Enter valid 10-digit Client Number');gid('f-cwa').focus();return;}
+  if(owa.length!==10){toast('Enter valid 10-digit Bartender WhatsApp');gid('f-owa').focus();return;}
   const pin=(gid('f-pin').value.trim()||'2580').toString();
   const ev={
     id:genId(client),client_name:client,event_name:evName,event_date:date,
     venue:gid('f-venue').value.trim(),city:gid('f-city').value,
-    guests:gid('f-guests').value.trim(),package:gid('f-package').value,
-    bartender_pin:pin,client_wa:gid('f-cwa').value.trim(),owner_wa:gid('f-owa').value.trim(),
+    guests:gid('f-guests').value.trim(),
+    non_alc:nonAlc,
+    bartender_pin:pin,client_wa:cwa,owner_wa:owa,
     status:'setup',stock:[],stock_confirmed:false,
     log:[{msg:'Event created',time:nowISO()}],created_at:nowISO()
   };
@@ -398,13 +433,14 @@ window.viewPhotos=function(id){
   const op=(ev.photos&&ev.photos.opening)||[];
   const cl=(ev.photos&&ev.photos.closing)||[];
   let html='';
+  const phBlock=(p,name)=>'<div style="position:relative"><img src="'+p+'" style="width:100%;border-radius:10px;border:1px solid var(--gold-dim);display:block"/><a href="'+p+'" download="'+name+'.jpg" style="position:absolute;bottom:6px;right:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;font-size:10px;font-weight:700;font-family:var(--fb);padding:5px 10px;border-radius:8px;text-decoration:none">⬇ Download</a></div>';
   html+='<div style="font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:8px">Opening Photos ('+op.filter(Boolean).length+'/2)</div>';
   html+=op.filter(Boolean).length
-    ?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">'+op.filter(Boolean).map(p=>'<img src="'+p+'" style="width:100%;border-radius:10px;border:1px solid var(--gold-dim)"/>').join('')+'</div>'
+    ?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">'+op.filter(Boolean).map((p,i)=>phBlock(p,ev.id+'_opening_'+(i+1))).join('')+'</div>'
     :'<div style="font-size:11px;color:var(--t3);padding:14px;text-align:center;background:var(--s2);border-radius:10px;margin-bottom:18px">No opening photos yet</div>';
   html+='<div style="font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:8px">Closing Photos ('+cl.filter(Boolean).length+'/3)</div>';
   html+=cl.filter(Boolean).length
-    ?'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">'+cl.filter(Boolean).map(p=>'<img src="'+p+'" style="width:100%;border-radius:10px;border:1px solid var(--gold-dim)"/>').join('')+'</div>'
+    ?'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">'+cl.filter(Boolean).map((p,i)=>phBlock(p,ev.id+'_closing_'+(i+1))).join('')+'</div>'
     :'<div style="font-size:11px;color:var(--t3);padding:14px;text-align:center;background:var(--s2);border-radius:10px;margin-bottom:18px">No closing photos yet</div>';
   if(ev.closing&&ev.closing.items&&ev.closing.items.length){
     html+='<div style="font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:8px">Closing Verification — Open Bottles & ML Left</div>';
@@ -419,26 +455,25 @@ window.closePhModal=function(){gid('ph-modal').classList.remove('open');};
 function buildWorkbook(evList){
   const wb=XLSX.utils.book_new();
   // Sheet 1 — Events
-  const evRows=[['Event ID','Client Name','Event Name','Date','City','Venue','Guests','Package','Status','PIN','Team Leader','No. of Bartenders','Bartender Names','Client WhatsApp','Manager WhatsApp','Created']];
+  const evRows=[['Event ID','Client Name','Event Name','Date','City','Venue','Guests','Non-Alcoholic from Rebelz','Status','PIN','Team Leader','No. of Bartenders','Bartender Names','Client Number','Bartender WhatsApp','Created']];
   evList.forEach(ev=>{
-    evRows.push([ev.id,ev.client_name||'',ev.event_name||'',ev.event_date||'',ev.city||'',ev.venue||'',ev.guests||'',ev.package||'',ev.status||'',ev.bartender_pin||'',
+    evRows.push([ev.id,ev.client_name||'',ev.event_name||'',ev.event_date||'',ev.city||'',ev.venue||'',ev.guests||'',ev.non_alc?'Yes':'No',ev.status||'',ev.bartender_pin||'',
       ev.team?ev.team.leader:'',ev.team?ev.team.count:'',ev.team?(ev.team.members||[]).join(', '):'',
-      ev.client_wa||'',ev.owner_wa||'',ev.created_at?ev.created_at.slice(0,10):'']);
+      ev.client_wa?'+91 '+ev.client_wa:'',ev.owner_wa?'+91 '+ev.owner_wa:'',ev.created_at?ev.created_at.slice(0,10):'']);
   });
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(evRows),'Events');
   // Sheet 2 — Feedback
-  const fbRows=[['Event ID','Event Name','Client','Overall','Bartender','Cocktails','Book Again','Tags','Comment','Submitted By']];
+  const fbRows=[['Event ID','Event Name','Client','Client Number','Overall','Bartender','Cocktails','Book Again','Tags','Comment','Submitted By']];
   evList.forEach(ev=>{
     const fb=feedbackData[ev.id];
-    if(fb)fbRows.push([ev.id,ev.event_name||'',ev.client_name||'',fb.overall||'',fb.bartender||'',fb.cocktails||'',fb.book_again?'Yes':'No',(fb.tags||[]).join(', '),fb.comment||'',fb.name||'Guest']);
+    if(fb)fbRows.push([ev.id,ev.event_name||'',ev.client_name||'',ev.client_wa?'+91 '+ev.client_wa:'',fb.overall||'',fb.bartender||'',fb.cocktails||'',fb.book_again?'Yes':'No',(fb.tags||[]).join(', '),fb.comment||'',fb.name||'Guest']);
   });
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(fbRows),'Feedback');
-  // Sheet 3 — Consumption
-  const coRows=[['Event ID','Event Name','Item','Category','Opening Qty','Extra Added','Consumed','Full Left','Open Bottles (Closing)','ML Left (Closing)']];
+  // Sheet 3 — Consumption (simple)
+  const coRows=[['Event ID','Event Name','Item','Type','Given','Consumed','Left']];
   evList.forEach(ev=>{
     (ev.stock||[]).forEach(it=>{
-      const cl=(ev.closing&&ev.closing.items||[]).find(c=>c.name===it.name)||{};
-      coRows.push([ev.id,ev.event_name||'',it.name,it.cat||'',it.qty||0,it.restocked||0,it.used||0,Math.max(0,(it.qty||0)-(it.used||0)),cl.openBottles!==undefined?cl.openBottles:'',cl.mlLeft!==undefined?cl.mlLeft:'']);
+      coRows.push([ev.id,ev.event_name||'',it.name,it.cat||'',it.qty||0,it.used||0,Math.max(0,(it.qty||0)-(it.used||0))]);
     });
   });
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(coRows),'Consumption');
@@ -488,7 +523,7 @@ function renderList(){
         </div>
       </div>
       <div style="font-size:10px;font-family:var(--fm);color:${ev.stock_confirmed?'var(--t3)':'var(--amb)'};margin-bottom:${ev.team?'6px':'12px'};padding:8px;background:var(--s2);border-radius:8px">
-        ${ev.stock_confirmed?`📦 ${tot} bottles · ${used} consumed · ${tot-used} remaining`:'⚠ Bartender yet to confirm opening stock'} · PIN: <span style="color:var(--gold2)">${ev.bartender_pin}</span> · ${ev.package||'Basic'}
+        ${ev.stock_confirmed?`📦 ${tot} bottles · ${used} consumed · ${tot-used} remaining`:'⚠ Bartender yet to confirm opening stock'} · PIN: <span style="color:var(--gold2)">${ev.bartender_pin}</span> · 🥤 Non-Alc: <span style="color:${ev.non_alc?'var(--grn)':'var(--red)'}">${ev.non_alc?'Rebelz':'Client'}</span>
       </div>
       ${ev.team?`<div style="font-size:10px;font-family:var(--fm);color:var(--gold2);margin-bottom:12px;padding:8px;background:#c8981e0d;border:0.5px solid var(--gold-dim);border-radius:8px">👥 Lead: <strong>${ev.team.leader}</strong> · ${ev.team.count} bartender${ev.team.count>1?'s':''} — ${(ev.team.members||[]).join(', ')}</div>`:''}
       <div style="display:flex;gap:6px;flex-wrap:wrap">

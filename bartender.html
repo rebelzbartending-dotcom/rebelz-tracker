@@ -218,37 +218,45 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
   </div>
   <div class="scroll-body">
     <div style="background:#f5a02012;border:0.5px solid #f5a02030;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--amb);line-height:1.7">
-      <strong>Before you start:</strong> Select template → adjust quantities to exactly match what client has brought → tap Confirm to go live.
+      <strong>Step 2 of 3 — Opening Stock:</strong> Add each brand one by one, exactly matching what the client has brought. Then photos → confirm → go live.
     </div>
     <div class="card">
-      <div class="card-title">Step 1 — Choose Template</div>
-      <div class="tpl-chips" id="setup-chips">
-        <div class="tpl-chip sel" data-id="wedding" onclick="selTpl(this)">💍 Wedding</div>
-        <div class="tpl-chip" data-id="corporate" onclick="selTpl(this)">💼 Corporate</div>
-        <div class="tpl-chip" data-id="birthday" onclick="selTpl(this)">🎂 Birthday</div>
-        <div class="tpl-chip" data-id="cocktail" onclick="selTpl(this)">🍹 Cocktail</div>
-        <div class="tpl-chip" data-id="sangeet" onclick="selTpl(this)">🎶 Sangeet</div>
-        <div class="tpl-chip" data-id="blank" onclick="selTpl(this)">✏️ Blank</div>
+      <div class="card-title">Step 1 — Alcoholic Beverages</div>
+      <div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-family:var(--fm)">Add one brand at a time:</div>
+      <div class="field"><label>Type</label>
+        <select class="inp" id="sa-cat">
+          <option value="whiskey">Whiskey</option><option value="vodka">Vodka</option>
+          <option value="gin">Gin</option><option value="rum">Rum</option>
+          <option value="tequila">Tequila</option><option value="brandy">Brandy</option>
+          <option value="beer">Beer</option><option value="wine">Wine</option>
+          <option value="other">Others</option>
+        </select>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Step 2 — Edit Quantities</div>
-      <div id="setup-items"></div>
-      <div class="divider"></div>
-      <div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-family:var(--fm)">Add a drink not in template:</div>
       <div style="display:grid;grid-template-columns:1fr 72px;gap:8px;margin-bottom:8px">
-        <input class="inp" id="sa-name" placeholder="Drink name" style="font-size:13px"/>
+        <input class="inp" id="sa-name" placeholder="Brand name — e.g. Royal Stag" style="font-size:13px"/>
         <input class="inp" id="sa-qty" type="number" min="1" value="1" style="text-align:center;font-size:13px"/>
       </div>
-      <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
-        <select class="inp" id="sa-cat" style="font-size:13px">
-          <option value="whiskey">Whiskey</option><option value="gin">Gin</option>
-          <option value="vodka">Vodka</option><option value="beer">Beer</option>
-          <option value="wine">Wine</option><option value="rum">Rum</option>
-          <option value="other">Other</option>
+      <button class="btn btn-gold" onclick="setupAdd()" style="font-size:12px;padding:11px">+ Add Bottle / Brand</button>
+      <div class="divider"></div>
+      <div id="setup-items"></div>
+    </div>
+    <div class="card" id="nonalc-card" style="display:none;border-color:var(--gold-dim)">
+      <div class="card-title" style="color:var(--gold2)">Step 2 — Non-Alcoholic (Rebelz Supply)</div>
+      <div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-family:var(--fm)">Admin confirmed: non-alcoholic from Rebelz. Add each item:</div>
+      <div class="field"><label>Item</label>
+        <select class="inp" id="na-cat">
+          <option value="juices">Juices</option><option value="softdrinks">Soft Drinks</option>
+          <option value="soda">Soda</option><option value="water">Water</option>
+          <option value="nonalc-other">Others</option>
         </select>
-        <button class="btn btn-ghost btn-sm" onclick="setupAdd()" style="white-space:nowrap">+ Add</button>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 72px;gap:8px;margin-bottom:8px">
+        <input class="inp" id="na-name" placeholder="Name — e.g. Real Mango Juice" style="font-size:13px"/>
+        <input class="inp" id="na-qty" type="number" min="1" value="1" style="text-align:center;font-size:13px"/>
+      </div>
+      <button class="btn btn-ghost" onclick="setupAddNA()" style="border-color:var(--gold-dim);color:var(--gold2);font-size:12px;padding:11px">+ Add Non-Alcoholic Item</button>
+      <div class="divider"></div>
+      <div id="setup-items-na"></div>
     </div>
     <div class="card">
       <div class="card-title">Step 3 — Opening Photos (Required)</div>
@@ -316,10 +324,13 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       <div style="display:grid;grid-template-columns:1fr 80px;gap:8px">
         <div class="field"><label>Category</label>
           <select class="inp" id="live-add-cat">
-            <option value="whiskey">Whiskey</option><option value="gin">Gin</option>
-            <option value="vodka">Vodka</option><option value="beer">Beer</option>
-            <option value="wine">Wine</option><option value="rum">Rum</option>
-            <option value="other">Other</option>
+            <option value="whiskey">Whiskey</option><option value="vodka">Vodka</option>
+            <option value="gin">Gin</option><option value="rum">Rum</option>
+            <option value="tequila">Tequila</option><option value="brandy">Brandy</option>
+            <option value="beer">Beer</option><option value="wine">Wine</option>
+            <option value="other">Others</option>
+            <option value="juices">Juices (Non-Alc)</option><option value="softdrinks">Soft Drinks (Non-Alc)</option>
+            <option value="soda">Soda (Non-Alc)</option><option value="water">Water (Non-Alc)</option>
           </select>
         </div>
         <div class="field"><label>Qty</label><input class="inp" id="live-add-qty" type="number" min="1" value="1" style="text-align:center"/></div>
@@ -408,15 +419,9 @@ const firebaseConfig = { databaseURL:"https://rebelz-tracker-default-rtdb.asia-s
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const TPLS={
-  wedding:[{name:'Royal Stag Whiskey',cat:'whiskey',qty:3},{name:'Bombay Sapphire Gin',cat:'gin',qty:4},{name:'Absolut Vodka',cat:'vodka',qty:2},{name:'Kingfisher Beer',cat:'beer',qty:32},{name:'Sula Red Wine',cat:'wine',qty:4},{name:'Old Monk Rum',cat:'rum',qty:2}],
-  corporate:[{name:'Johnnie Walker Black',cat:'whiskey',qty:4},{name:'Hendricks Gin',cat:'gin',qty:2},{name:'Grey Goose Vodka',cat:'vodka',qty:2},{name:'Corona Beer',cat:'beer',qty:24},{name:'Prosecco',cat:'wine',qty:3}],
-  birthday:[{name:'Jack Daniels',cat:'whiskey',qty:2},{name:"Gordon's Gin",cat:'gin',qty:2},{name:'Magic Moments Vodka',cat:'vodka',qty:3},{name:'Budweiser Beer',cat:'beer',qty:48}],
-  cocktail:[{name:'Bacardi White Rum',cat:'rum',qty:4},{name:'Absolut Vodka',cat:'vodka',qty:3},{name:'Bombay Sapphire Gin',cat:'gin',qty:3},{name:'Cointreau',cat:'other',qty:2},{name:'Kingfisher Beer',cat:'beer',qty:20}],
-  sangeet:[{name:'Royal Stag Whiskey',cat:'whiskey',qty:5},{name:'Kingfisher Beer',cat:'beer',qty:48},{name:'Magic Moments Vodka',cat:'vodka',qty:3},{name:'Old Monk Rum',cat:'rum',qty:2},{name:'Sula Wine',cat:'wine',qty:6}],
-  blank:[]
-};
-const COLORS={whiskey:'#c8860a',gin:'#0e9e80',vodka:'#7c5cc4',beer:'#3a7a20',wine:'#aa3870',rum:'#c04020',other:'#888'};
+const COLORS={whiskey:'#c8860a',gin:'#0e9e80',vodka:'#7c5cc4',beer:'#3a7a20',wine:'#aa3870',rum:'#c04020',tequila:'#d4a017',brandy:'#8b4513',other:'#888',juices:'#e87020',softdrinks:'#c02040',soda:'#4090c8',water:'#30a8c8','nonalc-other':'#888'};
+const NONALC_CATS=['juices','softdrinks','soda','water','nonalc-other'];
+function isNonAlc(cat){return NONALC_CATS.indexOf(cat)>=0;}
 
 let curEv=null,evId=null,setupDrinks=[],waLog=[];
 let openPhotos=[null,null],closePhotos=[null,null,null],photoTarget=null;
@@ -533,15 +538,18 @@ window.saveTeam=function(){
   toast('Team saved ✓');
 };
 
-function showSetup(){showScreen('scr-setup');gid('setup-ev-label').textContent=curEv.event_name;setupDrinks=[];selTplById('wedding');}
-
-window.selTpl=function(el){document.querySelectorAll('#setup-chips .tpl-chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selTplById(el.dataset.id);};
-function selTplById(id){setupDrinks=(TPLS[id]||[]).map(d=>({...d,used:0}));renderSetupItems();}
+function showSetup(){
+  showScreen('scr-setup');gid('setup-ev-label').textContent=curEv.event_name;
+  setupDrinks=[];
+  gid('nonalc-card').style.display=curEv.non_alc?'block':'none';
+  renderSetupItems();
+}
 
 function renderSetupItems(){
-  const el=gid('setup-items');
-  if(!setupDrinks.length){el.innerHTML='<div style="text-align:center;padding:14px;font-size:11px;color:var(--t3);font-family:var(--fm)">No drinks yet — add below</div>';updateSetupSummary();return;}
-  el.innerHTML=setupDrinks.map((d,i)=>{
+  const alc=setupDrinks.filter(d=>!isNonAlc(d.cat));
+  const na=setupDrinks.filter(d=>isNonAlc(d.cat));
+  const rowHtml=(d)=>{
+    const i=setupDrinks.indexOf(d);
     const col=COLORS[d.cat]||'#888';
     return `<div class="tpl-item">
       <div style="width:9px;height:9px;border-radius:50%;background:${col};flex-shrink:0"></div>
@@ -551,23 +559,42 @@ function renderSetupItems(){
       <button class="qty-btn" onclick="setupQty(${i},1)">+</button>
       <button class="remove-x" onclick="setupRemove(${i})">✕</button>
     </div>`;
-  }).join('');
+  };
+  gid('setup-items').innerHTML=alc.length?alc.map(rowHtml).join(''):'<div style="text-align:center;padding:14px;font-size:11px;color:var(--t3);font-family:var(--fm)">No bottles added yet — add above</div>';
+  const naEl=gid('setup-items-na');
+  if(naEl)naEl.innerHTML=na.length?na.map(rowHtml).join(''):'<div style="text-align:center;padding:14px;font-size:11px;color:var(--t3);font-family:var(--fm)">No items added yet — add above</div>';
   updateSetupSummary();
 }
 window.setupQty=function(i,d){setupDrinks[i].qty=Math.max(1,setupDrinks[i].qty+d);const el=gid('sqty-'+i);if(el)el.textContent=setupDrinks[i].qty;updateSetupSummary();};
 window.setupRemove=function(i){setupDrinks.splice(i,1);renderSetupItems();};
 window.setupAdd=function(){
-  const name=gid('sa-name').value.trim();if(!name){toast('Enter drink name');return;}
+  const name=gid('sa-name').value.trim();if(!name){toast('Enter brand name');return;}
   const qty=parseInt(gid('sa-qty').value)||1;const cat=gid('sa-cat').value;
   setupDrinks.push({name,cat,qty,used:0});gid('sa-name').value='';gid('sa-qty').value='1';
-  renderSetupItems();toast('Added!');
+  renderSetupItems();toast(name+' added ✓');
+};
+window.setupAddNA=function(){
+  const name=gid('na-name').value.trim();if(!name){toast('Enter item name');return;}
+  const qty=parseInt(gid('na-qty').value)||1;const cat=gid('na-cat').value;
+  setupDrinks.push({name,cat,qty,used:0});gid('na-name').value='';gid('na-qty').value='1';
+  renderSetupItems();toast(name+' added ✓');
 };
 window.clearSetup=function(){setupDrinks=[];renderSetupItems();};
 function updateSetupSummary(){
   const el=gid('setup-summary');
   if(!setupDrinks.length){el.textContent='No drinks added yet.';return;}
   const total=setupDrinks.reduce((s,d)=>s+d.qty,0);
-  el.innerHTML=setupDrinks.map(d=>`${d.qty}× ${d.name}`).join('<br/>')+'<br/><strong style="color:var(--t1)">Total: '+total+' bottles / cans</strong>';
+  el.innerHTML=setupDrinks.map(d=>`${d.qty}× ${d.name}`).join('<br/>')+'<br/><strong style="color:var(--t1)">Total: '+total+' bottles / cans / items</strong>';
+}
+
+// ---- OPENING STOCK WHATSAPP TO CLIENT ----
+function buildOpeningMsg(){
+  const alc=curEv.stock.filter(i=>!isNonAlc(i.cat));
+  const na=curEv.stock.filter(i=>isNonAlc(i.cat));
+  let msg=`🍸 *Rebelz Bartending Services*\n✦ Think of Party, Think of Us ✦\n\n*OPENING STOCK CONFIRMED*\n*${curEv.event_name} — ${fmtDate(curEv.event_date)}*\n━━━━━━━━━━━━━━━\n\n📦 *Bottles/Cans You Provided:*\n${alc.map(i=>`  • ${i.name} — ${i.qty}`).join('\n')||'  None'}`;
+  if(na.length)msg+=`\n\n🥤 *Non-Alcoholic (Rebelz Supply):*\n${na.map(i=>`  • ${i.name} — ${i.qty}`).join('\n')}`;
+  msg+=`\n\n📊 *Total Given:* ${curEv.stock.reduce((s,i)=>s+i.qty,0)} items\n\n🔗 *Track Live:*\n${window.location.href.replace(/bartender\.html.*/,'')}customer.html?ev=${evId}\n\nEvent is now LIVE ✦\n\n_Rebelz Bartending Services_`;
+  return msg;
 }
 
 window.confirmStock=function(){
@@ -579,7 +606,12 @@ window.confirmStock=function(){
   curEv.stock_confirmed=true;curEv.status='live';
   addLog('Opening stock confirmed — '+setupDrinks.length+' drinks, '+setupDrinks.reduce((s,d)=>s+d.qty,0)+' total');
   addLog('2 opening photos attached');
-  saveToFirebase();showPanel();toast('Stock confirmed! Live now ✦');
+  saveToFirebase();
+  // Send opening stock WhatsApp to client, then manager
+  const msg=buildOpeningMsg();addWAMsg(msg);
+  if(curEv.client_wa)openWA(msg,'91'+curEv.client_wa.replace(/\D/g,'').slice(-10));
+  if(curEv.owner_wa)setTimeout(()=>openWA(msg,'91'+curEv.owner_wa.replace(/\D/g,'').slice(-10)),1500);
+  showPanel();toast('Stock confirmed! Live now ✦ Opening report sent');
 };
 
 function showPanel(){
@@ -681,10 +713,14 @@ function buildSummaryMsg(){
 }
 function buildClosingMsg(){
   const consumed=curEv.stock.filter(i=>(i.used||0)>0).map(i=>`  • ${i.name}: ${i.used} consumed`).join('\n');
-  const leftover=curEv.stock.filter(i=>getRem(i)>0).map(i=>`  • ${i.name}: ${getRem(i)} returned`).join('\n');
-  return `✅ *Rebelz Bartending Services*\n*CLOSING REPORT*\n*${curEv.event_name} — ${fmtDate(curEv.event_date)}*\n\n🥃 *Consumed:*\n${consumed||'  None'}\n\n📦 *Returned:*\n${leftover||'  None'}\n\n📊 *Final:*\n  Given: ${curEv.stock.reduce((s,i)=>s+i.qty,0)}\n  Consumed: ${curEv.stock.reduce((s,i)=>s+(i.used||0),0)}\n  Returned: ${curEv.stock.reduce((s,i)=>s+getRem(i),0)}\n\n_Verified by Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦\nVijayawada · Hyderabad · Vizag`;
+  const leftover=curEv.stock.filter(i=>getRem(i)>0).map(i=>`  • ${i.name}: ${getRem(i)} left over`).join('\n');
+  let mlLines='';
+  if(curEv.closing&&curEv.closing.items){
+    mlLines=curEv.closing.items.filter(c=>(c.openBottles||0)>0||(c.mlLeft||0)>0).map(c=>`  • ${c.name}: ${c.openBottles} open bottle${c.openBottles!==1?'s':''} · approx ${c.mlLeft} ml left`).join('\n');
+  }
+  return `✅ *Rebelz Bartending Services*\n*CLOSING REPORT*\n*${curEv.event_name} — ${fmtDate(curEv.event_date)}*\n━━━━━━━━━━━━━━━\n\n🥃 *Consumed:*\n${consumed||'  None'}\n\n📦 *Left Over (Full Bottles):*\n${leftover||'  None'}${mlLines?`\n\n🍾 *Open Bottles & ML Remaining:*\n${mlLines}`:''}\n\n📊 *Final Summary:*\n  Given: ${curEv.stock.reduce((s,i)=>s+i.qty,0)}\n  Consumed: ${curEv.stock.reduce((s,i)=>s+(i.used||0),0)}\n  Left Over: ${curEv.stock.reduce((s,i)=>s+getRem(i),0)}\n\n_Verified by Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦\nVijayawada · Hyderabad · Visakhapatnam`;
 }
-function openWA(msg,phone){window.open('https://wa.me/'+(phone||'').replace(/\D/g,'')+'?text='+encodeURIComponent(msg),'_blank');}
+function openWA(msg,phone){const p=(phone||'').replace(/\D/g,'');const full=p.length===10?'91'+p:p;window.open('https://wa.me/'+full+'?text='+encodeURIComponent(msg),'_blank');}
 
 window.saveAndNotify=function(){saveToFirebase();const msg=buildSummaryMsg();addWAMsg(msg);addLog('Saved — '+curEv.stock.reduce((s,i)=>s+(i.used||0),0)+' consumed');toast('Saved! Tap WhatsApp to send.');};
 window.sendManualWA=function(){const msg=buildSummaryMsg();if(curEv.client_wa)openWA(msg,curEv.client_wa);if(curEv.owner_wa)setTimeout(()=>openWA(msg,curEv.owner_wa),700);if(!curEv.client_wa&&!curEv.owner_wa)openWA(msg,'');};
