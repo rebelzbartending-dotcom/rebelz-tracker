@@ -414,10 +414,20 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const firebaseConfig = { databaseURL:"https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app" };
+const firebaseConfig = {
+  apiKey: "AIzaSyDcrx5tOL1Y2TWiz1VFfCAC_OagARggGNE",
+  authDomain: "rebelz-tracker.firebaseapp.com",
+  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rebelz-tracker",
+  storageBucket: "rebelz-tracker.appspot.com",
+  messagingSenderId: "234156658582",
+  appId: "1:234156658582:web:26597fc333698b0778d7b7"
+};
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
 const COLORS={whiskey:'#c8860a',gin:'#0e9e80',vodka:'#7c5cc4',beer:'#3a7a20',wine:'#aa3870',rum:'#c04020',tequila:'#d4a017',brandy:'#8b4513',other:'#888',juices:'#e87020',softdrinks:'#c02040',soda:'#4090c8',water:'#30a8c8','nonalc-other':'#888'};
 const NONALC_CATS=['juices','softdrinks','soda','water','nonalc-other'];
@@ -472,8 +482,11 @@ function saveToFirebase(){if(!curEv||!evId)return;set(ref(db,'events/'+evId),cur
 
 const params=new URLSearchParams(window.location.search);
 evId=params.get('ev');
-if(!evId){showScreen('scr-error');}
-else{
+
+// Load the event data. Runs only after anonymous sign-in succeeds
+// (needed so the locked database allows this page to read/write).
+function initEvent(){
+  if(!evId){showScreen('scr-error');return;}
   onValue(ref(db,'events/'+evId),(snap)=>{
     const data=snap.val();
     if(!data){showScreen('scr-error');return;}
@@ -490,6 +503,17 @@ else{
     }
   });
 }
+
+// Silent anonymous sign-in — the bartender still just opens the link + enters
+// the PIN; there is NO extra login screen. This token lets the locked database
+// accept this page. If anonymous auth is not enabled in Firebase, show error.
+let evInit=false;
+onAuthStateChanged(auth,(user)=>{ if(user && !evInit){ evInit=true; initEvent(); } });
+signInAnonymously(auth).catch((e)=>{
+  console.error('Anonymous sign-in failed:', e);
+  showScreen('scr-error');
+  toast('Connection blocked — contact admin');
+});
 
 gid('login-btn').addEventListener('click',doLogin);
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&gid('scr-login').classList.contains('active'))doLogin();});
