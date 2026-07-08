@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>Rebelz — Admin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -185,6 +186,9 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     <button class="btn btn-ghost" onclick="clearForm()">Clear Form</button>
   </div>
 
+  <!-- EXPORT ALL -->
+  <button class="btn" onclick="exportAllExcel()" style="background:linear-gradient(135deg,#1a5028,#40c870);color:#fff;margin-bottom:16px">📊 Export All Data to Excel</button>
+
   <!-- EVENT LIST -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
     <div class="sec-lbl" style="margin-bottom:0;flex:1">All Events</div>
@@ -232,6 +236,16 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 </div>
 
 <!-- FEEDBACK MODAL -->
+<!-- PHOTOS MODAL (Admin Only) -->
+<div class="modal-bg" id="ph-modal" onclick="if(event.target===this)closePhModal()">
+  <div class="modal" style="max-height:86vh;overflow-y:auto">
+    <div style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--gold2);margin-bottom:4px">📷 Event Photos</div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:16px;font-family:var(--fm)" id="ph-modal-sub">Admin only — not visible to client</div>
+    <div id="ph-modal-content"></div>
+    <button class="btn btn-ghost" onclick="closePhModal()" style="margin-top:12px">Close</button>
+  </div>
+</div>
+
 <div class="modal-bg" id="fb-modal" onclick="if(event.target===this)closeFbModal()">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -376,6 +390,80 @@ window.viewFeedback=function(id){
   gid('fb-modal').classList.add('open');
 };
 
+// ---- PHOTOS VIEWER (Admin Only) ----
+window.viewPhotos=function(id){
+  const ev=EVENTS.find(e=>e.id===id);if(!ev)return;
+  const el=gid('ph-modal-content');
+  gid('ph-modal-sub').textContent=ev.event_name+' · '+ev.client_name+' · Admin only';
+  const op=(ev.photos&&ev.photos.opening)||[];
+  const cl=(ev.photos&&ev.photos.closing)||[];
+  let html='';
+  html+='<div style="font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:8px">Opening Photos ('+op.filter(Boolean).length+'/2)</div>';
+  html+=op.filter(Boolean).length
+    ?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">'+op.filter(Boolean).map(p=>'<img src="'+p+'" style="width:100%;border-radius:10px;border:1px solid var(--gold-dim)"/>').join('')+'</div>'
+    :'<div style="font-size:11px;color:var(--t3);padding:14px;text-align:center;background:var(--s2);border-radius:10px;margin-bottom:18px">No opening photos yet</div>';
+  html+='<div style="font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:8px">Closing Photos ('+cl.filter(Boolean).length+'/3)</div>';
+  html+=cl.filter(Boolean).length
+    ?'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">'+cl.filter(Boolean).map(p=>'<img src="'+p+'" style="width:100%;border-radius:10px;border:1px solid var(--gold-dim)"/>').join('')+'</div>'
+    :'<div style="font-size:11px;color:var(--t3);padding:14px;text-align:center;background:var(--s2);border-radius:10px;margin-bottom:18px">No closing photos yet</div>';
+  if(ev.closing&&ev.closing.items&&ev.closing.items.length){
+    html+='<div style="font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:8px">Closing Verification — Open Bottles & ML Left</div>';
+    html+='<div style="background:var(--s2);border-radius:10px;padding:4px 12px;margin-bottom:6px">'+ev.closing.items.map(it=>'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--b1);font-size:12px"><span style="color:var(--t2)">'+it.name+'</span><span style="color:var(--gold2);font-family:var(--fm);font-size:11px">'+it.openBottles+' open · '+it.mlLeft+' ml left</span></div>').join('')+'</div>';
+  }
+  el.innerHTML=html;
+  gid('ph-modal').classList.add('open');
+};
+window.closePhModal=function(){gid('ph-modal').classList.remove('open');};
+
+// ---- EXCEL EXPORT (4 sheets: Events, Feedback, Consumption, Photos) ----
+function buildWorkbook(evList){
+  const wb=XLSX.utils.book_new();
+  // Sheet 1 — Events
+  const evRows=[['Event ID','Client Name','Event Name','Date','City','Venue','Guests','Package','Status','PIN','Team Leader','No. of Bartenders','Bartender Names','Client WhatsApp','Manager WhatsApp','Created']];
+  evList.forEach(ev=>{
+    evRows.push([ev.id,ev.client_name||'',ev.event_name||'',ev.event_date||'',ev.city||'',ev.venue||'',ev.guests||'',ev.package||'',ev.status||'',ev.bartender_pin||'',
+      ev.team?ev.team.leader:'',ev.team?ev.team.count:'',ev.team?(ev.team.members||[]).join(', '):'',
+      ev.client_wa||'',ev.owner_wa||'',ev.created_at?ev.created_at.slice(0,10):'']);
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(evRows),'Events');
+  // Sheet 2 — Feedback
+  const fbRows=[['Event ID','Event Name','Client','Overall','Bartender','Cocktails','Book Again','Tags','Comment','Submitted By']];
+  evList.forEach(ev=>{
+    const fb=feedbackData[ev.id];
+    if(fb)fbRows.push([ev.id,ev.event_name||'',ev.client_name||'',fb.overall||'',fb.bartender||'',fb.cocktails||'',fb.book_again?'Yes':'No',(fb.tags||[]).join(', '),fb.comment||'',fb.name||'Guest']);
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(fbRows),'Feedback');
+  // Sheet 3 — Consumption
+  const coRows=[['Event ID','Event Name','Item','Category','Opening Qty','Extra Added','Consumed','Full Left','Open Bottles (Closing)','ML Left (Closing)']];
+  evList.forEach(ev=>{
+    (ev.stock||[]).forEach(it=>{
+      const cl=(ev.closing&&ev.closing.items||[]).find(c=>c.name===it.name)||{};
+      coRows.push([ev.id,ev.event_name||'',it.name,it.cat||'',it.qty||0,it.restocked||0,it.used||0,Math.max(0,(it.qty||0)-(it.used||0)),cl.openBottles!==undefined?cl.openBottles:'',cl.mlLeft!==undefined?cl.mlLeft:'']);
+    });
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(coRows),'Consumption');
+  // Sheet 4 — Photos
+  const phRows=[['Event ID','Event Name','Type','Photos Attached','Where to View']];
+  evList.forEach(ev=>{
+    const op=(ev.photos&&ev.photos.opening||[]).filter(Boolean).length;
+    const cl=(ev.photos&&ev.photos.closing||[]).filter(Boolean).length;
+    phRows.push([ev.id,ev.event_name||'','Opening',op,'Admin Panel → 📷 Photos button']);
+    phRows.push([ev.id,ev.event_name||'','Closing',cl,'Admin Panel → 📷 Photos button']);
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(phRows),'Photos');
+  return wb;
+}
+window.exportAllExcel=function(){
+  if(!EVENTS.length){toast('No events to export');return;}
+  XLSX.writeFile(buildWorkbook(EVENTS),'Rebelz_All_Events_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('Excel downloaded! 📊');
+};
+window.exportOneExcel=function(id){
+  const ev=EVENTS.find(e=>e.id===id);if(!ev)return;
+  XLSX.writeFile(buildWorkbook([ev]),'Rebelz_'+(ev.event_name||ev.id).replace(/[^A-Za-z0-9]+/g,'_')+'.xlsx');
+  toast('Excel downloaded! 📊');
+};
+
 function renderList(){
   const el=gid('event-list');
   gid('admin-count').textContent=EVENTS.length+' event'+(EVENTS.length!==1?'s':'');
@@ -399,14 +487,17 @@ function renderList(){
           ${fbBadge}
         </div>
       </div>
-      <div style="font-size:10px;font-family:var(--fm);color:${ev.stock_confirmed?'var(--t3)':'var(--amb)'};margin-bottom:12px;padding:8px;background:var(--s2);border-radius:8px">
+      <div style="font-size:10px;font-family:var(--fm);color:${ev.stock_confirmed?'var(--t3)':'var(--amb)'};margin-bottom:${ev.team?'6px':'12px'};padding:8px;background:var(--s2);border-radius:8px">
         ${ev.stock_confirmed?`📦 ${tot} bottles · ${used} consumed · ${tot-used} remaining`:'⚠ Bartender yet to confirm opening stock'} · PIN: <span style="color:var(--gold2)">${ev.bartender_pin}</span> · ${ev.package||'Basic'}
       </div>
+      ${ev.team?`<div style="font-size:10px;font-family:var(--fm);color:var(--gold2);margin-bottom:12px;padding:8px;background:#c8981e0d;border:0.5px solid var(--gold-dim);border-radius:8px">👥 Lead: <strong>${ev.team.leader}</strong> · ${ev.team.count} bartender${ev.team.count>1?'s':''} — ${(ev.team.members||[]).join(', ')}</div>`:''}
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="showModalById('${ev.id}')">🔗 Links</button>
         <button class="btn btn-ghost btn-sm" onclick="copyText(barLink('${ev.id}'))">Copy Bartender</button>
         <button class="btn btn-ghost btn-sm" onclick="copyText(custLink('${ev.id}'))">Copy Client</button>
+        <button class="btn btn-ghost btn-sm" onclick="viewPhotos('${ev.id}')" style="color:var(--gold3);border-color:var(--gold-dim)">📷 Photos</button>
         <button class="btn btn-ghost btn-sm" onclick="viewFeedback('${ev.id}')" style="color:var(--gold2);border-color:var(--gold-dim)">⭐ Feedback</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportOneExcel('${ev.id}')" style="color:var(--grn);border-color:#40c87040">📊 Export</button>
         <button class="btn btn-red btn-sm" onclick="deleteEvt('${ev.id}')">Delete</button>
       </div>
     </div>`;
