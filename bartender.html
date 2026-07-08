@@ -197,10 +197,6 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       <strong>Step 1 of 3 — Your Team:</strong> Enter who is working this event today. This goes into the event record.
     </div>
     <div class="card">
-      <div class="card-title">Team Leader</div>
-      <div class="field"><label>Team Leader Name *</label><input class="inp" id="t-leader" placeholder="e.g. Ravi Kumar"/></div>
-    </div>
-    <div class="card">
       <div class="card-title">Bartenders Working Today</div>
       <div class="field"><label>Number of Bartenders *</label><input class="inp" id="t-count" type="number" min="1" max="20" placeholder="e.g. 3" style="text-align:center;font-size:20px;font-family:var(--fh);font-weight:700"/></div>
       <div id="t-names"></div>
@@ -371,11 +367,11 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
   </div>
   <div class="scroll-body">
     <div style="background:#e8404012;border:0.5px solid #e8404030;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--red);line-height:1.7">
-      <strong>Before closing:</strong> Count the open bottles and leftover ML for each drink, attach 3 closing photos, then close. The final WhatsApp report goes out as usual.
+      <strong>Before closing:</strong> For <strong>alcohol</strong>, count the open bottles and leftover ML. Non-alcoholic drinks only show what was consumed — no bottle count needed. Attach 3 closing photos, then close. The final WhatsApp report goes out as usual.
     </div>
     <div class="card">
-      <div class="card-title">Step 1 — Open Bottles & Leftover ML</div>
-      <div class="photo-note">For each drink: how many bottles are <strong style="color:var(--gold2)">open</strong> and roughly how much <strong style="color:var(--gold2)">ML is left</strong> in them.</div>
+      <div class="card-title">Step 1 — Open Bottles & Leftover ML (Alcohol only)</div>
+      <div class="photo-note">For each <strong style="color:var(--gold2)">alcohol</strong> drink: how many bottles are <strong style="color:var(--gold2)">open</strong> and roughly how much <strong style="color:var(--gold2)">ML is left</strong>. Non-alcoholic items just show consumed.</div>
       <div id="close-items"></div>
     </div>
     <div class="card">
@@ -540,13 +536,12 @@ gid('t-count').addEventListener('input',function(){
   const wrap=gid('t-names');
   let html='';
   for(let i=0;i<n;i++){
-    html+='<div class="field"><label>Bartender '+(i+1)+' Name *</label><input class="inp t-name-inp" id="t-name-'+i+'" placeholder="Name"/></div>';
+    const lbl=(i===0)?'Bartender 1 Name (Team Leader) *':'Bartender '+(i+1)+' Name *';
+    html+='<div class="field"><label>'+lbl+'</label><input class="inp t-name-inp" id="t-name-'+i+'" placeholder="Name"/></div>';
   }
   wrap.innerHTML=html;
 });
 window.saveTeam=function(){
-  const leader=gid('t-leader').value.trim();
-  if(!leader){toast('Enter Team Leader name');gid('t-leader').focus();return;}
   const n=parseInt(gid('t-count').value)||0;
   if(n<1){toast('Enter number of bartenders');gid('t-count').focus();return;}
   const members=[];
@@ -555,6 +550,7 @@ window.saveTeam=function(){
     if(!v){toast('Enter Bartender '+(i+1)+' name');return;}
     members.push(v);
   }
+  const leader=members[0]; // first bartender is the Team Leader
   curEv.team={leader,count:n,members};
   addLog('Team confirmed — Leader: '+leader+' · '+n+' bartender'+(n>1?'s':'')+' ('+members.join(', ')+')');
   saveToFirebase();
@@ -755,15 +751,20 @@ window.closeEventFn=function(){
   const el=gid('close-items');
   el.innerHTML=(curEv.stock||[]).map((it,i)=>{
     const col=COLORS[it.cat]||'#888';
+    const na=isNonAlc(it.cat);
+    // Non-alcoholic: consumed only, no open-bottle / ML count. Alcohol: full inputs.
+    const inputs = na
+      ? `<div style="font-size:10px;color:var(--t3);font-family:var(--fm);padding:8px 2px 2px;line-height:1.6">Non-alcoholic — consumed <strong style="color:var(--gold2)">${it.used||0}</strong>, left <strong style="color:var(--gold2)">${getRem(it)}</strong>. No open-bottle count needed.</div>`
+      : `<div class="close-inputs">
+        <div class="close-inp-wrap"><label>Open Bottles</label><input class="close-inp" id="cb-open-${i}" type="number" min="0" value="0"/></div>
+        <div class="close-inp-wrap"><label>ML Left (approx)</label><input class="close-inp" id="cb-ml-${i}" type="number" min="0" value="0" placeholder="ml"/></div>
+      </div>`;
     return `<div class="close-item">
       <div style="display:flex;align-items:center;gap:8px">
         <div style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0"></div>
         <div style="flex:1"><div class="close-item-name">${it.name}</div><div class="close-item-sub">${it.cat} · given: ${it.qty} · consumed: ${it.used||0} · full left: ${getRem(it)}</div></div>
       </div>
-      <div class="close-inputs">
-        <div class="close-inp-wrap"><label>Open Bottles</label><input class="close-inp" id="cb-open-${i}" type="number" min="0" value="0"/></div>
-        <div class="close-inp-wrap"><label>ML Left (approx)</label><input class="close-inp" id="cb-ml-${i}" type="number" min="0" value="0" placeholder="ml"/></div>
-      </div>
+      ${inputs}
     </div>`;
   }).join('')||'<div style="text-align:center;padding:14px;font-size:11px;color:var(--t3)">No stock items</div>';
 };
@@ -772,11 +773,14 @@ window.finalizeClose=function(){
   if(!closePhotos[0]||!closePhotos[1]||!closePhotos[2]){toast('📷 Attach all 3 closing photos first!');return;}
   // Save closing verification data (admin + Excel)
   curEv.closing={
-    items:(curEv.stock||[]).map((it,i)=>({
-      name:it.name,cat:it.cat,
-      openBottles:parseInt(gid('cb-open-'+i)?gid('cb-open-'+i).value:0)||0,
-      mlLeft:parseInt(gid('cb-ml-'+i)?gid('cb-ml-'+i).value:0)||0
-    })),
+    items:(curEv.stock||[]).map((it,i)=>{
+      const na=isNonAlc(it.cat);
+      return {
+        name:it.name,cat:it.cat,
+        openBottles: na?0:(parseInt(gid('cb-open-'+i)?gid('cb-open-'+i).value:0)||0),
+        mlLeft: na?0:(parseInt(gid('cb-ml-'+i)?gid('cb-ml-'+i).value:0)||0)
+      };
+    }),
     closedAt:nowISO()
   };
   if(!curEv.photos)curEv.photos={};
