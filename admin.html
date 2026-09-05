@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>Rebelz — Admin</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -134,6 +135,56 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .empty-title{font-family:var(--fh);font-size:18px;font-weight:600;color:var(--t2);margin-bottom:6px}
 .empty-sub{font-size:12px;line-height:1.6}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ===== MENU CARD UPLOAD ===== */
+.menu-slot{border:1px dashed var(--b3);border-radius:12px;background:var(--s2);min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;overflow:hidden;position:relative;transition:border-color .2s,box-shadow .2s;text-align:center;padding:16px}
+.menu-slot:active{border-color:var(--gold)}
+.menu-slot.filled{border:1.5px solid var(--gold);box-shadow:0 0 14px var(--gold-dim);min-height:auto;padding:8px}
+.menu-slot img{width:100%;border-radius:8px;display:block}
+.menu-slot .ps-icon{font-size:26px}
+.menu-slot .ps-lbl{font-size:10px;color:var(--t3);font-family:var(--fm);line-height:1.6}
+.menu-clear{position:absolute;top:8px;right:8px;background:rgba(8,8,6,.72);border:0.5px solid var(--b2);color:var(--t1);border-radius:8px;font-size:10px;padding:5px 9px;cursor:pointer;font-family:var(--fb);font-weight:600;z-index:2}
+
+/* ===== SEARCH + FILTER BAR ===== */
+.filter-bar{margin-bottom:14px}
+#ev-search{margin-bottom:10px}
+.filter-chips{display:flex;gap:7px;flex-wrap:wrap}
+.fchip{padding:7px 14px;border-radius:20px;border:0.5px solid var(--b2);font-size:11px;color:var(--t2);cursor:pointer;background:transparent;font-family:var(--fm);letter-spacing:.04em;transition:all .15s;user-select:none}
+.fchip.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;border-color:transparent;font-weight:700}
+
+/* ===== ANALYTICS ===== */
+.btn-analytics{background:linear-gradient(135deg,#2a2410,#3a3418);border:0.5px solid var(--gold-dim);color:var(--gold2)}
+.btn-analytics:active{filter:brightness(1.15)}
+.an-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.an-box{background:var(--s2);border:0.5px solid var(--b1);border-radius:12px;padding:14px;text-align:center;position:relative;overflow:hidden}
+.an-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.an-box-l{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:6px}
+.an-box-v{font-family:var(--fh);font-size:30px;font-weight:700;color:var(--gold2);line-height:1}
+.an-box-s{font-size:9px;color:var(--t4);font-family:var(--fm);margin-top:4px}
+.an-sec{font-size:9px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin:18px 0 10px;display:flex;align-items:center;gap:10px}
+.an-sec::after{content:'';flex:1;height:.5px;background:linear-gradient(90deg,var(--b2),transparent)}
+.an-row{margin-bottom:9px}
+.an-row-top{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.an-row-name{color:var(--t2)}
+.an-row-val{color:var(--gold2);font-family:var(--fm);font-size:10px}
+.an-bar{height:7px;background:var(--s3);border-radius:4px;overflow:hidden}
+.an-bar-fill{height:7px;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+
+/* ===== MENU LIGHTBOX (customer shares style; admin preview) ===== */
+.menu-badge{font-size:9px;color:var(--gold2);font-family:var(--fm);background:var(--gold-dim);padding:2px 8px;border-radius:10px}
+
+/* ===== POLISH ===== */
+html{scroll-behavior:smooth}
+.btn-gold{box-shadow:0 6px 18px var(--gold-dim)}
+.btn{transition:transform .12s ease,filter .15s ease,background .15s ease}
+.ev-card{transition:border-color .2s,transform .12s}
+.ev-card:active{transform:scale(.995)}
+.inp,.phone-wrap{transition:border-color .2s,box-shadow .2s}
+.inp:focus{box-shadow:0 0 0 3px var(--gold-dim)}
+.stat-box{transition:transform .12s}
+.stat-box:active{transform:scale(.97)}
+.lbtn{transition:background .15s,transform .1s}
+.lbtn:active{transform:scale(.96)}
 </style>
 </head>
 <body>
@@ -215,19 +266,36 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       </div>
       <div class="toggle-hint">If YES, bartender will see non-alcoholic section to log items. If NO, section is hidden.</div>
     </div>
+    <div class="field">
+      <label>Cocktail Menu Card (optional)</label>
+      <div id="menu-slot" class="menu-slot" onclick="pickMenu()">
+        <div class="ps-icon">🍸</div>
+        <div class="ps-lbl">Tap to upload your menu card image<br/>Client sees a “View Menu” button on the live page</div>
+      </div>
+    </div>
     <div class="field"><label>Bartender PIN (4–6 digits)</label><input class="inp" id="f-pin" type="number" placeholder="e.g. 2580" style="letter-spacing:6px;font-family:var(--fm);font-size:18px"/></div>
     <div style="height:4px"></div>
     <button class="btn btn-gold" onclick="createNewEvent()">✦ Create Event + Send WhatsApp</button>
     <button class="btn btn-ghost" onclick="clearForm()">Clear Form</button>
   </div>
 
-  <!-- EXPORT ALL -->
+  <!-- ANALYTICS + EXPORT -->
+  <button class="btn btn-analytics" onclick="openAnalytics()" style="margin-bottom:8px">📈 Owner Analytics Dashboard</button>
   <button class="btn" onclick="exportAllExcel()" style="background:linear-gradient(135deg,#1a5028,#40c870);color:#fff;margin-bottom:16px">📊 Export All Data to Excel</button>
 
   <!-- EVENT LIST -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
     <div class="sec-lbl" style="margin-bottom:0;flex:1">All Events</div>
     <div style="font-size:9px;color:var(--t4);font-family:var(--fm)" id="admin-count">0 events</div>
+  </div>
+  <div class="filter-bar">
+    <input class="inp" id="ev-search" placeholder="🔍  Search client, event or city" oninput="applyFilters()"/>
+    <div class="filter-chips">
+      <div class="fchip active" data-f="all" onclick="setFilter('all')">All</div>
+      <div class="fchip" data-f="live" onclick="setFilter('live')">● Live</div>
+      <div class="fchip" data-f="setup" onclick="setFilter('setup')">Setup</div>
+      <div class="fchip" data-f="closed" onclick="setFilter('closed')">✓ Done</div>
+    </div>
   </div>
   <div id="event-list"></div>
   <div style="height:30px"></div>
@@ -290,6 +358,20 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
   </div>
 </div>
 
+<!-- ANALYTICS MODAL -->
+<div class="modal-bg" id="an-modal" onclick="if(event.target===this)closeAnalytics()">
+  <div class="modal" style="max-height:92vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div style="font-family:var(--fh);font-size:26px;font-weight:700;color:var(--gold2);margin-bottom:2px">Owner Analytics ✦</div>
+    <div style="font-size:11px;color:var(--t3);font-family:var(--fm);margin-bottom:20px;letter-spacing:.04em">Live snapshot across all your events</div>
+    <div id="an-content"></div>
+    <button class="btn btn-ghost" onclick="closeAnalytics()" style="margin-top:14px">Close</button>
+  </div>
+</div>
+
+<!-- hidden menu upload input -->
+<input type="file" id="menu-input" accept="image/*" style="display:none"/>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -311,6 +393,39 @@ const db = getDatabase(app);
 const auth = getAuth(app);
 
 let EVENTS=[], modalEv=null, feedbackData={};
+let menuImg=null;                 // uploaded cocktail menu card (base64)
+let curFilter='all', searchText='';  // event search + filter state
+
+// ---- MENU CARD IMAGE UPLOAD ----
+function compressImage(file,cb,max=1100,q=0.78){
+  const img=new Image(),rd=new FileReader();
+  rd.onload=e=>{img.src=e.target.result;};
+  img.onload=()=>{
+    let w=img.width,h=img.height;
+    if(w>h&&w>max){h=Math.round(h*max/w);w=max;}else if(h>max){w=Math.round(w*max/h);h=max;}
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    cb(c.toDataURL('image/jpeg',q));
+  };
+  rd.readAsDataURL(file);
+}
+window.pickMenu=function(){gid('menu-input').value='';gid('menu-input').click();};
+gid('menu-input').addEventListener('change',function(e){
+  const file=e.target.files&&e.target.files[0];if(!file)return;
+  toast('Processing menu…');
+  compressImage(file,b64=>{menuImg=b64;renderMenuSlot();toast('Menu card added ✓');});
+});
+function renderMenuSlot(){
+  const s=gid('menu-slot');if(!s)return;
+  if(menuImg){
+    s.classList.add('filled');
+    s.innerHTML='<img src="'+menuImg+'"/><button class="menu-clear" onclick="event.stopPropagation();clearMenu()">✕ Remove</button>';
+  } else {
+    s.classList.remove('filled');
+    s.innerHTML='<div class="ps-icon">🍸</div><div class="ps-lbl">Tap to upload your menu card image<br/>Client sees a “View Menu” button on the live page</div>';
+  }
+}
+window.clearMenu=function(){menuImg=null;renderMenuSlot();};
 
 function gid(id){return document.getElementById(id);}
 function toast(msg,dur=2400){const t=gid('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
@@ -321,6 +436,7 @@ function baseUrl(){return window.location.href.replace(/admin\.html.*/,'');}
 function barLink(id){return baseUrl()+'bartender.html?ev='+id;}
 function custLink(id){return baseUrl()+'customer.html?ev='+id;}
 function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
+function getRem(it){return Math.max(0,(it.qty||0)-(it.used||0));}
 
 // Firebase listeners — attached ONLY after an admin has logged in
 let listenersOn=false;
@@ -390,7 +506,7 @@ window.waShare=function(type){
   if(!modalEv)return;
   let msg,phone;
   if(type==='bar'){
-    msg=`*Rebelz Bartending Services*\n✦ Think of Party, Think of Us ✦\n\n*NEW EVENT ASSIGNED*\n━━━━━━━━━━━━━━━\n\n📋 *Event:* ${modalEv.event_name}\n👤 *Client:* ${modalEv.client_name}\n📞 *Client Number:* +91 ${modalEv.client_wa||'—'}\n📅 *Date:* ${fmtDate(modalEv.event_date)}\n📍 *Venue:* ${modalEv.venue||'—'}\n🏙️ *City:* ${modalEv.city||'—'}\n👥 *Guests:* ${modalEv.guests||'—'}\n\n🥤 *Non-Alcoholic from Rebelz:* ${modalEv.non_alc?'YES — add non-alcoholic items in your panel':'NO — client brings their own'}\n\n🔐 *Your PIN:* ${modalEv.bartender_pin}\n\n🔗 *Bartender Link:*\n${barLink(modalEv.id)}\n\nOpen link → Enter PIN → Add team → Add stock → 2 photos → Go Live\n\n_Rebelz Bartending Services_`;
+    msg=`🍸 *REBELZ BARTENDING SERVICES*\n✦ Think of Party, Think of Us ✦\n\n*━━━ NEW EVENT ASSIGNED ━━━*\n\nHi team 👋 Here are your full details for this event. Please read everything before you reach the venue.\n\n📋 *EVENT DETAILS*\n• Event: ${modalEv.event_name}\n• Client: ${modalEv.client_name}\n• Client Contact: +91 ${modalEv.client_wa||'—'}\n• Date: ${fmtDate(modalEv.event_date)}\n• City: ${modalEv.city||'—'}\n• Guests: ${modalEv.guests||'—'}\n• Venue: ${modalEv.venue||'—'}\n\n🥤 *MIXERS / SOFT DRINKS:* ${modalEv.non_alc?'Rebelz is supplying — you will log these in your panel.':"Client is bringing their own — you don't log these."}\n\n🍹 *COCKTAIL MENU:* ${modalEv.menu_img?"Menu card is attached in the client's live tracker — please serve as per the menu.":'No fixed menu card shared for this event.'}\n\n🔐 *YOUR PIN:* ${modalEv.bartender_pin}\n\n🔗 *YOUR PANEL LINK:*\n${barLink(modalEv.id)}\n\n*━━━ WHAT TO DO (step by step) ━━━*\n1️⃣ Open the link above on your phone\n2️⃣ Enter your PIN: *${modalEv.bartender_pin}*\n3️⃣ STEP 1 — Add your TEAM (leader + every bartender working today)\n4️⃣ STEP 2 — Add OPENING STOCK: every bottle/brand the client gave, with correct counts${modalEv.non_alc?' + the non-alcoholic items Rebelz supplied':''}\n5️⃣ Take 2 opening photos (venue + bar counter with team)\n6️⃣ Tap *Confirm — Go Live* → the client's live tracker starts\n7️⃣ DURING the event: tap *Consumed* each time a bottle finishes · use *+Add Bottles* if the client gives more\n8️⃣ AT THE END: tap *Close Event* → enter open bottles + ml left → add 3 closing photos → final report auto-sends\n\n⚠️ Keep every count accurate — the client sees the stock live on their phone.\n\n_Rebelz Bartending Services_\nVijayawada · Hyderabad · Visakhapatnam`;
     phone='91'+(modalEv.owner_wa||'').replace(/\D/g,'').slice(-10);
   } else {
     msg=`Hello! 🍸\n\nYour *live alcohol tracker* for *${modalEv.event_name}* is ready!\n\nTrack your bottles live:\n${custLink(modalEv.id)}\n\n_Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦`;
@@ -411,6 +527,7 @@ window.clearForm=function(){
   ['f-client','f-event','f-date','f-venue','f-cwa','f-owa','f-pin','f-guests'].forEach(id=>{const e=gid(id);if(e)e.value='';});
   gid('f-date').value=new Date().toISOString().split('T')[0];
   window.setNonAlc(true);
+  clearMenu();
 };
 
 window.createNewEvent=function(){
@@ -432,6 +549,7 @@ window.createNewEvent=function(){
     non_alc:nonAlc,
     bartender_pin:pin,client_wa:cwa,owner_wa:owa,
     status:'setup',stock:[],stock_confirmed:false,
+    menu_img:menuImg||null,
     log:[{msg:'Event created',time:nowISO()}],created_at:nowISO()
   };
   saveEvent(ev);showModal(ev);window.clearForm();toast('Event created!');
@@ -563,14 +681,190 @@ window.exportOneExcel=function(id){
   toast('Excel downloaded! 📊');
 };
 
+// ===== OWNER ANALYTICS DASHBOARD =====
+function computeAnalytics(){
+  const evs=EVENTS;
+  const total=evs.length;
+  const live=evs.filter(e=>e.status==='live').length;
+  const done=evs.filter(e=>e.status==='closed').length;
+  const setup=evs.filter(e=>e.status==='setup').length;
+  let given=0,consumed=0;const brandUsed={};
+  evs.forEach(e=>(e.stock||[]).forEach(it=>{given+=it.qty||0;consumed+=it.used||0;if((it.used||0)>0)brandUsed[it.name]=(brandUsed[it.name]||0)+(it.used||0);}));
+  const topBrands=Object.entries(brandUsed).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const cityCount={};evs.forEach(e=>{const c=e.city||'Others';cityCount[c]=(cityCount[c]||0)+1;});
+  const topCities=Object.entries(cityCount).sort((a,b)=>b[1]-a[1]);
+  const fbs=Object.values(feedbackData||{});const fbCount=fbs.length;
+  const avg=k=>fbCount?(fbs.reduce((s,f)=>s+(f[k]||0),0)/fbCount):0;
+  const bookAgain=fbCount?Math.round(fbs.filter(f=>f.book_again).length/fbCount*100):0;
+  const totalGuests=evs.reduce((s,e)=>s+(parseInt(e.guests)||0),0);
+  const monthCount={};evs.forEach(e=>{const d=e.event_date||((e.created_at||'').slice(0,10));if(d&&d.length>=7){const m=d.slice(0,7);monthCount[m]=(monthCount[m]||0)+1;}});
+  const months=Object.entries(monthCount).sort((a,b)=>a[0]<b[0]?-1:1).slice(-6);
+  return {total,live,done,setup,given,consumed,topBrands,topCities,fbCount,
+    avgOverall:avg('overall'),avgBartender:avg('bartender'),avgCocktails:avg('cocktails'),
+    bookAgain,totalGuests,months};
+}
+function barRow(name,val,max,valLabel){
+  const pct=max?Math.round(val/max*100):0;
+  return `<div class="an-row"><div class="an-row-top"><span class="an-row-name">${name}</span><span class="an-row-val">${valLabel!=null?valLabel:val}</span></div><div class="an-bar"><div class="an-bar-fill" style="width:${Math.max(6,pct)}%"></div></div></div>`;
+}
+function monthLabel(m){try{const[y,mo]=m.split('-');return new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'short',year:'2-digit'});}catch(e){return m;}}
+window.openAnalytics=function(){
+  const a=computeAnalytics();
+  const el=gid('an-content');
+  if(!a.total){el.innerHTML='<div style="text-align:center;padding:36px;color:var(--t3)"><div style="font-size:32px;margin-bottom:12px">📈</div><div style="font-family:var(--fh);font-size:18px;color:var(--t2)">No data yet</div><div style="font-size:12px;margin-top:6px">Create and run events to see your analytics.</div></div>';gid('an-modal').classList.add('open');return;}
+  const rating=a.avgOverall?a.avgOverall.toFixed(1):'—';
+  let h='';
+  h+=`<div class="an-grid">
+    <div class="an-box"><div class="an-box-l">Total Events</div><div class="an-box-v">${a.total}</div><div class="an-box-s">${a.live} live · ${a.done} done · ${a.setup} setup</div></div>
+    <div class="an-box"><div class="an-box-l">Avg Rating</div><div class="an-box-v">${rating}${a.avgOverall?'<span style="font-size:14px;color:var(--t3)">/5</span>':''}</div><div class="an-box-s">${a.fbCount} review${a.fbCount!==1?'s':''}</div></div>
+    <div class="an-box"><div class="an-box-l">Bottles Consumed</div><div class="an-box-v">${a.consumed}</div><div class="an-box-s">of ${a.given} given</div></div>
+    <div class="an-box"><div class="an-box-l">Would Rebook</div><div class="an-box-v">${a.bookAgain}<span style="font-size:14px;color:var(--t3)">%</span></div><div class="an-box-s">${a.totalGuests} guests served</div></div>
+  </div>`;
+  if(a.fbCount){
+    h+=`<div class="an-sec">Service Ratings</div>`;
+    h+=barRow('Overall experience',a.avgOverall,5,a.avgOverall.toFixed(1)+'/5');
+    h+=barRow('Bartender performance',a.avgBartender,5,a.avgBartender.toFixed(1)+'/5');
+    h+=barRow('Cocktails & drinks',a.avgCocktails,5,a.avgCocktails.toFixed(1)+'/5');
+  }
+  if(a.topBrands.length){
+    const max=a.topBrands[0][1];
+    h+=`<div class="an-sec">Most Consumed Brands</div>`+a.topBrands.map(b=>barRow(b[0],b[1],max,b[1]+' used')).join('');
+  }
+  if(a.topCities.length){
+    const max=a.topCities[0][1];
+    h+=`<div class="an-sec">Events by City</div>`+a.topCities.map(c=>barRow(c[0],c[1],max,c[1]+' event'+(c[1]!==1?'s':''))).join('');
+  }
+  if(a.months.length){
+    const max=Math.max(...a.months.map(m=>m[1]));
+    h+=`<div class="an-sec">Monthly Trend</div>`+a.months.map(m=>barRow(monthLabel(m[0]),m[1],max,m[1]+' event'+(m[1]!==1?'s':''))).join('');
+  }
+  el.innerHTML=h;
+  gid('an-modal').classList.add('open');
+};
+window.closeAnalytics=function(){gid('an-modal').classList.remove('open');};
+
+// ===== BRANDED PDF CLOSING REPORT =====
+let _logoCache;
+function loadLogo(){
+  return new Promise(res=>{
+    if(_logoCache!==undefined){res(_logoCache);return;}
+    const img=new Image();
+    img.onload=()=>{try{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);_logoCache=c.toDataURL('image/png');}catch(e){_logoCache=null;}res(_logoCache);};
+    img.onerror=()=>{_logoCache=null;res(null);};
+    img.src='rebelz%20bartending%20logo.png';
+  });
+}
+window.exportPDF=async function(id){
+  const ev=EVENTS.find(e=>e.id===id);if(!ev){toast('Event not found');return;}
+  if(!window.jspdf||!window.jspdf.jsPDF){toast('PDF library still loading — try again');return;}
+  toast('Building PDF report…');
+  const logo=await loadLogo();
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const W=210,H=297,ML=18,MR=210-18;
+  const GOLD=[200,152,30],GOLD2=[232,184,48],TXT=[238,232,220],DIM=[150,140,120],BG=[15,15,12],CARD=[26,26,22];
+  function bg(){doc.setFillColor(BG[0],BG[1],BG[2]);doc.rect(0,0,W,H,'F');doc.setFillColor(GOLD[0],GOLD[1],GOLD[2]);doc.rect(0,0,W,2.2,'F');}
+  bg();
+  let y=0;
+  function ensure(n){if(y+n>H-16){doc.addPage();bg();y=18;}}
+  // Header
+  y=16;
+  if(logo){try{doc.addImage(logo,'PNG',W/2-11,y,22,22);}catch(e){}y+=26;}else{y+=4;}
+  doc.setFont('helvetica','bold');doc.setFontSize(19);doc.setTextColor(GOLD2[0],GOLD2[1],GOLD2[2]);
+  doc.text('REBELZ BARTENDING SERVICES',W/2,y,{align:'center'});y+=6;
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);
+  doc.text('THINK OF PARTY, THINK OF US',W/2,y,{align:'center'});y+=9;
+  doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]);doc.setLineWidth(0.4);doc.line(ML,y,MR,y);y+=9;
+  const title=ev.status==='closed'?'EVENT CLOSING REPORT':ev.status==='live'?'LIVE EVENT REPORT':'EVENT SETUP REPORT';
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(TXT[0],TXT[1],TXT[2]);
+  doc.text(title,W/2,y,{align:'center'});y+=10;
+  // Details
+  doc.setFontSize(10);
+  const det=[['Event',ev.event_name||'-'],['Client',ev.client_name||'-'],['Date',fmtDate(ev.event_date)],
+    ['City',ev.city||'-'],['Venue',ev.venue||'-'],['Guests',(ev.guests||'-')+''],
+    ['Team',ev.team?(ev.team.leader+' (+'+((ev.team.count||1)-1)+' more)'):'-']];
+  det.forEach(d=>{
+    ensure(7);
+    doc.setFont('helvetica','bold');doc.setTextColor(GOLD2[0],GOLD2[1],GOLD2[2]);doc.text(d[0]+':',ML,y);
+    doc.setFont('helvetica','normal');doc.setTextColor(TXT[0],TXT[1],TXT[2]);
+    doc.text(doc.splitTextToSize(String(d[1]),MR-ML-30),ML+28,y);y+=7;
+  });
+  y+=3;
+  // Summary boxes
+  const given=(ev.stock||[]).reduce((s,i)=>s+(i.qty||0),0);
+  const used=(ev.stock||[]).reduce((s,i)=>s+(i.used||0),0);
+  const left=Math.max(0,given-used);
+  ensure(26);
+  const bw=(MR-ML-12)/3;const stats=[['GIVEN',given],['CONSUMED',used],['LEFT OVER',left]];
+  stats.forEach((s,i)=>{
+    const x=ML+i*(bw+6);
+    doc.setFillColor(CARD[0],CARD[1],CARD[2]);doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]);doc.setLineWidth(0.3);
+    doc.roundedRect(x,y,bw,22,2,2,'FD');
+    doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(DIM[0],DIM[1],DIM[2]);
+    doc.text(s[0],x+bw/2,y+7,{align:'center'});
+    doc.setFont('helvetica','bold');doc.setFontSize(18);doc.setTextColor(GOLD2[0],GOLD2[1],GOLD2[2]);
+    doc.text(String(s[1]),x+bw/2,y+17,{align:'center'});
+  });
+  y+=30;
+  function section(label){ensure(12);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(GOLD[0],GOLD[1],GOLD[2]);doc.text(label.toUpperCase(),ML,y);doc.setDrawColor(60,56,44);doc.setLineWidth(0.2);doc.line(ML,y+2,MR,y+2);y+=8;}
+  function line(name,val){ensure(6.5);doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(TXT[0],TXT[1],TXT[2]);doc.text('•  '+name,ML+2,y);doc.setTextColor(GOLD2[0],GOLD2[1],GOLD2[2]);doc.text(String(val),MR,y,{align:'right'});y+=6.5;}
+  const consumed=(ev.stock||[]).filter(i=>(i.used||0)>0);
+  const leftover=(ev.stock||[]).filter(i=>getRem(i)>0);
+  if(consumed.length){section('Consumed');consumed.forEach(i=>line(i.name,(i.used||0)+' used'));y+=2;}
+  if(leftover.length){section('Left Over — Full Bottles');leftover.forEach(i=>line(i.name,getRem(i)+' left'));y+=2;}
+  const mlItems=(ev.closing&&ev.closing.items||[]).filter(c=>(c.openBottles||0)>0||(c.mlLeft||0)>0);
+  if(mlItems.length){section('Open Bottles — ML Remaining');mlItems.forEach(c=>line(c.name,c.openBottles+' open · ~'+c.mlLeft+' ml'));y+=2;}
+  // Feedback
+  const fb=feedbackData[ev.id];
+  if(fb){
+    section('Client Feedback');
+    line('Overall',(fb.overall||0)+'/5');line('Bartender',(fb.bartender||0)+'/5');line('Cocktails',(fb.cocktails||0)+'/5');
+    line('Would book again',fb.book_again?'Yes':'Not sure');
+    if(fb.comment){ensure(14);doc.setFont('helvetica','italic');doc.setFontSize(9.5);doc.setTextColor(DIM[0],DIM[1],DIM[2]);const ct=doc.splitTextToSize('"'+fb.comment+'"  — '+(fb.name||'Guest'),MR-ML-4);doc.text(ct,ML+2,y);y+=ct.length*5+2;}
+  }
+  // Footer
+  ensure(18);y=Math.max(y,H-20);
+  doc.setDrawColor(GOLD[0],GOLD[1],GOLD[2]);doc.setLineWidth(0.4);doc.line(ML,y,MR,y);y+=6;
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(DIM[0],DIM[1],DIM[2]);
+  doc.text('Verified by Rebelz Bartending Services  ·  Vijayawada · Hyderabad · Visakhapatnam',W/2,y,{align:'center'});
+  doc.save('Rebelz_Report_'+(ev.event_name||ev.id).replace(/[^A-Za-z0-9]+/g,'_')+'.pdf');
+  toast('PDF downloaded! 📄');
+};
+
+window.setFilter=function(f){
+  curFilter=f;
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));
+  renderList();
+};
+window.applyFilters=function(){
+  searchText=(gid('ev-search').value||'').trim().toLowerCase();
+  renderList();
+};
+function filteredEvents(){
+  return EVENTS.filter(ev=>{
+    if(curFilter!=='all' && (ev.status||'setup')!==curFilter) return false;
+    if(searchText){
+      const hay=((ev.event_name||'')+' '+(ev.client_name||'')+' '+(ev.city||'')+' '+(ev.venue||'')).toLowerCase();
+      if(hay.indexOf(searchText)<0) return false;
+    }
+    return true;
+  });
+}
+
 function renderList(){
   const el=gid('event-list');
-  gid('admin-count').textContent=EVENTS.length+' event'+(EVENTS.length!==1?'s':'');
   if(!EVENTS.length){
+    gid('admin-count').textContent='0 events';
     el.innerHTML=`<div class="empty-state"><div class="empty-icon">🍸</div><div class="empty-title">No events yet</div><div class="empty-sub">Fill the form above to create your first event</div></div>`;
     return;
   }
-  el.innerHTML=EVENTS.map(ev=>{
+  const list=filteredEvents();
+  gid('admin-count').textContent=(list.length===EVENTS.length)?(EVENTS.length+' event'+(EVENTS.length!==1?'s':'')):(list.length+' of '+EVENTS.length);
+  if(!list.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No matching events</div><div class="empty-sub">Try a different search or filter</div></div>`;
+    return;
+  }
+  el.innerHTML=list.map(ev=>{
     const tot=ev.stock?ev.stock.reduce((s,i)=>s+i.qty,0):0;
     const used=ev.stock?ev.stock.reduce((s,i)=>s+(i.used||0),0):0;
     const fb=feedbackData[ev.id];
@@ -597,6 +891,7 @@ function renderList(){
         <button class="btn btn-ghost btn-sm" onclick="viewPhotos('${ev.id}')" style="color:var(--gold3);border-color:var(--gold-dim)">📷 Photos</button>
         <button class="btn btn-ghost btn-sm" onclick="viewFeedback('${ev.id}')" style="color:var(--gold2);border-color:var(--gold-dim)">⭐ Feedback</button>
         <button class="btn btn-ghost btn-sm" onclick="exportOneExcel('${ev.id}')" style="color:var(--grn);border-color:#40c87040">📊 Export</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportPDF('${ev.id}')" style="color:var(--gold3);border-color:var(--gold-dim)">📄 PDF Report</button>
         <button class="btn btn-red btn-sm" onclick="deleteEvt('${ev.id}')">Delete</button>
       </div>
     </div>`;
