@@ -146,6 +146,18 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .divider{height:0.5px;background:var(--b1);margin:12px 0}
 .error-screen{display:flex;align-items:center;justify-content:center;min-height:80vh;padding:24px;text-align:center}
+
+/* ===== POLISH ===== */
+.scroll-body{scroll-behavior:smooth}
+.btn-gold,.btn-grn,.btn-wa{box-shadow:0 6px 16px rgba(0,0,0,.28)}
+.dc{transition:border-color .3s,transform .1s}
+.dc:active{transform:scale(.996)}
+.inp:focus{box-shadow:0 0 0 3px var(--gold-dim)}
+.qty-btn{transition:background .12s,transform .1s}
+.qty-btn:active{transform:scale(.9)}
+.tap{transition:background .1s,transform .08s}
+.photo-slot{transition:border-color .2s,box-shadow .2s,transform .1s}
+.photo-slot:active{transform:scale(.98)}
 </style>
 </head>
 <body>
@@ -304,6 +316,13 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       <div class="metric"><div class="metric-l">Used</div><div class="metric-v mv-a" id="bm-used">0</div></div>
       <div class="metric"><div class="metric-l">Left</div><div class="metric-v mv-g" id="bm-left">0</div></div>
       <div class="metric"><div class="metric-l">Empty</div><div class="metric-v mv-r" id="bm-done">0</div></div>
+    </div>
+    <div style="background:#c8981e10;border:0.5px solid var(--gold-dim);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--gold2);line-height:1.75">
+      <strong>How to use this panel:</strong><br/>
+      • Tap <strong>− Consumed</strong> each time a bottle finishes<br/>
+      • <strong>+ Add Bottles</strong> if the client gives more of a brand<br/>
+      • <strong>+ New Drink</strong> below if the client brings something new<br/>
+      • Tap <strong>🔒 Close Event</strong> at the end to send the final report
     </div>
     <div style="font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:10px">Live Consumption — Tap to Update</div>
     <div id="drink-cards"></div>
