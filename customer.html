@@ -161,6 +161,26 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* ERROR / LOADING */
 .full-center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--bg);position:relative;z-index:1}
 @keyframes glow{0%,100%{box-shadow:0 0 30px #c8981e50}50%{box-shadow:0 0 60px #c8981e80}}
+
+/* ===== VIEW MENU CTA + LIGHTBOX ===== */
+.menu-cta{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0805;font-family:var(--fb);font-size:14px;font-weight:700;border:none;cursor:pointer;letter-spacing:.03em;box-shadow:0 8px 24px var(--gold-dim);transition:transform .12s}
+.menu-cta:active{transform:scale(.98)}
+.menu-lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:300;flex-direction:column;padding:16px 16px 24px;backdrop-filter:blur(5px)}
+.menu-lb.open{display:flex}
+.menu-lb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0}
+.menu-lb-title{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--gold2)}
+.menu-lb-title span{display:block;font-family:var(--fm);font-size:9px;color:var(--gold);letter-spacing:.16em;text-transform:uppercase;margin-top:2px}
+.menu-lb-close{background:var(--s2);border:0.5px solid var(--b2);color:var(--t1);border-radius:10px;padding:9px 16px;font-size:13px;cursor:pointer;font-family:var(--fb);font-weight:600}
+.menu-lb-body{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;-webkit-overflow-scrolling:touch}
+.menu-lb-body img{max-width:100%;height:auto;border-radius:12px;border:1px solid var(--gold-dim);box-shadow:0 12px 40px rgba(0,0,0,.6)}
+
+/* ===== POLISH ===== */
+html{scroll-behavior:smooth}
+.bc{transition:border-color .2s,transform .1s}
+.fb-submit{transition:transform .12s,filter .15s}
+.star{transition:transform .12s,opacity .15s}
+.fb-tag,.book-btn{transition:all .15s}
+.fb-inp:focus{box-shadow:0 0 0 3px var(--gold-dim)}
 </style>
 </head>
 <body>
@@ -214,6 +234,9 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 
   <div class="main">
+
+    <!-- View Menu CTA (only when a menu card is attached) -->
+    <div id="c-menu-btn-wrap" style="display:none;margin-bottom:14px"></div>
 
     <!-- Setup notice -->
     <div id="c-setup" style="display:none" class="setup-notice">
@@ -322,6 +345,15 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 </div>
 
+<!-- MENU LIGHTBOX -->
+<div class="menu-lb" id="menu-lb" onclick="if(event.target===this)closeMenu()">
+  <div class="menu-lb-head">
+    <div class="menu-lb-title">Cocktail Menu<span>Rebelz Bartending</span></div>
+    <button class="menu-lb-close" onclick="closeMenu()">✕ Close</button>
+  </div>
+  <div class="menu-lb-body"><img id="menu-lb-img" src="" alt="Cocktail Menu"/></div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -378,6 +410,9 @@ window.submitFb=function(){
   gid('fb-done').style.display='block';
 };
 
+window.openMenu=function(){gid('menu-lb').classList.add('open');};
+window.closeMenu=function(){gid('menu-lb').classList.remove('open');};
+
 const params=new URLSearchParams(window.location.search);
 const evId=params.get('ev');
 curEvId=evId;
@@ -422,6 +457,14 @@ function renderDash(ev){
   if(ev.status==='live') chip.innerHTML='<div class="chip-live"><div class="chip-dot"></div><div class="chip-txt">Live Now</div></div>';
   else if(ev.status==='closed') chip.innerHTML='<div class="chip-live" style="background:#c9a84c14"><div class="chip-txt" style="color:var(--gold2)">✦ Event Concluded</div></div>';
   else chip.innerHTML='<div class="chip-setup"><div class="chip-setup-dot"></div><div class="chip-setup-txt">Setting Up</div></div>';
+
+  // View Menu button — only when a menu card is attached to this event
+  const mb=gid('c-menu-btn-wrap');
+  if(ev.menu_img){
+    mb.style.display='block';
+    mb.innerHTML='<button class="menu-cta" onclick="openMenu()">🍸 View Cocktail Menu</button>';
+    gid('menu-lb-img').src=ev.menu_img;
+  } else { mb.style.display='none'; }
 
   const stock=ev.stock||[];
   const tot=stock.reduce((s,i)=>s+i.qty,0);
