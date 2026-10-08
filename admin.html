@@ -270,7 +270,7 @@ html{scroll-behavior:smooth}
       <label>Cocktail Menu Card (optional)</label>
       <div id="menu-slot" class="menu-slot" onclick="pickMenu()">
         <div class="ps-icon">🍸</div>
-        <div class="ps-lbl">Tap to upload your menu card image<br/>Client sees a “View Menu” button on the live page</div>
+        <div class="ps-lbl">Tap to upload your menu card image<br/>Bartender gets a direct menu link on WhatsApp · Client sees “View Menu”</div>
       </div>
     </div>
     <div class="field"><label>Bartender PIN (4–6 digits)</label><input class="inp" id="f-pin" type="number" placeholder="e.g. 2580" style="letter-spacing:6px;font-family:var(--fm);font-size:18px"/></div>
@@ -349,6 +349,17 @@ html{scroll-behavior:smooth}
   </div>
 </div>
 
+<!-- MENU CARD MODAL (Admin) -->
+<div class="modal-bg" id="mn-modal" onclick="if(event.target===this)closeMenuModal()">
+  <div class="modal" style="max-height:88vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--gold2);margin-bottom:4px">📋 Menu Card</div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:14px;font-family:var(--fm)" id="mn-modal-sub">—</div>
+    <div id="mn-modal-content"></div>
+    <button class="btn btn-ghost" onclick="closeMenuModal()" style="margin-top:4px">Close</button>
+  </div>
+</div>
+
 <div class="modal-bg" id="fb-modal" onclick="if(event.target===this)closeFbModal()">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -376,7 +387,7 @@ html{scroll-behavior:smooth}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -397,7 +408,7 @@ let menuImg=null;                 // uploaded cocktail menu card (base64)
 let curFilter='all', searchText='';  // event search + filter state
 
 // ---- MENU CARD IMAGE UPLOAD ----
-function compressImage(file,cb,max=1100,q=0.78){
+function compressImage(file,cb,max=1400,q=0.8){   // 1400px keeps menu text sharp on phones
   const img=new Image(),rd=new FileReader();
   rd.onload=e=>{img.src=e.target.result;};
   img.onload=()=>{
@@ -409,11 +420,22 @@ function compressImage(file,cb,max=1100,q=0.78){
   };
   rd.readAsDataURL(file);
 }
-window.pickMenu=function(){gid('menu-input').value='';gid('menu-input').click();};
+let menuTargetId=null;            // set when adding/replacing a menu on an EXISTING event
+window.pickMenu=function(){menuTargetId=null;gid('menu-input').value='';gid('menu-input').click();};
 gid('menu-input').addEventListener('change',function(e){
   const file=e.target.files&&e.target.files[0];if(!file)return;
   toast('Processing menu…');
-  compressImage(file,b64=>{menuImg=b64;renderMenuSlot();toast('Menu card added ✓');});
+  const target=menuTargetId;menuTargetId=null;
+  compressImage(file,b64=>{
+    if(target){
+      // Existing event: save menu + reset "reviewed" (bartender must review the new card)
+      update(ref(db,'events/'+target),{menu_img:b64,menu_reviewed:null,menu_updated_at:nowISO()})
+        .then(()=>{toast('Menu saved ✓ — now send it to bartender');setTimeout(()=>window.openMenuModal(target),400);})
+        .catch(()=>toast('Could not save menu — check connection'));
+    } else {
+      menuImg=b64;renderMenuSlot();toast('Menu card added ✓');
+    }
+  });
 });
 function renderMenuSlot(){
   const s=gid('menu-slot');if(!s)return;
@@ -422,7 +444,7 @@ function renderMenuSlot(){
     s.innerHTML='<img src="'+menuImg+'"/><button class="menu-clear" onclick="event.stopPropagation();clearMenu()">✕ Remove</button>';
   } else {
     s.classList.remove('filled');
-    s.innerHTML='<div class="ps-icon">🍸</div><div class="ps-lbl">Tap to upload your menu card image<br/>Client sees a “View Menu” button on the live page</div>';
+    s.innerHTML='<div class="ps-icon">🍸</div><div class="ps-lbl">Tap to upload your menu card image<br/>Bartender gets a direct menu link on WhatsApp · Client sees “View Menu”</div>';
   }
 }
 window.clearMenu=function(){menuImg=null;renderMenuSlot();};
@@ -435,6 +457,8 @@ function nowISO(){return new Date().toISOString();}
 function baseUrl(){return window.location.href.replace(/admin\.html.*/,'');}
 function barLink(id){return baseUrl()+'bartender.html?ev='+id;}
 function custLink(id){return baseUrl()+'customer.html?ev='+id;}
+function menuLink(id){return baseUrl()+'menu.html?ev='+id;}
+function fmtDT(iso){try{return new Date(iso).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit',hour12:true});}catch(e){return '';}}
 function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
 function getRem(it){return Math.max(0,(it.qty||0)-(it.used||0));}
 
@@ -448,6 +472,7 @@ function startListeners(){
     const d=snap.val();
     EVENTS=d?Object.values(d).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)):[];
     renderList();updateStats();
+    if(mnEvId && gid('mn-modal').classList.contains('open')) window.openMenuModal(mnEvId);
   });
   onValue(ref(db,'feedback'),(snap)=>{
     feedbackData=snap.val()||{};
@@ -506,10 +531,10 @@ window.waShare=function(type){
   if(!modalEv)return;
   let msg,phone;
   if(type==='bar'){
-    msg=`🍸 *REBELZ BARTENDING SERVICES*\n✦ Think of Party, Think of Us ✦\n\n*━━━ NEW EVENT ASSIGNED ━━━*\n\nHi team 👋 Here are your full details for this event. Please read everything before you reach the venue.\n\n📋 *EVENT DETAILS*\n• Event: ${modalEv.event_name}\n• Client: ${modalEv.client_name}\n• Client Contact: +91 ${modalEv.client_wa||'—'}\n• Date: ${fmtDate(modalEv.event_date)}\n• City: ${modalEv.city||'—'}\n• Guests: ${modalEv.guests||'—'}\n• Venue: ${modalEv.venue||'—'}\n\n🥤 *MIXERS / SOFT DRINKS:* ${modalEv.non_alc?'Rebelz is supplying — you will log these in your panel.':"Client is bringing their own — you don't log these."}\n\n🍹 *COCKTAIL MENU:* ${modalEv.menu_img?"Menu card is attached in the client's live tracker — please serve as per the menu.":'No fixed menu card shared for this event.'}\n\n🔐 *YOUR PIN:* ${modalEv.bartender_pin}\n\n🔗 *YOUR PANEL LINK:*\n${barLink(modalEv.id)}\n\n*━━━ WHAT TO DO (step by step) ━━━*\n1️⃣ Open the link above on your phone\n2️⃣ Enter your PIN: *${modalEv.bartender_pin}*\n3️⃣ STEP 1 — Add your TEAM (leader + every bartender working today)\n4️⃣ STEP 2 — Add OPENING STOCK: every bottle/brand the client gave, with correct counts${modalEv.non_alc?' + the non-alcoholic items Rebelz supplied':''}\n5️⃣ Take 2 opening photos (venue + bar counter with team)\n6️⃣ Tap *Confirm — Go Live* → the client's live tracker starts\n7️⃣ DURING the event: tap *Consumed* each time a bottle finishes · use *+Add Bottles* if the client gives more\n8️⃣ AT THE END: tap *Close Event* → enter open bottles + ml left → add 3 closing photos → final report auto-sends\n\n⚠️ Keep every count accurate — the client sees the stock live on their phone.\n\n_Rebelz Bartending Services_\nVijayawada · Hyderabad · Visakhapatnam`;
+    msg=`🍸 *REBELZ BARTENDING SERVICES*\n✦ Think of Party, Think of Us ✦\n\n*━━━ NEW EVENT ASSIGNED ━━━*\n\nHi team 👋 Here are your full details for this event. Please read everything before you reach the venue.\n\n📋 *EVENT DETAILS*\n• Event: ${modalEv.event_name}\n• Client: ${modalEv.client_name}\n• Client Contact: +91 ${modalEv.client_wa||'—'}\n• Date: ${fmtDate(modalEv.event_date)}\n• City: ${modalEv.city||'—'}\n• Guests: ${modalEv.guests||'—'}\n• Venue: ${modalEv.venue||'—'}\n\n🥤 *MIXERS / SOFT DRINKS:* ${modalEv.non_alc?'Rebelz is supplying — you will log these in your panel.':"Client is bringing their own — you don't log these."}\n\n🍹 *COCKTAIL MENU:* ${modalEv.menu_img?`Menu card is ready 👇\n📋 ${menuLink(modalEv.id)}\nReview it and prepare garnishes, syrups & fruits *before* you leave for the venue. Serve as per the menu.`:'No fixed menu card shared for this event.'}\n\n🔐 *YOUR PIN:* ${modalEv.bartender_pin}\n\n🔗 *YOUR PANEL LINK:*\n${barLink(modalEv.id)}\n\n*━━━ WHAT TO DO (step by step) ━━━*\n1️⃣ Open the link above on your phone\n2️⃣ Enter your PIN: *${modalEv.bartender_pin}*${modalEv.menu_img?' → check the menu card → tap *Menu Reviewed ✅*':''}\n3️⃣ STEP 1 — Add your TEAM (leader + every bartender working today)\n4️⃣ STEP 2 — Add OPENING STOCK: every bottle/brand the client gave, with correct counts${modalEv.non_alc?' + the non-alcoholic items Rebelz supplied':''}\n5️⃣ Take 2 opening photos (venue + bar counter with team)\n6️⃣ Tap *Confirm — Go Live* → the client's live tracker starts\n7️⃣ DURING the event: tap *Consumed* each time a bottle finishes · use *+Add Bottles* if the client gives more\n8️⃣ AT THE END: tap *Close Event* → enter open bottles + ml left → add 3 closing photos → final report auto-sends\n\n⚠️ Keep every count accurate — the client sees the stock live on their phone.\n\n_Rebelz Bartending Services_\nVijayawada · Hyderabad · Visakhapatnam`;
     phone='91'+(modalEv.owner_wa||'').replace(/\D/g,'').slice(-10);
   } else {
-    msg=`Hello! 🍸\n\nYour *live alcohol tracker* for *${modalEv.event_name}* is ready!\n\nTrack your bottles live:\n${custLink(modalEv.id)}\n\n_Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦`;
+    msg=`Hello! 🍸\n\nYour *live alcohol tracker* for *${modalEv.event_name}* is ready!\n\n🍸 *Your Bartender Contact:*\n📞 +91 ${modalEv.owner_wa||'—'}\n_(For any bar requirement during the event)_\n\nTrack your bottles live:\n${custLink(modalEv.id)}${modalEv.menu_img?'\n\n🍹 Your cocktail menu is also available in the tracker — tap *View Cocktail Menu*.':''}\n\n_Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦`;
     phone='91'+(modalEv.client_wa||'').replace(/\D/g,'').slice(-10);
   }
   window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
@@ -632,6 +657,55 @@ window.viewPhotos=function(id){
   gid('ph-modal').classList.add('open');
 };
 window.closePhModal=function(){gid('ph-modal').classList.remove('open');};
+
+// ---- MENU CARD MANAGER (per event: upload later / send / replace / remove) ----
+let mnEvId=null;
+function menuStatusHTML(ev){
+  if(!ev.menu_img) return '';
+  const r=ev.menu_reviewed;
+  return r&&r.at
+    ? `<span style="color:var(--grn)">✅ Reviewed${r.by?' by <strong>'+r.by+'</strong>':''} · ${fmtDT(r.at)}</span>`
+    : `<span style="color:var(--amb)">⏳ Not reviewed by bartender yet</span>`;
+}
+window.openMenuModal=function(id){
+  const ev=EVENTS.find(e=>e.id===id);if(!ev)return;
+  mnEvId=id;
+  gid('mn-modal-sub').textContent=ev.event_name+' · '+ev.client_name+' · '+fmtDate(ev.event_date);
+  const el=gid('mn-modal-content');
+  if(!ev.menu_img){
+    el.innerHTML=`<div style="text-align:center;padding:26px 12px;background:var(--s2);border:1px dashed var(--b3);border-radius:12px;margin-bottom:12px">
+        <div style="font-size:30px;margin-bottom:8px">🍸</div>
+        <div style="font-family:var(--fh);font-size:17px;color:var(--t2)">No menu card for this event</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:6px;font-family:var(--fm)">Upload one and send it to the bartender in one tap</div>
+      </div>
+      <button class="btn btn-gold" onclick="replaceMenu('${id}')">⬆ Upload Menu Card</button>`;
+  } else {
+    el.innerHTML=`<img src="${ev.menu_img}" style="width:100%;border-radius:12px;border:1px solid var(--gold-dim);display:block;margin-bottom:12px"/>
+      <div style="font-size:11px;font-family:var(--fm);padding:10px 12px;background:var(--s2);border-radius:10px;margin-bottom:12px;line-height:1.7">${menuStatusHTML(ev)}</div>
+      <button class="btn" style="background:linear-gradient(135deg,#128c4a,#25d366);color:#fff" onclick="sendMenuWA('${id}')">📲 Send Menu to Bartender</button>
+      <button class="btn btn-ghost" onclick="copyText(menuLink('${id}'))">🔗 Copy Menu Link</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="replaceMenu('${id}')">↻ Replace</button>
+        <button class="btn btn-red" onclick="removeMenu('${id}')">✕ Remove</button>
+      </div>`;
+  }
+  gid('mn-modal').classList.add('open');
+};
+window.closeMenuModal=function(){gid('mn-modal').classList.remove('open');mnEvId=null;};
+window.replaceMenu=function(id){menuTargetId=id;gid('menu-input').value='';gid('menu-input').click();};
+window.removeMenu=function(id){
+  if(!confirm('Remove the menu card from this event?'))return;
+  update(ref(db,'events/'+id),{menu_img:null,menu_reviewed:null})
+    .then(()=>{toast('Menu removed');window.closeMenuModal();})
+    .catch(()=>toast('Could not remove — check connection'));
+};
+window.sendMenuWA=function(id){
+  const ev=EVENTS.find(e=>e.id===id);if(!ev||!ev.menu_img)return;
+  const msg=`🍸 *REBELZ BARTENDING SERVICES*\n✦ Think of Party, Think of Us ✦\n\n*━━━ MENU CARD READY ━━━*\n\n📋 *${ev.event_name}*\n${ev.client_name} · ${fmtDate(ev.event_date)}${ev.city?' · '+ev.city:''}${ev.guests?' · '+ev.guests+' guests':''}\n\n👉 *View menu:*\n${menuLink(ev.id)}\n\n✅ *Before the event:*\n• Read every cocktail & mocktail\n• Prepare garnishes, syrups, fruits & glassware\n• Open your panel → enter PIN → tap *Menu Reviewed ✅*\n\n🔗 Panel: ${barLink(ev.id)}\n🔐 PIN: ${ev.bartender_pin}\n\n_Rebelz Bartending Services_`;
+  const phone='91'+(ev.owner_wa||'').replace(/\D/g,'').slice(-10);
+  window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
+};
+window.menuLink=menuLink;
 
 // ---- EXCEL EXPORT (4 sheets: Events, Feedback, Consumption, Photos) ----
 function buildWorkbook(evList){
@@ -880,14 +954,16 @@ function renderList(){
           ${fbBadge}
         </div>
       </div>
-      <div style="font-size:10px;font-family:var(--fm);color:${ev.stock_confirmed?'var(--t3)':'var(--amb)'};margin-bottom:${ev.team?'6px':'12px'};padding:8px;background:var(--s2);border-radius:8px">
+      <div style="font-size:10px;font-family:var(--fm);color:${ev.stock_confirmed?'var(--t3)':'var(--amb)'};margin-bottom:${(ev.team||ev.menu_img)?'6px':'12px'};padding:8px;background:var(--s2);border-radius:8px">
         ${ev.stock_confirmed?`📦 ${tot} bottles · ${used} consumed · ${tot-used} remaining`:'⚠ Bartender yet to confirm opening stock'} · PIN: <span style="color:var(--gold2)">${ev.bartender_pin}</span> · 🥤 Non-Alc: <span style="color:${ev.non_alc?'var(--grn)':'var(--red)'}">${ev.non_alc?'Rebelz':'Client'}</span>
       </div>
+      ${ev.menu_img?`<div style="font-size:10px;font-family:var(--fm);margin-bottom:${ev.team?'6px':'12px'};padding:8px;background:var(--s2);border-radius:8px">📋 Menu: ${menuStatusHTML(ev)}</div>`:''}
       ${ev.team?`<div style="font-size:10px;font-family:var(--fm);color:var(--gold2);margin-bottom:12px;padding:8px;background:#c8981e0d;border:0.5px solid var(--gold-dim);border-radius:8px">👥 Lead: <strong>${ev.team.leader}</strong> · ${ev.team.count} bartender${ev.team.count>1?'s':''} — ${(ev.team.members||[]).join(', ')}</div>`:''}
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="showModalById('${ev.id}')">🔗 Links</button>
         <button class="btn btn-ghost btn-sm" onclick="copyText(barLink('${ev.id}'))">Copy Bartender</button>
         <button class="btn btn-ghost btn-sm" onclick="copyText(custLink('${ev.id}'))">Copy Client</button>
+        <button class="btn btn-ghost btn-sm" onclick="openMenuModal('${ev.id}')" style="color:var(--gold2);border-color:var(--gold-dim)">📋 ${ev.menu_img?'Menu':'+ Menu'}</button>
         <button class="btn btn-ghost btn-sm" onclick="viewPhotos('${ev.id}')" style="color:var(--gold3);border-color:var(--gold-dim)">📷 Photos</button>
         <button class="btn btn-ghost btn-sm" onclick="viewFeedback('${ev.id}')" style="color:var(--gold2);border-color:var(--gold-dim)">⭐ Feedback</button>
         <button class="btn btn-ghost btn-sm" onclick="exportOneExcel('${ev.id}')" style="color:var(--grn);border-color:#40c87040">📊 Export</button>
