@@ -198,6 +198,23 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
   </div>
 </div>
 
+<!-- MENU CARD (only when admin attached a menu) -->
+<div class="screen" id="scr-menu">
+  <div class="hdr">
+    <div class="hdr-main"><img class="hdr-logo" src="rebelz%20bartending%20logo.png"/><div><div class="hdr-brand">Rebelz <span>Bartending</span></div><div class="hdr-tag">✦ Think of Party, Think of Us ✦</div></div></div>
+    <div class="hdr-sub"><div class="page-label">Menu Card</div><div class="live-pill"><div class="live-dot"></div><div class="live-txt" id="menu-ev-label">—</div></div></div>
+  </div>
+  <div class="scroll-body">
+    <div style="background:#c8981e10;border:0.5px solid var(--gold-dim);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--gold2);line-height:1.7">
+      <strong>Before you start — Today's Menu:</strong> Read every drink. Prepare garnishes, syrups, fruits &amp; glassware as per this menu.
+    </div>
+    <img id="menu-img" src="" alt="Menu Card" style="width:100%;border-radius:12px;border:1px solid var(--gold-dim);display:block;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)"/>
+    <div id="menu-rev-note" style="display:none;font-size:11px;color:var(--grn);font-family:var(--fm);text-align:center;margin-bottom:10px"></div>
+    <button class="btn btn-gold" id="menu-ok-btn" onclick="menuReviewed()">✅ Menu Reviewed — Continue</button>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
 <!-- TEAM DETAILS -->
 <div class="screen" id="scr-team">
   <div class="hdr">
@@ -424,7 +441,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -520,6 +537,7 @@ function initEvent(){
       const wasLoggedIn=curEv._loggedIn;
       curEv=data;curEv._loggedIn=wasLoggedIn;
       if(wasLoggedIn&&curEv.stock_confirmed){renderCards();renderLog();}
+      if(wasLoggedIn&&gid('scr-menu').classList.contains('active')) renderMenuScreen();
     }
   });
 }
@@ -545,10 +563,47 @@ function doLogin(){
   if(curEv.bartender_pin.toString()!==pin.toString()){err.textContent='Wrong PIN. Try again.';err.style.display='block';return;}
   curEv._loggedIn=true;waLog=[];
   if(curEv.stock_confirmed)showPanel();
+  else if(curEv.menu_img)showMenu();          // menu card first (only if admin attached one)
   else if(curEv.team&&curEv.team.leader)showSetup();
   else showTeam();
   toast('Welcome! 🍸');
 }
+
+// ---- MENU CARD (shown before Team/Stock, only when a menu is attached) ----
+function fmtDT(iso){try{return new Date(iso).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit',hour12:true});}catch(e){return '';}}
+function showMenu(){
+  showScreen('scr-menu');
+  gid('menu-ev-label').textContent=curEv.event_name;
+  renderMenuScreen();
+}
+function renderMenuScreen(){
+  if(!curEv.menu_img){ // admin removed the menu meanwhile — move on
+    if(curEv.team&&curEv.team.leader)showSetup(); else showTeam();
+    return;
+  }
+  if(gid('menu-img').getAttribute('src')!==curEv.menu_img) gid('menu-img').src=curEv.menu_img;
+  const r=curEv.menu_reviewed, note=gid('menu-rev-note');
+  if(r&&r.at){
+    note.style.display='block';
+    note.textContent='✓ Reviewed'+(r.by?' by '+r.by:'')+' · '+fmtDT(r.at);
+    gid('menu-ok-btn').textContent='Continue →';
+  } else {
+    note.style.display='none';
+    gid('menu-ok-btn').textContent='✅ Menu Reviewed — Continue';
+  }
+}
+window.menuReviewed=function(){
+  const next=()=>{ if(curEv.team&&curEv.team.leader)showSetup(); else showTeam(); };
+  if(curEv.menu_reviewed&&curEv.menu_reviewed.at){ next(); return; }
+  const by=(curEv.team&&curEv.team.leader)||'';
+  const rec={by,at:nowISO()};
+  curEv.menu_reviewed=rec;
+  // write only this field so nothing else in the event is touched
+  update(ref(db,'events/'+evId),{menu_reviewed:rec}).catch(()=>{});
+  addLog('Menu card reviewed'+(by?' by '+by:''));
+  toast('Menu reviewed ✓');
+  next();
+};
 
 // ---- TEAM DETAILS (Step 1 of opening) ----
 function showTeam(){
@@ -576,6 +631,7 @@ window.saveTeam=function(){
   }
   const leader=members[0]; // first bartender is the Team Leader
   curEv.team={leader,count:n,members};
+  if(curEv.menu_reviewed&&curEv.menu_reviewed.at&&!curEv.menu_reviewed.by) curEv.menu_reviewed.by=leader; // name the reviewer
   addLog('Team confirmed — Leader: '+leader+' · '+n+' bartender'+(n>1?'s':'')+' ('+members.join(', ')+')');
   saveToFirebase();
   showSetup();
