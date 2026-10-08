@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Rebelz — Menu Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080806;--s1:#0f0f0c;--s2:#161612;--b1:#2a2a22;--b2:#383830;
+  --t1:#f5f0e8;--t2:#b8b0a0;--t3:#706858;--t4:#454038;
+  --gold:#c8981e;--gold2:#e8b830;--gold-dim:#c8981e40;--grn:#40c870;--red:#e84040;
+  --fh:'Cormorant Garamond',serif;--fb:'Outfit',sans-serif;--fm:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh}
+.hdr{background:var(--s1);border-bottom:0.5px solid var(--b1);position:relative}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.hdr-main{padding:12px 16px;display:flex;align-items:center;justify-content:center;gap:10px}
+.hdr-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid var(--gold);box-shadow:0 0 14px var(--gold-dim)}
+.hdr-brand{font-family:var(--fh);font-size:17px;font-weight:700}
+.hdr-brand span{color:var(--gold2)}
+.hdr-tag{font-size:8px;color:var(--gold);font-family:var(--fm);letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
+.wrap{max-width:720px;margin:0 auto;padding:16px}
+.ev-title{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--gold2);text-align:center;line-height:1.2}
+.ev-sub{font-size:11px;color:var(--t3);font-family:var(--fm);text-align:center;margin:6px 0 16px;line-height:1.7}
+.note{background:#c8981e10;border:0.5px solid var(--gold-dim);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--gold2);line-height:1.7}
+.menu-img{width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--gold-dim);box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;font-size:13px;font-family:var(--fb);font-weight:600;cursor:pointer;border:none;width:100%;margin-top:12px;text-decoration:none}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;box-shadow:0 6px 18px var(--gold-dim)}
+.btn-ghost{background:transparent;border:0.5px solid var(--b2);color:var(--t2)}
+.state{text-align:center;padding:70px 20px;color:var(--t2);line-height:1.7}
+.state .ic{font-size:42px;margin-bottom:14px}
+.state .tt{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.foot{text-align:center;font-size:9px;color:var(--t4);font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;padding:22px 0 30px}
+.spin{width:28px;height:28px;border:2px solid var(--b2);border-top-color:var(--gold2);border-radius:50%;margin:0 auto 14px;animation:sp 0.9s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-main"><img class="hdr-logo" src="rebelz%20bartending%20logo.png" alt="Rebelz"/><div><div class="hdr-brand">Rebelz <span>Bartending</span></div><div class="hdr-tag">✦ Think of Party, Think of Us ✦</div></div></div>
+</div>
+
+<div class="wrap" id="app">
+  <div class="state"><div class="spin"></div>Loading menu card…</div>
+</div>
+<div class="foot">Rebelz Bartending Services · Vijayawada · Hyderabad · Visakhapatnam</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDcrx5tOL1Y2TWiz1VFfCAC_OagARggGNE",
+  authDomain: "rebelz-tracker.firebaseapp.com",
+  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rebelz-tracker",
+  storageBucket: "rebelz-tracker.appspot.com",
+  messagingSenderId: "234156658582",
+  appId: "1:234156658582:web:26597fc333698b0778d7b7"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+const evId = new URLSearchParams(window.location.search).get('ev');
+const appEl = document.getElementById('app');
+
+function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'';}catch(e){return d||'';}}
+function state(icon,title,sub){appEl.innerHTML=`<div class="state"><div class="ic">${icon}</div><div class="tt">${title}</div><div>${sub}</div></div>`;}
+
+// Read-only page: shows the menu card for one event. No PIN needed.
+// "Menu Reviewed" is recorded only inside the bartender panel (PIN protected).
+function load(){
+  if(!evId){state('⚠️','Invalid Link','This menu link is not valid.<br/>Ask admin for a new link.');return;}
+  onValue(ref(db,'events/'+evId),(snap)=>{
+    const ev=snap.val();
+    if(!ev){state('⚠️','Event Not Found','This menu link has expired.<br/>Ask admin for a new link.');return;}
+    if(!ev.menu_img){state('🍸','No Menu Card Yet','Admin has not attached a menu for<br/><strong>'+esc(ev.event_name)+'</strong>.');return;}
+    const meta=[esc(ev.client_name),fmtDate(ev.event_date),esc(ev.city||''),ev.guests?esc(ev.guests)+' guests':''].filter(Boolean).join(' · ');
+    const panel='bartender.html?ev='+encodeURIComponent(evId);
+    appEl.innerHTML=`
+      <div class="ev-title">${esc(ev.event_name)}</div>
+      <div class="ev-sub">${meta}</div>
+      <div class="note"><strong>Bartender checklist:</strong> read every drink · prepare garnishes, syrups, fruits &amp; glassware · then open your panel and tap <strong>Menu Reviewed ✅</strong></div>
+      <img class="menu-img" src="${ev.menu_img}" alt="Menu Card"/>
+      <a class="btn btn-ghost" href="${ev.menu_img}" download="${esc(evId)}_menu.jpg">⬇ Save Menu to Phone</a>
+      <a class="btn btn-gold" href="${panel}">🍸 Open Bartender Panel</a>`;
+  },()=>state('⚠️','Connection Problem','Could not load the menu. Check your internet and refresh.'));
+}
+
+let started=false;
+onAuthStateChanged(auth,(user)=>{ if(user && !started){ started=true; load(); } });
+signInAnonymously(auth).catch(()=>state('⚠️','Connection Blocked','Please contact admin.'));
+</script>
+</body>
+</html>
