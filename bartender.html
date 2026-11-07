@@ -4,15 +4,16 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>Rebelz — Bartender</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,500;1,9..144,700&family=Unbounded:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#080806;--s1:#0f0f0c;--s2:#161612;--s3:#1e1e18;--s4:#252520;
-  --b1:#2a2a22;--b2:#383830;--b3:#454540;
-  --t1:#f5f0e8;--t2:#b8b0a0;--t3:#706858;--t4:#454038;
-  --gold:#c8981e;--gold2:#e8b830;--gold3:#f5d060;--gold-dim:#c8981e40;
-  --acc:#d4f040;--red:#e84040;--grn:#40c870;--amb:#f5a020;
-  --fh:'Cormorant Garamond',serif;--fb:'Outfit',sans-serif;--fm:'DM Mono',monospace;
+  --bg:#150f1f;--s1:#1e1630;--s2:#271d3d;--s3:#30254a;--s4:#3a2e58;
+  --b1:#3a2e58;--b2:#4a3c6e;--b3:#5c4d84;
+  --t1:#fff4e2;--t2:#d9cdef;--t3:#a796c4;--t4:#7d6e9a;
+  --gold:#ffc447;--gold2:#ffc447;--gold3:#ffe08a;--gold-dim:#ffc44740;
+  --acc:#3de0d2;--red:#ff4f8b;--grn:#c6f432;--amb:#ff7a45;
+  --tang:#ff7a45;--pink:#ff4f8b;--lime:#c6f432;--aqua:#3de0d2;--honey:#ffc447;--lav:#b79cff;
+  --fh:'Fraunces',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif;--fm:'Plus Jakarta Sans',system-ui,sans-serif;--fx:'Unbounded','Arial Black',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
@@ -31,7 +32,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px}
 .hdr-tag{font-size:8px;color:var(--gold);font-family:var(--fm);letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
 .hdr-sub{padding:7px 16px;display:flex;align-items:center;justify-content:space-between}
 .page-label{font-size:9px;color:var(--t4);font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em}
-.live-pill{display:flex;align-items:center;gap:5px;background:#c8981e18;border:0.5px solid var(--gold-dim);border-radius:20px;padding:3px 10px}
+.live-pill{display:flex;align-items:center;gap:5px;background:#ffc44718;border:0.5px solid var(--gold-dim);border-radius:20px;padding:3px 10px}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--gold2);animation:blink 1.5s infinite}
 .live-txt{font-size:9px;color:var(--gold2);font-family:var(--fm)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
@@ -39,10 +40,10 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px}
 /* BUTTONS */
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;font-size:13px;font-family:var(--fb);font-weight:600;cursor:pointer;border:none;width:100%;transition:all .15s;margin-bottom:8px;letter-spacing:.02em}
 .btn:last-child{margin-bottom:0}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806}.btn-gold:active{transform:scale(.97)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#150f1f}.btn-gold:active{transform:scale(.97)}
 .btn-ghost{background:transparent;border:0.5px solid var(--b2);color:var(--t2)}.btn-ghost:active{background:var(--s2)}
-.btn-grn{background:linear-gradient(135deg,#1a5028,var(--grn));color:#fff}.btn-grn:active{transform:scale(.97)}
-.btn-red{background:transparent;border:0.5px solid #e8404030;color:var(--red)}.btn-red:active{background:#e8404010}
+.btn-grn{background:linear-gradient(135deg,#4a6b10,var(--grn));color:#fff}.btn-grn:active{transform:scale(.97)}
+.btn-red{background:transparent;border:0.5px solid #ff4f8b30;color:var(--red)}.btn-red:active{background:#ff4f8b10}
 .btn-wa{background:linear-gradient(135deg,#128c3e,#25d366);color:#fff}.btn-wa:active{transform:scale(.97)}
 .btn-sm{padding:8px 14px;font-size:11px;width:auto;border-radius:8px;margin-bottom:0}
 
@@ -61,7 +62,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 /* TEMPLATE CHIPS */
 .tpl-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
 .tpl-chip{padding:7px 13px;border-radius:20px;border:0.5px solid var(--b2);font-size:11px;color:var(--t2);cursor:pointer;background:transparent;font-family:var(--fb);transition:all .15s}
-.tpl-chip.sel{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;border-color:transparent;font-weight:600}
+.tpl-chip.sel{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#150f1f;border-color:transparent;font-weight:600}
 
 /* STOCK ITEMS */
 .tpl-item{background:var(--s2);border:0.5px solid var(--b1);border-radius:10px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:10px}
@@ -80,7 +81,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 
 /* DRINK CARDS */
 .dc{background:var(--s1);border:0.5px solid var(--b1);border-radius:14px;margin-bottom:8px;overflow:hidden;transition:border-color .3s}
-.dc.low{border-color:#f5a02045}.dc.empty{border-color:#e8404045;opacity:.85}
+.dc.low{border-color:#ff7a4545}.dc.empty{border-color:#ff4f8b45;opacity:.85}
 .dc-top{display:flex;align-items:center;gap:10px;padding:12px 14px}
 .dc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .dc-info{flex:1;min-width:0}
@@ -90,25 +91,25 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .dc-rem.ok{color:var(--grn)}.dc-rem.low{color:var(--amb)}.dc-rem.empty{color:var(--red)}
 .dc-prog{height:3px;background:var(--b1);margin:0 14px}
 .dc-fill{height:3px;border-radius:2px;transition:width .4s}
-.dc-fill.ok{background:linear-gradient(90deg,#1a5028,var(--grn))}.dc-fill.low{background:linear-gradient(90deg,#5a3800,var(--amb))}.dc-fill.empty{background:var(--red)}
+.dc-fill.ok{background:linear-gradient(90deg,#4a6b10,var(--grn))}.dc-fill.low{background:linear-gradient(90deg,#6b3a1a,var(--amb))}.dc-fill.empty{background:var(--red)}
 .dc-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b1)}
 .tap{background:var(--s2);padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border:none;font-family:var(--fb);-webkit-tap-highlight-color:transparent;transition:background .1s}
 .tap:active{transform:scale(.94)}
-.tap.minus:active{background:#e8404018}
-.tap.undo:active{background:#f5a02018}
-.tap.done-tap:active{background:#c8981e18}
+.tap.minus:active{background:#ff4f8b18}
+.tap.undo:active{background:#ff7a4518}
+.tap.done-tap:active{background:#ffc44718}
 .tap-icon{font-size:22px;line-height:1}
 .tap-lbl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-family:var(--fm)}
 
 /* ADD BOTTLES ROW */
-.add-btl-row{display:none;padding:10px 14px;background:#c8981e08;border-top:0.5px solid #c8981e20;align-items:center;gap:8px}
+.add-btl-row{display:none;padding:10px 14px;background:#ffc44708;border-top:0.5px solid #ffc44720;align-items:center;gap:8px}
 .add-btl-row.open{display:flex}
 .add-btl-inp{width:64px;background:var(--s2);border:0.5px solid var(--b2);border-radius:8px;padding:8px;color:var(--t1);font-size:18px;font-family:var(--fh);font-weight:700;text-align:center;outline:none}
 .add-btl-inp:focus{border-color:var(--gold)}
 .add-btl-label{font-size:11px;color:var(--t2);flex:1;line-height:1.4}
-.add-btl-ok{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-family:var(--fb);font-weight:700;cursor:pointer}
+.add-btl-ok{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#150f1f;border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-family:var(--fb);font-weight:700;cursor:pointer}
 .add-btl-no{background:transparent;border:0.5px solid var(--b2);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--t3);cursor:pointer;font-family:var(--fb)}
-.restock-badge{font-size:9px;font-family:var(--fm);background:#c8981e18;color:var(--gold2);border:0.5px solid var(--gold-dim);border-radius:10px;padding:2px 7px;margin-left:6px}
+.restock-badge{font-size:9px;font-family:var(--fm);background:#ffc44718;color:var(--gold2);border:0.5px solid var(--gold-dim);border-radius:10px;padding:2px 7px;margin-left:6px}
 
 /* WA FEED */
 .wa-feed{max-height:160px;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:6px}
@@ -118,7 +119,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .log-item:last-child{border-bottom:none}
 
 /* CONFIRM BOX */
-.confirm-box{background:#c8981e10;border:0.5px solid var(--gold-dim);border-radius:12px;padding:16px;margin-top:4px}
+.confirm-box{background:#ffc44710;border:0.5px solid var(--gold-dim);border-radius:12px;padding:16px;margin-top:4px}
 
 /* PHOTO SLOTS */
 .photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -129,7 +130,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .photo-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .photo-slot .ps-icon{font-size:24px}
 .photo-slot .ps-lbl{font-size:9px;color:var(--t3);font-family:var(--fm);text-align:center;padding:0 6px;line-height:1.4}
-.photo-slot .ps-check{position:absolute;top:5px;right:5px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;z-index:2}
+.photo-slot .ps-check{position:absolute;top:5px;right:5px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#150f1f;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;z-index:2}
 .photo-note{font-size:11px;color:var(--t3);line-height:1.6;margin-bottom:12px}
 
 /* CLOSING ITEM ROWS */
@@ -142,7 +143,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .close-inp:focus{border-color:var(--gold)}
 
 /* TOAST */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--fb);opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:linear-gradient(135deg,var(--gold),var(--gold2));color:#150f1f;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--fb);opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .divider{height:0.5px;background:var(--b1);margin:12px 0}
 /* ---- Store indent / supplies / returns ---- */
@@ -154,12 +155,12 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .sp-inp{width:64px;background:var(--s1);border:0.5px solid var(--b2);border-radius:8px;padding:8px 4px;color:var(--gold2);font-size:16px;font-family:var(--fh);font-weight:700;text-align:center;outline:none}
 .sp-inp.diff{border-color:var(--red);color:var(--red)}
 .sp-tag{font-size:8px;font-family:var(--fm);padding:2px 7px;border-radius:8px;letter-spacing:.04em}
-.sp-ok{background:#40c87015;color:var(--grn);border:0.5px solid #40c87040}
-.sp-warn{background:#f5a02015;color:var(--amb);border:0.5px solid #f5a02040}
-.sp-bad{background:#e8404015;color:var(--red);border:0.5px solid #e8404040}
+.sp-ok{background:#c6f43215;color:var(--grn);border:0.5px solid #c6f43240}
+.sp-warn{background:#ff7a4515;color:var(--amb);border:0.5px solid #ff7a4540}
+.sp-bad{background:#ff4f8b15;color:var(--red);border:0.5px solid #ff4f8b40}
 .src-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
 .src-btn{padding:10px;border-radius:10px;border:0.5px solid var(--b2);background:var(--s2);color:var(--t2);font-size:12px;font-weight:600;text-align:center;cursor:pointer}
-.src-btn.on{border-color:var(--gold);color:var(--gold2);background:#c8981e15}
+.src-btn.on{border-color:var(--gold);color:var(--gold2);background:#ffc44715}
 .rt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
 .rt-grid label{display:block;font-size:8px;color:var(--gold);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;text-align:center}
 #net-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--amb);color:#1a1000;font-size:11px;font-weight:700;text-align:center;padding:6px;font-family:var(--fm)}
@@ -176,6 +177,60 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .tap{transition:background .1s,transform .08s}
 .photo-slot{transition:border-color .2s,box-shadow .2s,transform .1s}
 .photo-slot:active{transform:scale(.98)}
+
+.qchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.qc{padding:7px 12px;border-radius:20px;border:1.5px solid var(--b2);background:var(--s2);font-size:11px;font-weight:800;color:var(--t2);cursor:pointer;user-select:none;white-space:nowrap}
+.qc:active{transform:scale(.95)}
+.qc.on{background:var(--aqua);border-color:var(--aqua);color:#06302c}
+.same-team{display:none;width:100%;margin-bottom:12px;padding:13px;border-radius:16px;border:1.5px dashed var(--lime);background:#c6f43212;color:var(--lime);font-weight:800;font-size:12px;cursor:pointer;text-align:left;line-height:1.5}
+/* ================= REBELZ NIGHT THEME (matches client page) ================= */
+body{background:radial-gradient(520px 420px at 112% -6%,#ff4f8b2e,transparent 62%),radial-gradient(480px 420px at -22% 48%,#3de0d21f,transparent 62%),radial-gradient(520px 420px at 118% 104%,#ff7a4524,transparent 62%),var(--bg)!important;background-attachment:fixed!important}
+body::before{display:none!important}
+.hdr{background:#150f1fe8!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.hdr::after{height:2px!important;background:linear-gradient(90deg,var(--tang),var(--pink),var(--lav))!important}
+.brand-name,.hdr-brand{font-family:var(--fh)!important;font-weight:800!important;letter-spacing:0!important}
+.brand-name span,.hdr-brand span{font-style:italic;font-weight:500;color:var(--honey)!important}
+.brand-tag,.hdr-tag{color:var(--pink)!important;font-weight:700}
+.brand-logo,.hdr-logo{border-color:var(--honey)!important;box-shadow:0 0 0 3px #ffc44722!important}
+.page-tag,.page-label{font-family:var(--fx)!important;font-size:9px!important;letter-spacing:.14em!important;color:var(--t3)!important}
+.card{border-radius:22px!important;border:1.5px solid var(--b1)!important;background:var(--s1)!important}
+.card::before{display:none!important}
+.card-title{font-family:var(--fx)!important;font-size:9px!important;font-weight:700!important;letter-spacing:.12em!important;color:var(--honey)!important}
+.sec-lbl{font-family:var(--fh)!important;font-style:italic;font-size:22px!important;font-weight:700!important;text-transform:none!important;letter-spacing:0!important;color:var(--t1)!important}
+.sec-lbl::after{background:linear-gradient(90deg,var(--b2),transparent)!important}
+.field label,label{font-weight:700!important;letter-spacing:.08em!important}
+.inp,.fb-inp{border-radius:14px!important;border:1.5px solid var(--b2)!important;background:var(--s2)!important;color:var(--t1)!important}
+.inp:focus{border-color:var(--aqua)!important;box-shadow:0 0 0 3px #3de0d226}
+.inp::placeholder{color:var(--t4)}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ffc447' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 13px center!important}
+.btn{border-radius:16px!important;font-weight:700!important;letter-spacing:.02em}
+.btn-gold{background:var(--honey)!important;color:#2a1a00!important;box-shadow:0 10px 26px #ffc4472e!important}
+.btn-ghost{border:1.5px solid var(--b2)!important;color:var(--t2)!important}
+.btn-wa{background:#25d366!important;color:#06280f!important}
+.btn-red{border:1.5px solid #ff4f8b66!important;color:var(--pink)!important}
+.toast{background:var(--lime)!important;color:#1a2100!important;border-radius:14px!important;font-weight:800!important;box-shadow:0 10px 30px #00000066!important}
+.fchip{border-radius:30px!important;border:1.5px solid var(--b2)!important;font-weight:700!important;font-family:var(--fb)!important}
+.fchip.active{background:var(--pink)!important;color:#fff!important;border-color:var(--pink)!important}
+/* chunky numbers */
+.stat-v,.metric-v,.qty-num,.dc-rem,.qn,.close-inp,.sp-inp,.pin-num{font-family:var(--fx)!important;font-weight:800!important}
+.stat-box,.metric{border-radius:22px!important;border:none!important;color:#1b1328!important}
+.stat-box::before{display:none!important}
+.stats-grid .stat-box:nth-child(1),.metrics .metric:nth-child(1){background:var(--honey)!important}
+.stats-grid .stat-box:nth-child(2),.metrics .metric:nth-child(2){background:var(--aqua)!important}
+.stats-grid .stat-box:nth-child(3),.metrics .metric:nth-child(3){background:var(--lime)!important}
+.stats-grid .stat-box:nth-child(4),.metrics .metric:nth-child(4){background:var(--pink)!important}
+.stat-box .stat-v,.stat-box .stat-l,.metric .metric-v,.metric .metric-l{color:#1b1328!important}
+.stat-box .stat-l,.metric .metric-l{font-weight:800!important;opacity:.75}
+.stats-grid .stat-box:nth-child(4) .stat-v,.stats-grid .stat-box:nth-child(4) .stat-l,.metrics .metric:nth-child(4) .metric-v,.metrics .metric:nth-child(4) .metric-l{color:#fff!important}
+.ev-card,.dc,.tpl-item,.close-item{border-radius:20px!important;border:1.5px solid var(--b1)!important;background:var(--s1)!important}
+.ev-card.live,.dc.ok{border-color:#c6f43255!important}
+.dc.low{border-color:#ff7a4566!important}.dc.empty{border-color:#ff4f8b66!important}
+.qty-btn,.qb{border-radius:12px!important;border:1.5px solid var(--b2)!important;background:var(--s3)!important;color:var(--honey)!important}
+.tap{border-radius:14px!important}
+.modal{border-radius:28px 28px 0 0!important;border-top:2px solid var(--pink)!important;background:var(--s1)!important}
+.photo-slot{border-radius:18px!important;border:2px dashed var(--b2)!important}
+.status-pill.sp-live,.live-pill{border-radius:30px!important}
+::selection{background:var(--pink);color:#fff}
 </style>
 </head>
 <body>
@@ -223,7 +278,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     <div class="hdr-sub"><div class="page-label">Menu Card</div><div class="live-pill"><div class="live-dot"></div><div class="live-txt" id="menu-ev-label">—</div></div></div>
   </div>
   <div class="scroll-body">
-    <div style="background:#c8981e10;border:0.5px solid var(--gold-dim);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--gold2);line-height:1.7">
+    <div style="background:#ffc44710;border:0.5px solid var(--gold-dim);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--gold2);line-height:1.7">
       <strong>Before you start — Today's Menu:</strong> Read every drink. Prepare garnishes, syrups, fruits &amp; glassware as per this menu.
     </div>
     <img id="menu-img" src="" alt="Menu Card" style="width:100%;border-radius:12px;border:1px solid var(--gold-dim);display:block;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)"/>
@@ -240,12 +295,13 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     <div class="hdr-sub"><div class="page-label">Team Details</div><div class="live-pill"><div class="live-dot"></div><div class="live-txt" id="team-ev-label">—</div></div></div>
   </div>
   <div class="scroll-body">
-    <div style="background:#c8981e10;border:0.5px solid var(--gold-dim);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--gold2);line-height:1.7">
+    <div style="background:#ffc44710;border:0.5px solid var(--gold-dim);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--gold2);line-height:1.7">
       <strong>Step 1 of 3 — Your Team:</strong> Enter who is working this event today. This goes into the event record.
     </div>
     <div class="card">
       <div class="card-title">Bartenders Working Today</div>
       <div class="field"><label>Number of Bartenders *</label><input class="inp" id="t-count" type="number" min="1" max="20" placeholder="e.g. 3" style="text-align:center;font-size:20px;font-family:var(--fh);font-weight:700"/></div>
+      <button class="same-team" id="same-team" onclick="sameTeam()"></button>
       <div id="t-names"></div>
     </div>
     <button class="btn btn-gold" onclick="saveTeam()">✦ Confirm Team — Continue</button>
@@ -260,7 +316,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     <div class="hdr-sub"><div class="page-label">Set Opening Stock</div><div class="live-pill"><div class="live-dot"></div><div class="live-txt" id="setup-ev-label">—</div></div></div>
   </div>
   <div class="scroll-body">
-    <div style="background:#f5a02012;border:0.5px solid #f5a02030;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--amb);line-height:1.7">
+    <div style="background:#ff7a4512;border:0.5px solid #ff7a4530;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--amb);line-height:1.7">
       <strong>Step 2 of 3 — Opening Stock:</strong> Add each brand one by one, exactly matching what the client has brought. Then photos → confirm → go live.
     </div>
     <div class="card" id="indent-card" style="display:none;border-color:var(--gold-dim)"></div>
@@ -277,9 +333,10 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
         </select>
       </div>
       <div style="display:grid;grid-template-columns:1fr 72px;gap:8px;margin-bottom:8px">
-        <input class="inp" id="sa-name" placeholder="Brand name — e.g. Royal Stag" style="font-size:13px"/>
+        <input class="inp" id="sa-name" list="dl-brands" autocomplete="off" placeholder="Brand — start typing, e.g. Royal Stag" style="font-size:13px"/>
         <input class="inp" id="sa-qty" type="number" min="1" value="1" style="text-align:center;font-size:13px"/>
       </div>
+      <div class="qchips" id="sa-chips"></div>
       <button class="btn btn-gold" onclick="setupAdd()" style="font-size:12px;padding:11px">+ Add Bottle / Brand</button>
       <div class="divider"></div>
       <div id="setup-items"></div>
@@ -353,7 +410,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       <div class="metric"><div class="metric-l">Left</div><div class="metric-v mv-g" id="bm-left">0</div></div>
       <div class="metric"><div class="metric-l">Empty</div><div class="metric-v mv-r" id="bm-done">0</div></div>
     </div>
-    <div style="background:#c8981e10;border:0.5px solid var(--gold-dim);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--gold2);line-height:1.75">
+    <div style="background:#ffc44710;border:0.5px solid var(--gold-dim);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--gold2);line-height:1.75">
       <strong>How to use this panel:</strong><br/>
       • Tap <strong>− Consumed</strong> each time a bottle finishes<br/>
       • <strong>+ Add Bottles</strong> if the client gives more of a brand<br/>
@@ -370,7 +427,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     <div class="card" style="border-color:var(--gold-dim)">
       <div class="card-title" style="color:var(--gold2)">+ New Drink Added by Client</div>
       <div style="font-size:11px;color:var(--t3);margin-bottom:12px;line-height:1.6">Use when client brings a completely new drink mid-event.</div>
-      <div class="field"><label>Drink Name</label><input class="inp" id="live-add-name" placeholder="e.g. Black Dog Whiskey"/></div>
+      <div class="field"><label>Drink Name</label><input class="inp" id="live-add-name" list="dl-brands-live" autocomplete="off" placeholder="Start typing — e.g. Black Dog"/></div>
       <div style="display:grid;grid-template-columns:1fr 80px;gap:8px">
         <div class="field"><label>Category</label>
           <select class="inp" id="live-add-cat">
@@ -385,6 +442,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
         </div>
         <div class="field"><label>Qty</label><input class="inp" id="live-add-qty" type="number" min="1" value="1" style="text-align:center"/></div>
       </div>
+      <div class="qchips" id="live-chips"></div>
       <button class="btn btn-ghost" style="border-color:var(--gold-dim);color:var(--gold2);font-size:12px;padding:11px" onclick="addNewDrinkLive()">+ Add to Live Stock</button>
     </div>
 
@@ -420,7 +478,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     <div class="hdr-sub"><div class="page-label">Closing — Final Verification</div><div class="live-pill"><div class="live-dot"></div><div class="live-txt" id="closing-ev-label">—</div></div></div>
   </div>
   <div class="scroll-body">
-    <div style="background:#e8404012;border:0.5px solid #e8404030;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--red);line-height:1.7">
+    <div style="background:#ff4f8b12;border:0.5px solid #ff4f8b30;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--red);line-height:1.7">
       <strong>Before closing:</strong> For <strong>alcohol</strong>, count the open bottles and leftover ML. Non-alcoholic drinks only show what was consumed — no bottle count needed. Attach 3 closing photos, then close. The final WhatsApp report goes out as usual.
     </div>
     <div class="card">
@@ -449,7 +507,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       <div class="confirm-box">
         <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--gold2);margin-bottom:6px">Ready to close?</div>
         <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6">Final closing report will be sent on WhatsApp to client and manager — same as always.</div>
-        <button class="btn btn-red" onclick="finalizeClose()" style="margin-bottom:0;background:linear-gradient(135deg,#7a1a1a,var(--red));border:none;color:#fff">🔒 Close Event + Send Final Report</button>
+        <button class="btn btn-red" onclick="finalizeClose()" style="margin-bottom:0;background:linear-gradient(135deg,#8a1f4a,var(--red));border:none;color:#fff">🔒 Close Event + Send Final Report</button>
       </div>
       <div style="height:8px"></div>
       <button class="btn btn-ghost" onclick="cancelClosing()" style="font-size:12px;padding:10px">← Back to Live Panel</button>
@@ -818,7 +876,7 @@ function renderCards(){
         </button>
       </div>
       <div style="padding:7px 14px 10px;border-top:0.5px solid var(--b1);display:flex;justify-content:flex-end">
-        <button style="background:#c8981e12;border:0.5px solid var(--gold-dim);border-radius:8px;padding:5px 12px;font-size:10px;color:var(--gold2);cursor:pointer;font-family:var(--fb);font-weight:600" onclick="toggleAddBottles(${i})">+ Add Bottles</button>
+        <button style="background:#ffc44712;border:0.5px solid var(--gold-dim);border-radius:8px;padding:5px 12px;font-size:10px;color:var(--gold2);cursor:pointer;font-family:var(--fb);font-weight:600" onclick="toggleAddBottles(${i})">+ Add Bottles</button>
       </div>
       <div class="add-btl-row" id="abtl-${i}">
         <div class="add-btl-label">Extra bottles<br/>from client?</div>
@@ -1060,7 +1118,7 @@ function renderSupplies(){
   const saved=keepVals(['ex-cat','ex-name','ex-unit','ex-qty']);
   el.style.display='block';
   let h='';
-  if(curEv.indent&&!indentConfirmed()) h+=`<div style="background:#f5a02012;border:0.5px solid #f5a02040;border-radius:12px;padding:12px;margin-bottom:12px">${indentHTML()}</div>`;
+  if(curEv.indent&&!indentConfirmed()) h+=`<div style="background:#ff7a4512;border:0.5px solid #ff7a4540;border-radius:12px;padding:12px;margin-bottom:12px">${indentHTML()}</div>`;
   const given=suppliesGiven();
   h+=`<div class="card-title" style="color:var(--gold2)">🥤 Rebelz Supplies at this Event</div>`;
   if(!given.length) h+=`<div class="photo-note">No Rebelz items recorded yet.</div>`;
@@ -1175,6 +1233,68 @@ function collectReturns(){
 setTimeout(()=>{
   onValue(ref(db,'.info/connected'),s=>{gid('net-banner').style.display=s.val()?'none':'block';});
 },2500);
+
+// ===================== SMART INPUT (bartender) =====================
+// Popular brands per type: typing suggests brands, picking one sets the type automatically.
+const BRANDS={
+ whiskey:["Royal Stag","Blenders Pride","Imperial Blue","McDowell's No.1","Signature","Antiquity Blue","Royal Challenge","Officer's Choice","8PM","Sterling Reserve B7","Rockford Reserve","Oaksmith","Teacher's","100 Pipers","Black Dog","Black & White","Vat 69","Ballantine's","Dewar's","Johnnie Walker Red Label","Johnnie Walker Black Label","Jameson","Jack Daniel's","Chivas Regal 12","Monkey Shoulder","Glenfiddich 12","Glenlivet 12","Amrut","Paul John"],
+ vodka:["Smirnoff","Magic Moments","Romanov","White Mischief","Absolut","Eristoff","Ketel One","Grey Goose","Belvedere","Ciroc"],
+ gin:["Blue Riband","Gordon's","Greater Than","Stranger & Sons","Jaisalmer","Beefeater","Bombay Sapphire","Tanqueray","Hendrick's"],
+ rum:["Old Monk","McDowell's Celebration","Contessa","Bacardi White","Bacardi Black","Captain Morgan","Malibu","Havana Club"],
+ tequila:["Camino Real","Jose Cuervo Gold","Jose Cuervo Silver","Olmeca","Patron Silver","Don Julio"],
+ brandy:["Mansion House","Honey Bee","Morpheus","McDowell's No.1 Brandy","Hennessy VS","Remy Martin VSOP"],
+ beer:["Kingfisher Premium","Kingfisher Ultra","Kingfisher Strong","Budweiser","Budweiser Magnum","Heineken","Carlsberg","Tuborg","Corona","Bira 91 White","Hoegaarden","Simba","Knock Out"],
+ wine:["Sula Shiraz","Sula Chenin Blanc","Sula Brut","Grover Zampa","Fratelli","Big Banyan","Jacob's Creek","Chandon Brut"],
+ other:["Jägermeister","Baileys","Kahlua","Triple Sec","Cointreau","Campari","Aperol","Martini Bianco"]
+};
+const BRAND_CAT={}; Object.entries(BRANDS).forEach(([c,l])=>l.forEach(b=>BRAND_CAT[b.toLowerCase()]=c));
+function brandOpts(cat){
+  const pri=(BRANDS[cat]||[]), rest=Object.entries(BRANDS).filter(([c])=>c!==cat).flatMap(([c,l])=>l);
+  return [...pri,...rest].map(b=>`<option value="${b.replace(/"/g,'&quot;')}">`).join('');
+}
+function mountBrands(nameId,catId,dlId){
+  const nm=gid(nameId), ct=gid(catId); if(!nm||!ct) return;
+  let dl=gid(dlId); if(!dl){dl=document.createElement('datalist');dl.id=dlId;document.body.appendChild(dl);}
+  const fill=()=>{dl.innerHTML=brandOpts(ct.value);}; fill();
+  ct.addEventListener('change',fill);
+  nm.addEventListener('change',()=>{const c=BRAND_CAT[nm.value.trim().toLowerCase()];if(c&&[...ct.options].some(o=>o.value===c)&&ct.value!==c){ct.value=c;fill();toast('Type set to '+c);}});
+}
+mountBrands('sa-name','sa-cat','dl-brands');
+mountBrands('live-add-name','live-add-cat','dl-brands-live');
+// quick quantity chips
+function mountQty(boxId,inpId){
+  const box=gid(boxId), inp=gid(inpId); if(!box||!inp) return;
+  const draw=()=>{box.innerHTML=[1,2,3,6,12,24].map(n=>`<div class="qc${inp.value==n?' on':''}" data-q="${n}">${n===24?'🍺 24 · crate':n===12?'12 · half':'× '+n}</div>`).join('');};
+  box.addEventListener('click',e=>{const q=e.target.closest('[data-q]');if(!q)return;inp.value=q.dataset.q;draw();});
+  inp.addEventListener('input',draw); draw();
+  return draw;
+}
+const _drawSa=mountQty('sa-chips','sa-qty'), _drawLive=mountQty('live-chips','live-add-qty');
+const _setupAdd=window.setupAdd; window.setupAdd=function(){_setupAdd();_drawSa&&_drawSa();gid('sa-name').focus();};
+const _addLive=window.addNewDrinkLive; window.addNewDrinkLive=function(){_addLive();_drawLive&&_drawLive();};
+// "Same team as last time" — remembered on this phone
+const _showTeam=showTeam;
+function lastTeam(){try{return JSON.parse(localStorage.getItem('rbz_last_team')||'null');}catch(e){return null;}}
+function offerSameTeam(){
+  const t=lastTeam(), b=gid('same-team'); if(!b) return;
+  if(t&&t.members&&t.members.length){b.style.display='block';b.innerHTML='↺ Same team as last time<br/><span style="font-weight:600;color:var(--t2)">'+t.members.map(m=>m.replace(/</g,'&lt;')).join(', ')+'</span>';}
+  else b.style.display='none';
+}
+window.sameTeam=function(){
+  const t=lastTeam(); if(!t) return;
+  const c=gid('t-count'); c.value=t.members.length; c.dispatchEvent(new Event('input'));
+  t.members.forEach((m,i)=>{const el=gid('t-name-'+i);if(el)el.value=m;});
+  toast('Team filled ✓ — edit if anyone changed');
+};
+const _saveTeam=window.saveTeam;
+window.saveTeam=function(){
+  const n=parseInt(gid('t-count').value)||0, members=[];
+  for(let i=0;i<n;i++){const v=gid('t-name-'+i)?gid('t-name-'+i).value.trim():'';if(v)members.push(v);}
+  if(members.length===n&&n>0) localStorage.setItem('rbz_last_team',JSON.stringify({members}));
+  _saveTeam();
+};
+const _teamObs=new MutationObserver(()=>{if(gid('scr-team')&&gid('scr-team').classList.contains('active'))offerSameTeam();});
+if(gid('scr-team')) _teamObs.observe(gid('scr-team'),{attributes:true,attributeFilter:['class']});
 </script>
 </body>
 </html>
