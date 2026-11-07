@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Rebelz — Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080806;--s1:#0f0f0c;--s2:#161612;--s3:#1e1e18;--s4:#252520;
+  --b1:#2a2a22;--b2:#383830;--b3:#454540;
+  --t1:#f5f0e8;--t2:#b8b0a0;--t3:#706858;--t4:#454038;
+  --gold:#c8981e;--gold2:#e8b830;--gold3:#f5d060;--gold-dim:#c8981e40;
+  --red:#e84040;--grn:#40c870;--amb:#f5a020;
+  --fh:'Cormorant Garamond',serif;--fb:'Outfit',sans-serif;--fm:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh;overflow-x:hidden}
+.hdr{background:linear-gradient(180deg,#0f0f0a 0%,#080806 100%);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.hdr-inner{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand-wrap{display:flex;align-items:center;gap:12px}
+.brand-logo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid var(--gold);box-shadow:0 0 20px var(--gold-dim)}
+.brand-name{font-family:var(--fh);font-size:20px;font-weight:700;color:var(--t1);line-height:1}
+.brand-name span{color:var(--gold2)}
+.brand-tag{font-size:8px;color:var(--gold);font-family:var(--fm);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
+.sync-badge{display:flex;align-items:center;gap:6px;background:var(--s2);border:0.5px solid var(--b2);border-radius:20px;padding:5px 10px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--amb)}
+.sync-txt{font-size:9px;color:var(--t3);font-family:var(--fm);letter-spacing:.06em}
+.hbtn{background:none;border:0.5px solid var(--gold-dim);color:var(--gold2);font-family:var(--fm);font-size:10px;letter-spacing:.05em;padding:6px 12px;border-radius:8px;cursor:pointer}
+.page-tag{font-size:9px;color:var(--t4);font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:6px;border-top:0.5px solid var(--b1)}
+.wrap{padding:16px;max-width:640px;margin:0 auto 150px}
+.sec-lbl{font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin:4px 0 12px;display:flex;align-items:center;gap:10px}
+.sec-lbl::after{content:'';flex:1;height:.5px;background:linear-gradient(90deg,var(--b2),transparent)}
+.card{background:var(--s1);border:0.5px solid var(--b1);border-radius:16px;padding:16px;margin-bottom:14px;position:relative}
+.card-title{font-size:9px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--fm);margin-bottom:6px}
+.inp{width:100%;background:var(--s2);border:0.5px solid var(--b2);border-radius:10px;padding:12px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;-webkit-appearance:none}
+.inp:focus{border-color:var(--gold)}
+select.inp{cursor:pointer;padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23706858' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid-add{display:grid;grid-template-columns:1fr 90px;gap:10px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;font-size:13px;font-family:var(--fb);font-weight:600;cursor:pointer;border:none;width:100%;margin-bottom:8px}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806}
+.btn-gold:active{transform:scale(.97)}
+.btn-ghost{background:transparent;border:0.5px solid var(--b2);color:var(--t2)}
+.btn-wa{background:#0f2a18;border:0.5px solid #1f6b3a;color:#7de0a0}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.fchip{padding:7px 14px;border-radius:20px;border:0.5px solid var(--b2);font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--fm);user-select:none}
+.fchip.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;border-color:transparent;font-weight:700}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:0.5px solid var(--b1)}
+.row:first-of-type{border-top:none}
+.rname{font-size:14px;color:var(--t1)}
+.runit{font-size:10px;color:var(--t3);font-family:var(--fm);margin-left:6px}
+.qty{display:flex;align-items:center;gap:6px}
+.qb{width:32px;height:32px;border-radius:9px;border:0.5px solid var(--b2);background:var(--s2);color:var(--gold2);font-size:16px;cursor:pointer}
+.qn{width:52px;text-align:center;background:transparent;border:none;color:var(--t1);font-size:15px;font-weight:600;font-family:var(--fb);outline:none}
+.xb{width:28px;height:28px;border-radius:8px;border:none;background:transparent;color:var(--t3);font-size:14px;cursor:pointer}
+.tag{font-size:9px;font-family:var(--fm);padding:3px 8px;border-radius:10px;letter-spacing:.04em;text-transform:none}
+.tag-c{background:#0f2a2240;color:#7dd8b8;border:0.5px solid #1f6b5a}
+.tag-r{background:#3a280840;color:var(--amb);border:0.5px solid #6b4a10}
+.status{font-size:11px;font-family:var(--fm);padding:10px 12px;border-radius:10px;margin-top:4px;line-height:1.6}
+.st-new{background:var(--s2);color:var(--t3)}
+.st-sent{background:#0f2a1840;color:var(--grn);border:0.5px solid #1f6b3a}
+.st-draft{background:#3a280840;color:var(--amb);border:0.5px solid #6b4a10}
+.empty{text-align:center;padding:26px 10px;color:var(--t3);font-size:12px;font-family:var(--fm);line-height:1.7}
+.bar{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(0deg,#080806 70%,transparent);padding:14px 16px 18px;z-index:50}
+.bar .in{max-width:640px;margin:0 auto}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(12px);background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;transition:all .25s;pointer-events:none;z-index:999;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN GATE ===== -->
+<div id="login-gate" style="position:fixed;inset:0;z-index:9999;background:#080806;display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="width:100%;max-width:360px;text-align:center">
+    <img src="rebelz%20bartending%20logo.png" style="width:72px;height:72px;object-fit:contain;margin-bottom:14px"/>
+    <div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--gold2)">Store Login</div>
+    <div style="font-size:11px;color:var(--t3);font-family:var(--fm);margin:6px 0 22px;letter-spacing:.04em">Rebelz Bartending — store managers only</div>
+    <input id="lg-user" class="inp" placeholder="Username" autocomplete="username" autocapitalize="none" spellcheck="false" style="margin-bottom:12px"/>
+    <input id="lg-pass" class="inp" type="password" placeholder="Password" autocomplete="current-password" style="margin-bottom:8px"/>
+    <div id="lg-err" style="color:var(--red);font-size:12px;font-family:var(--fm);min-height:16px;margin-bottom:10px"></div>
+    <button class="btn btn-gold" onclick="doLogin()">Log In →</button>
+  </div>
+</div>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="brand-wrap">
+      <img src="rebelz%20bartending%20logo.png" class="brand-logo"/>
+      <div>
+        <div class="brand-name">Rebelz <span>Store</span></div>
+        <div class="brand-tag">✦ Think of Party, Think of Us ✦</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="sync-badge"><div class="sync-dot" id="sync-dot"></div><div class="sync-txt" id="sync-txt">Connecting</div></div>
+      <button class="hbtn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="page-tag" id="page-tag">Store Manager</div>
+</div>
+
+<div class="wrap">
+  <!-- City switch (Super Admin only) -->
+  <div class="chips hidden" id="city-chips">
+    <div class="fchip" data-c="Vijayawada" onclick="setCity('Vijayawada')">Vijayawada</div>
+    <div class="fchip" data-c="Hyderabad" onclick="setCity('Hyderabad')">Hyderabad</div>
+    <div class="fchip" data-c="Visakhapatnam" onclick="setCity('Visakhapatnam')">Visakhapatnam</div>
+  </div>
+
+  <div class="chips">
+    <div class="fchip active" data-t="indent" onclick="setTab('indent')">📦 Send Indent</div>
+    <div class="fchip" data-t="items" onclick="setTab('items')">📋 Item List</div>
+  </div>
+
+  <!-- ================= INDENT TAB ================= -->
+  <div id="tab-indent">
+    <div class="card">
+      <div class="card-title">Select Event</div>
+      <select class="inp" id="ev-sel" onchange="selectEvent(this.value)"></select>
+      <div id="ev-info"></div>
+    </div>
+
+    <div id="indent-body" class="hidden">
+      <div class="card">
+        <div class="card-title">Add Item</div>
+        <div class="grid2">
+          <div class="field"><label>Category</label><select class="inp" id="a-cat" onchange="fillItemSel()"></select></div>
+          <div class="field"><label>Item</label><select class="inp" id="a-item" onchange="onItemSel()"></select></div>
+        </div>
+        <div class="grid2 hidden" id="a-new">
+          <div class="field"><label>New Item Name</label><input class="inp" id="a-name" placeholder="e.g. Mountain Dew"/></div>
+          <div class="field"><label>Unit</label><select class="inp" id="a-unit"></select></div>
+        </div>
+        <div class="grid-add">
+          <div class="field" style="margin-bottom:0"><label>Quantity</label><input class="inp" id="a-qty" type="number" inputmode="numeric" min="1" placeholder="e.g. 24"/></div>
+          <div style="display:flex;align-items:flex-end"><button class="btn btn-gold" style="margin:0;height:46px" onclick="addLine()">＋ Add</button></div>
+        </div>
+      </div>
+
+      <div id="indent-list"></div>
+    </div>
+  </div>
+
+  <!-- ================= ITEM LIST TAB ================= -->
+  <div id="tab-items" class="hidden">
+    <div class="card">
+      <div class="card-title">Add to Item List</div>
+      <div class="field"><label>Category</label><select class="inp" id="m-cat"></select></div>
+      <div class="grid2">
+        <div class="field"><label>Item Name</label><input class="inp" id="m-name" placeholder="e.g. Coke"/></div>
+        <div class="field"><label>Unit</label><select class="inp" id="m-unit"></select></div>
+      </div>
+      <button class="btn btn-gold" onclick="addMaster()">＋ Save Item</button>
+    </div>
+    <div id="master-list"></div>
+  </div>
+</div>
+
+<div class="bar hidden" id="send-bar"><div class="in">
+  <button class="btn btn-gold" id="send-btn" onclick="sendIndent()">Send Indent to Bartender →</button>
+  <button class="btn btn-wa hidden" id="wa-btn" onclick="sendWhatsApp()" style="margin-bottom:0">📲 Share Indent on WhatsApp</button>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, update, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDcrx5tOL1Y2TWiz1VFfCAC_OagARggGNE",
+  authDomain: "rebelz-tracker.firebaseapp.com",
+  databaseURL: "https://rebelz-tracker-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "rebelz-tracker",
+  storageBucket: "rebelz-tracker.appspot.com",
+  messagingSenderId: "234156658582",
+  appId: "1:234156658582:web:26597fc333698b0778d7b7"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+const EMAIL_DOMAIN='@rebelz-admin.web';
+
+// ---- CONSTANTS ----
+const CATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Disposables','Bar props','Rental glassware'];
+const UNITS=['bottle','can','packet','bag','pcs','litre','kg','box','tray'];
+const STARTER={
+  'Soft drinks':[['Coke','bottle'],['Sprite','bottle'],['Thums Up','bottle'],['Limca','bottle'],['Fanta','bottle']],
+  'Soda & mixers':[['Soda','bottle'],['Ginger ale','can'],['Tonic water','can']],
+  'Energy drinks':[['Red Bull','can']],
+  'Juices':[['Orange juice','litre'],['Pineapple juice','litre'],['Cranberry juice','litre']],
+  'Syrups':[['Sugar syrup','bottle'],['Grenadine','bottle'],['Blue curacao syrup','bottle']],
+  'Ice':[['Ice cubes','bag']],
+  'Disposables':[['Cocktail disposable glass','pcs'],['Mocktail disposable glass','pcs'],['Short disposable glass','pcs'],['Tissue paper','packet'],['Straws','packet'],['Stirrers','packet']],
+  'Bar props':[['Garnish tray','pcs'],['Bar mat','pcs'],['Shaker','pcs'],['Jigger','pcs'],['Ice bucket','pcs']],
+  'Rental glassware':[['Wine glass','pcs'],['Highball glass','pcs'],['Martini glass','pcs'],['Rocks / whisky glass','pcs'],['Shot glass','pcs'],['Champagne flute','pcs']]
+};
+
+// ---- STATE ----
+let ME=null, CITY=null, EVENTS=[], MASTER={}, curEv=null, LINES=[], dirty=false, listenersOn=false, evUnsub=null, mUnsub=null;
+
+// ---- HELPERS ----
+function gid(id){return document.getElementById(id);}
+function toast(m,d=2600){const t=gid('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),d);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function slug(s){return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';}catch(e){return d||'—';}}
+function fmtDT(iso){try{return new Date(iso).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit',hour12:true});}catch(e){return '';}}
+function nowISO(){return new Date().toISOString();}
+function opts(arr,sel){return arr.map(v=>`<option${v===sel?' selected':''}>${esc(v)}</option>`).join('');}
+function draftKey(id){return 'rbz_indent_'+id;}
+
+// ---- LOGIN ----
+function showGate(show){gid('login-gate').style.display=show?'flex':'none';}
+window.doLogin=function(){
+  const u=(gid('lg-user').value||'').trim().toLowerCase(), p=gid('lg-pass').value||'', err=gid('lg-err');
+  if(!u||!p){err.textContent='Enter username and password.';return;}
+  err.textContent='Checking…';
+  signInWithEmailAndPassword(auth,u+EMAIL_DOMAIN,p).then(()=>{gid('lg-pass').value='';}).catch(()=>{err.textContent='Wrong username or password.';});
+};
+window.doLogout=function(){ if(dirty&&!confirm('You have an unsent indent (kept on this phone). Log out anyway?'))return; signOut(auth); };
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&gid('login-gate').style.display!=='none')window.doLogin();});
+
+onAuthStateChanged(auth,user=>{
+  if(!(user&&user.providerData&&user.providerData.length)){ME=null;showGate(true);return;}
+  get(ref(db,'staff/'+user.uid)).then(s=>{
+    const p=s.val();
+    ME=p?p:{role:'super',name:'Admin',legacy:true};
+    if(ME.active===false){signOut(auth);gid('lg-err').textContent='This login has been disabled. Contact Super Admin.';return;}
+    if(ME.role!=='store'&&ME.role!=='super'){signOut(auth);gid('lg-err').textContent='This page is for Store Managers only.';return;}
+    gid('lg-err').textContent='';
+    showGate(false);
+    if(ME.role==='super'){gid('city-chips').classList.remove('hidden');setCity(localStorage.getItem('rbz_store_city')||'Vijayawada');}
+    else setCity(ME.city);
+    startConn();
+  }).catch(()=>{signOut(auth);gid('lg-err').textContent='Could not load your profile — check connection.';});
+});
+
+// ---- CONNECTION BADGE (weak network support) ----
+function startConn(){
+  if(listenersOn)return; listenersOn=true;
+  onValue(ref(db,'.info/connected'),s=>{
+    const on=!!s.val();
+    gid('sync-dot').style.background=on?'var(--grn)':'var(--amb)';
+    gid('sync-txt').textContent=on?'Live':'Offline · saving on phone';
+  });
+}
+
+// ---- CITY ----
+window.setCity=function(c){
+  if(ME.role!=='super'&&c!==ME.city)return;
+  if(dirty&&curEv&&!confirm('Switch city? Your unsent indent stays saved on this phone.'))return;
+  CITY=c; localStorage.setItem('rbz_store_city',c);
+  document.querySelectorAll('#city-chips .fchip').forEach(x=>x.classList.toggle('active',x.dataset.c===c));
+  gid('page-tag').textContent='Store · '+c+(ME.name?' · '+ME.name:'')+(ME.role==='super'?' (Super Admin)':'');
+  curEv=null; LINES=[]; dirty=false;
+  if(evUnsub)evUnsub(); if(mUnsub)mUnsub();
+  evUnsub=onValue(ref(db,'events'),s=>{
+    const d=s.val()||{};
+    EVENTS=Object.values(d).filter(e=>(e.city||'')===CITY&&e.status!=='closed')
+      .sort((a,b)=>(a.event_date||'').localeCompare(b.event_date||''));
+    renderEvSel();
+  });
+  mUnsub=onValue(ref(db,'store_items/'+CITY),s=>{MASTER=s.val()||{};renderMaster();fillItemSel(true);});
+};
+
+// ---- TABS ----
+window.setTab=function(t){
+  document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('active',x.dataset.t===t));
+  gid('tab-indent').classList.toggle('hidden',t!=='indent');
+  gid('tab-items').classList.toggle('hidden',t!=='items');
+  gid('send-bar').classList.toggle('hidden',t!=='indent'||!curEv);
+};
+
+// ---- EVENT SELECT ----
+function renderEvSel(){
+  const sel=gid('ev-sel'), keep=curEv&&curEv.id;
+  sel.innerHTML='<option value="">— Choose an upcoming event —</option>'+EVENTS.map(e=>
+    `<option value="${esc(e.id)}"${e.id===keep?' selected':''}>${e.indent?'✅ ':'⏳ '}${esc(fmtDate(e.event_date))} · ${esc(e.client_name||'')}${e.event_name?' · '+esc(e.event_name):''}</option>`).join('');
+  if(!EVENTS.length) sel.innerHTML='<option value="">No upcoming events in '+esc(CITY)+'</option>';
+  if(keep){ const ev=EVENTS.find(e=>e.id===keep); if(ev){curEv=ev; renderInfo();} }
+}
+window.selectEvent=function(id){
+  if(dirty&&curEv&&curEv.id!==id) toast('Previous indent kept as draft on this phone');
+  curEv=EVENTS.find(e=>e.id===id)||null;
+  if(!curEv){gid('indent-body').classList.add('hidden');gid('send-bar').classList.add('hidden');gid('ev-info').innerHTML='';return;}
+  // Load: a newer unsent draft on this phone wins over the saved indent
+  const draft=JSON.parse(localStorage.getItem(draftKey(id))||'null');
+  const server=curEv.indent;
+  if(draft&&(!server||draft.at>(server.updated_at||''))){LINES=draft.lines;dirty=true;}
+  else{LINES=server&&server.items?JSON.parse(JSON.stringify(server.items)):[];dirty=false;}
+  gid('indent-body').classList.remove('hidden');
+  gid('send-bar').classList.remove('hidden');
+  renderInfo(); renderLines(); fillItemSel();
+};
+function renderInfo(){
+  const e=curEv, i=e.indent;
+  let st;
+  if(dirty) st=`<div class="status st-draft">✏️ Changes not sent yet — saved on this phone.</div>`;
+  else if(i) st=`<div class="status st-sent">✅ Indent sent ${esc(fmtDT(i.updated_at))} by ${esc(i.sent_by_name||'—')}${i.pending?' · ⏳ waiting for network':''}<br/>You can still edit and update it until the event closes.</div>`;
+  else st=`<div class="status st-new">⏳ No indent sent yet for this event.</div>`;
+  gid('ev-info').innerHTML=`<div style="font-size:11px;color:var(--t3);font-family:var(--fm);margin:10px 0 2px;line-height:1.7">
+    ${esc(e.client_name||'')} · ${esc(fmtDate(e.event_date))}${e.guests?' · '+esc(e.guests)+' guests':''}<br/>
+    Status: ${esc(e.status||'setup')} · Bartender: ${e.owner_wa?'+91 '+esc(e.owner_wa):'—'}</div>${st}`;
+  gid('send-btn').textContent=i?'Update Indent →':'Send Indent to Bartender →';
+  gid('wa-btn').classList.toggle('hidden',!i||dirty);
+}
+
+// ---- ADD ITEM ----
+function masterFor(cat){return Object.entries(MASTER).filter(([k,v])=>v.cat===cat).sort((a,b)=>a[1].name.localeCompare(b[1].name));}
+window.fillItemSel=function(keep){
+  const cs=gid('a-cat'); if(!cs.options.length) cs.innerHTML=opts(CATS);
+  const cat=cs.value, is=gid('a-item'), prev=keep?is.value:'';
+  const list=masterFor(cat);
+  is.innerHTML=list.map(([k,v])=>`<option value="${esc(k)}">${esc(v.name)} (${esc(v.unit)})</option>`).join('')+'<option value="__new">＋ New item…</option>';
+  if(prev&&[...is.options].some(o=>o.value===prev)) is.value=prev;
+  if(!gid('a-unit').options.length) gid('a-unit').innerHTML=opts(UNITS);
+  window.onItemSel();
+};
+window.onItemSel=function(){gid('a-new').classList.toggle('hidden',gid('a-item').value!=='__new');};
+window.addLine=function(){
+  const cat=gid('a-cat').value, key=gid('a-item').value, qty=parseInt(gid('a-qty').value,10);
+  let name,unit;
+  if(key==='__new'){
+    name=gid('a-name').value.trim(); unit=gid('a-unit').value;
+    if(!name){toast('Type the new item name');return;}
+    const k=slug(cat+'-'+name);
+    if(!MASTER[k]) set(ref(db,'store_items/'+CITY+'/'+k),{cat,name,unit,added_by:ME.name||'',added_at:nowISO()});
+    MASTER[k]={cat,name,unit};
+  } else {
+    const m=MASTER[key]; if(!m){toast('Choose an item');return;}
+    name=m.name; unit=m.unit;
+  }
+  if(!qty||qty<1){toast('Enter quantity');return;}
+  const ex=LINES.find(l=>l.cat===cat&&l.name.toLowerCase()===name.toLowerCase());
+  if(ex){ex.qty+=qty;toast(name+' → now '+ex.qty+' '+ex.unit);}
+  else LINES.push({cat,name,unit,qty});
+  gid('a-qty').value=''; gid('a-name').value='';
+  if(key==='__new'){fillItemSel();}
+  touch();
+};
+
+// ---- INDENT LINES ----
+function touch(){
+  dirty=true;
+  if(curEv) localStorage.setItem(draftKey(curEv.id),JSON.stringify({at:nowISO(),lines:LINES}));
+  renderLines(); renderInfo();
+}
+window.chg=function(i,d){const l=LINES[i];if(!l)return;l.qty=Math.max(0,(l.qty||0)+d);touch();};
+window.setQ=function(i,v){const l=LINES[i];if(!l)return;l.qty=Math.max(0,parseInt(v,10)||0);touch();};
+window.delL=function(i){LINES.splice(i,1);touch();};
+function renderLines(){
+  const box=gid('indent-list');
+  if(!LINES.length){box.innerHTML=`<div class="card"><div class="empty">No items yet.<br/>Pick a category and item above, enter quantity, tap ＋ Add.</div></div>`;return;}
+  let h='', total=0;
+  CATS.forEach(cat=>{
+    const rows=LINES.map((l,i)=>[l,i]).filter(([l])=>l.cat===cat);
+    if(!rows.length)return;
+    const rental=cat==='Rental glassware';
+    h+=`<div class="card"${rental?' style="border-color:#6b4a10"':''}><div class="card-title"><span>${esc(cat)}</span>
+      <span class="tag ${rental?'tag-r':'tag-c'}">${rental?'Client sees: sent + breakage':'Client sees: list'}</span></div>`;
+    rows.forEach(([l,i])=>{ total+=l.qty;
+      h+=`<div class="row"><div><span class="rname">${esc(l.name)}</span><span class="runit">${esc(l.unit)}</span></div>
+        <div class="qty"><button class="qb" onclick="chg(${i},-1)">−</button>
+        <input class="qn" type="number" inputmode="numeric" value="${l.qty}" onchange="setQ(${i},this.value)"/>
+        <button class="qb" onclick="chg(${i},1)">+</button><button class="xb" onclick="delL(${i})" aria-label="Remove">✕</button></div></div>`;
+    });
+    h+='</div>';
+  });
+  box.innerHTML=`<div class="sec-lbl">Indent · ${LINES.length} item${LINES.length!==1?'s':''}</div>`+h;
+}
+
+// ---- SEND ----
+window.sendIndent=function(){
+  if(!curEv)return;
+  const items=LINES.filter(l=>l.qty>0);
+  if(!items.length){toast('Add at least one item');return;}
+  const prev=curEv.indent||{};
+  const data={items,city:CITY,sent_at:prev.sent_at||nowISO(),updated_at:nowISO(),
+    sent_by:auth.currentUser.uid,sent_by_name:ME.name||'',version:(prev.version||0)+1};
+  const evId=curEv.id;
+  // Firebase keeps this write queued on the phone if the network is weak and sends it when back online
+  set(ref(db,'events/'+evId+'/indent'),data)
+    .then(()=>{localStorage.removeItem(draftKey(evId));toast('Indent synced ✓ — bartender can see it');})
+    .catch(e=>toast('Could not save — '+((e&&e.code)||'check connection')));
+  curEv.indent=data; LINES=JSON.parse(JSON.stringify(items)); dirty=false;
+  localStorage.removeItem(draftKey(evId));
+  renderLines(); renderInfo();
+  toast(prev.version?'Indent updated ✓':'Indent sent ✓');
+};
+
+// ---- WHATSAPP (single message to bartender) ----
+window.sendWhatsApp=function(){
+  const e=curEv; if(!e||!e.indent)return;
+  const phone='91'+(e.owner_wa||'').replace(/\D/g,'').slice(-10);
+  let body='';
+  CATS.forEach(cat=>{
+    const rows=e.indent.items.filter(l=>l.cat===cat); if(!rows.length)return;
+    body+=`\n*${cat.toUpperCase()}*\n`+rows.map(l=>`• ${l.name} — ${l.qty} ${l.unit}`).join('\n')+'\n';
+  });
+  const msg=`📦 *REBELZ STORE — INDENT*\n✦ Think of Party, Think of Us ✦\n\n📋 *${e.event_name||e.client_name}*\n${e.client_name} · ${fmtDate(e.event_date)} · ${CITY}\n${body}\n✅ Please count everything when it reaches you and confirm in your panel.\n\n_Sent by ${ME.name||'Store'} · Rebelz Bartending Services_`;
+  window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
+};
+
+// ---- MASTER ITEM LIST ----
+gid('m-cat').innerHTML=opts(CATS); gid('m-unit').innerHTML=opts(UNITS);
+window.addMaster=function(){
+  const cat=gid('m-cat').value, name=gid('m-name').value.trim(), unit=gid('m-unit').value;
+  if(!name){toast('Type the item name');return;}
+  const k=slug(cat+'-'+name);
+  if(MASTER[k]){toast(name+' is already in the list');return;}
+  set(ref(db,'store_items/'+CITY+'/'+k),{cat,name,unit,added_by:ME.name||'',added_at:nowISO()})
+    .catch(e=>toast('Could not save — '+((e&&e.code)||'check connection')));
+  gid('m-name').value=''; toast(name+' saved ✓');
+};
+window.delMaster=function(k){
+  const m=MASTER[k]; if(!m)return;
+  if(!confirm('Remove "'+m.name+'" from the item list? (Past indents are not affected.)'))return;
+  remove(ref(db,'store_items/'+CITY+'/'+k));
+};
+window.loadStarter=function(){
+  const upd={};
+  Object.entries(STARTER).forEach(([cat,list])=>list.forEach(([name,unit])=>{
+    const k=slug(cat+'-'+name); if(!MASTER[k]) upd[k]={cat,name,unit,added_by:ME.name||'',added_at:nowISO()};
+  }));
+  update(ref(db,'store_items/'+CITY),upd).then(()=>toast('Starter list loaded ✓ — edit anytime'))
+    .catch(e=>toast('Could not save — '+((e&&e.code)||'check connection')));
+};
+function renderMaster(){
+  const box=gid('master-list'), n=Object.keys(MASTER).length;
+  if(!n){box.innerHTML=`<div class="card"><div class="empty">No items saved for ${esc(CITY)} yet.<br/>Load the starter list (Coke, Sprite, Thums Up, soda, Red Bull, ice, disposables, bar props, rental glasses…) and edit it.</div>
+    <button class="btn btn-gold" onclick="loadStarter()">Load Starter List</button></div>`;return;}
+  let h=`<div class="sec-lbl">${esc(CITY)} Item List · ${n} items</div>`;
+  CATS.forEach(cat=>{
+    const list=masterFor(cat); if(!list.length)return;
+    h+=`<div class="card"><div class="card-title"><span>${esc(cat)}</span><span class="tag tag-c">${list.length}</span></div>`+
+      list.map(([k,v])=>`<div class="row"><div><span class="rname">${esc(v.name)}</span><span class="runit">${esc(v.unit)}</span></div>
+        <button class="xb" onclick="delMaster('${esc(k)}')" aria-label="Remove">✕</button></div>`).join('')+'</div>';
+  });
+  box.innerHTML=h;
+}
+</script>
+</body>
+</html>
