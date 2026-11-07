@@ -1,0 +1,38 @@
+{
+  "id": "/store.html?app=store",
+  "name": "Rebelz Store",
+  "short_name": "Rebelz Store",
+  "description": "Rebelz Tracker \u2014 store indents and items",
+  "start_url": "/store.html?app=store",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#150f1f",
+  "theme_color": "#150f1f",
+  "icons": [
+    {
+      "src": "icons/store-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/store-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/store-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/store-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

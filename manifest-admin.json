@@ -1,0 +1,38 @@
+{
+  "id": "/admin.html?app=admin",
+  "name": "Rebelz Admin",
+  "short_name": "Rebelz Admin",
+  "description": "Rebelz Tracker \u2014 events, staff and reports",
+  "start_url": "/admin.html?app=admin",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#150f1f",
+  "theme_color": "#150f1f",
+  "icons": [
+    {
+      "src": "icons/admin-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/admin-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/admin-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/admin-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
