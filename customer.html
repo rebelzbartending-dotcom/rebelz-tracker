@@ -3,355 +3,284 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<title>Rebelz — Live Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<meta name="theme-color" content="#150f1f"/>
+<title>Rebelz — Live Bar Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,500;1,9..144,700&family=Unbounded:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#070604;--s1:#0e0d09;--s2:#151310;--s3:#1d1a15;
-  --b1:#2b2820;--b2:#3a362b;
-  --t1:#f7f2e7;--t2:#c3bba8;--t3:#776e5b;--t4:#48433a;
-  --gold:#c9a84c;--gold2:#e8d089;--gold3:#f3e6bd;--gold-dim:#c9a84c40;
-  --royal:#5c1a2e;--emerald:#0e4634;
-  --grn:#46cc78;--amb:#f5a020;--red:#e84040;
-  --fh:'Cormorant Garamond',serif;--fb:'Outfit',sans-serif;--fm:'DM Mono',monospace;
+  --night:#150f1f;--night2:#1e1630;--night3:#2a2042;--line:#3a2e58;
+  --cream:#fff4e2;--cream2:#f3e6d0;--ink:#21172f;--muted:#b9a9d4;--dim:#7d6e9a;
+  --tang:#ff7a45;--pink:#ff4f8b;--lime:#c6f432;--aqua:#3de0d2;--honey:#ffc447;--lav:#b79cff;
+  --fd:'Fraunces',Georgia,serif;--fx:'Unbounded','Arial Black',sans-serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh;overflow-x:hidden}
+html,body{overflow-x:hidden}
+body{background:var(--night);color:var(--cream);font-family:var(--fb);min-height:100vh}
+.page{max-width:480px;margin:0 auto;padding:0 18px 40px;position:relative;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.33;z-index:0;pointer-events:none}
+.z{position:relative;z-index:1}
+.hide{display:none!important}
 
-/* NOISE */
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+/* loading / error */
+.center{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px}
+.center img{width:76px;height:76px;border-radius:50%;border:3px solid var(--honey);margin-bottom:18px}
+.center h3{font-family:var(--fd);font-style:italic;font-size:26px;margin-bottom:8px}
+.center p{font-size:13px;color:var(--muted);line-height:1.7}
+.spin{animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* HERO */
-.hero{background:linear-gradient(160deg,#1d1504 0%,#120d02 28%,#070604 62%,#081008 88%,#0a0507 100%);border-bottom:1px solid var(--b1);padding:24px 16px 0;text-align:center;position:relative;overflow:hidden;z-index:1}
-.hero::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:420px;height:420px;background:radial-gradient(circle,#c9a84c16 0%,transparent 65%);pointer-events:none}
-.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold2),transparent)}
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0 8px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo img{width:42px;height:42px;border-radius:50%;border:2px solid var(--honey)}
+.logo b{font-family:var(--fx);font-size:13px;letter-spacing:.06em;display:block}
+.logo small{display:block;font-size:9px;color:var(--muted);letter-spacing:.16em;font-weight:700}
+.pill{display:flex;align-items:center;gap:7px;font-family:var(--fx);font-size:10px;font-weight:700;padding:7px 12px;border-radius:30px;letter-spacing:.08em}
+.pill i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.p-live{background:var(--lime);color:#1a2100}.p-live i{animation:beat 1.2s infinite}
+.p-setup{background:var(--honey);color:#3a2600}
+.p-done{background:var(--lav);color:#24124f}
+@keyframes beat{50%{transform:scale(.45);opacity:.4}}
 
-/* ROYAL CLOSING REPORT */
-.cr-wrap{background:linear-gradient(165deg,#1d1504 0%,#0e0d09 40%,#0a0810 75%,#12060b 100%);border:1px solid var(--gold-dim);border-radius:20px;padding:24px 18px;margin-bottom:16px;position:relative;overflow:hidden;text-align:center}
-.cr-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold2),var(--gold),transparent)}
-.cr-wrap::after{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,#c9a84c14 0%,transparent 70%)}
-.cr-crest{font-size:34px;margin-bottom:8px}
-.cr-title{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--gold2);letter-spacing:.06em;margin-bottom:2px}
-.cr-sub{font-size:9px;color:var(--gold);font-family:var(--fm);letter-spacing:.2em;text-transform:uppercase;margin-bottom:18px}
-.cr-line{height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin:14px 0}
-.cr-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-.cr-stat{background:rgba(201,168,76,.06);border:0.5px solid var(--gold-dim);border-radius:14px;padding:14px 6px}
-.cr-stat-l{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:5px}
-.cr-stat-v{font-family:var(--fh);font-size:30px;font-weight:700;color:var(--gold2);line-height:1}
-.cr-list{text-align:left;background:rgba(255,255,255,.025);border:0.5px solid rgba(255,255,255,.06);border-radius:14px;padding:6px 14px;margin-bottom:12px}
-.cr-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:.5px solid rgba(255,255,255,.05);font-size:12px}
-.cr-item:last-child{border-bottom:none}
-.cr-item-name{color:var(--t2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cr-item-val{color:var(--gold2);font-family:var(--fm);font-size:11px;flex-shrink:0;text-align:right}
-.cr-sec-lbl{font-size:8px;color:var(--gold);font-family:var(--fm);letter-spacing:.16em;text-transform:uppercase;margin:14px 0 8px;text-align:left}
-.cr-thanks{font-family:var(--fh);font-size:16px;font-weight:600;color:var(--t2);margin-top:16px;font-style:italic}
-.cr-tag{font-size:9px;color:var(--gold);font-family:var(--fm);letter-spacing:.16em;margin-top:5px}
+/* hero */
+.hero{padding:18px 0 6px}
+.kicker{display:inline-block;background:var(--pink);color:#fff;font-family:var(--fx);font-size:9px;font-weight:700;letter-spacing:.14em;padding:6px 10px;border-radius:6px;transform:rotate(-3deg)}
+h1{font-family:var(--fd);font-weight:800;font-size:42px;line-height:1;margin:14px 0 4px;letter-spacing:-.01em;word-break:break-word}
+h1 em{font-style:italic;font-weight:500;color:var(--honey)}
+.squig{display:block;margin:4px 0 14px}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.meta span{font-size:12px;font-weight:600;padding:7px 12px;border-radius:30px;background:var(--night2);border:1.5px solid var(--line);color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta a{color:var(--aqua);text-decoration:none}
 
-/* LOGO */
-.logo-stage{position:relative;display:inline-block;margin-bottom:14px}
-.logo-img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);box-shadow:0 0 30px #c8981e50,0 0 80px #c8981e18;position:relative;z-index:2}
-.logo-ring1{position:absolute;inset:-8px;border-radius:50%;border:1px dashed #c8981e40;animation:spin1 15s linear infinite}
-.logo-ring2{position:absolute;inset:-16px;border-radius:50%;border:0.5px dashed #c8981e20;animation:spin1 25s linear infinite reverse}
-@keyframes spin1{to{transform:rotate(360deg)}}
+/* menu button + notices */
+.menu-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:20px;padding:15px;border:none;border-radius:18px;background:var(--pink);color:#fff;font-family:var(--fx);font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer;box-shadow:0 10px 30px #ff4f8b40}
+.notice{margin-top:22px;border-radius:20px;padding:18px;background:var(--night2);border:1.5px dashed var(--honey);text-align:center}
+.notice b{display:block;font-family:var(--fd);font-style:italic;font-size:21px;color:var(--honey);margin-bottom:4px}
+.notice span{font-size:12px;color:var(--muted);line-height:1.6}
 
-.hero-brand{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--t1);margin-bottom:5px;letter-spacing:.02em}
-.hero-brand span{color:var(--gold2)}
-.hero-tag{font-size:9px;color:var(--gold);font-family:var(--fm);letter-spacing:.18em;text-transform:uppercase;margin-bottom:16px}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0 8px}
+.st{border-radius:26px 26px 26px 8px;padding:16px 12px 14px;color:#1b1328}
+.st:nth-child(2){border-radius:26px 8px 26px 26px;transform:translateY(8px)}
+.st:nth-child(3){border-radius:8px 26px 26px 26px}
+.st b{display:block;font-family:var(--fx);font-size:30px;font-weight:800;line-height:1}
+.st span{display:block;font-size:11px;font-weight:700;margin-top:6px;line-height:1.25}
 
-/* STATUS CHIPS */
-.chip-live{display:inline-flex;align-items:center;gap:6px;background:#c8981e18;border:0.5px solid var(--gold-dim);border-radius:20px;padding:5px 14px;margin-bottom:16px}
-.chip-dot{width:6px;height:6px;border-radius:50%;background:var(--gold2);animation:blink 1.4s infinite}
-.chip-txt{font-size:10px;color:var(--gold2);font-family:var(--fm);letter-spacing:.06em}
-.chip-setup{display:inline-flex;align-items:center;gap:6px;background:#f5a02018;border:0.5px solid #f5a02035;border-radius:20px;padding:5px 14px;margin-bottom:16px}
-.chip-setup-dot{width:6px;height:6px;border-radius:50%;background:var(--amb)}
-.chip-setup-txt{font-size:10px;color:var(--amb);font-family:var(--fm)}
-.chip-closed{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 14px;margin-bottom:16px}
-.chip-closed-txt{font-size:10px;color:var(--t3);font-family:var(--fm)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+/* section heads */
+.sh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:40px 0 14px}
+.sh h2{font-family:var(--fd);font-style:italic;font-weight:700;font-size:28px;line-height:1.05}
+.sh h2 u{text-decoration:none;color:var(--aqua)}
+.sh small{font-size:11px;color:var(--dim);font-weight:600;text-align:right;flex-shrink:0}
 
-/* EVENT INFO */
-.ev-info-box{background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:16px;padding:14px;text-align:left;margin-bottom:0}
-.ev-info-label{font-size:8px;color:rgba(245,240,232,.3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px}
-.ev-info-name{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--t1);line-height:1.15;margin-bottom:4px}
-.ev-info-meta{font-size:10px;color:rgba(245,240,232,.4);font-family:var(--fm);line-height:1.6}
+/* bottle shelf */
+.shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 10px}
+.bt{text-align:center}
+.bt svg{width:100%;height:150px;display:block;overflow:visible}
+.bt .nm{font-size:12px;font-weight:700;margin-top:8px;line-height:1.25;min-height:30px;word-break:break-word}
+.bt .ct{font-family:var(--fx);font-size:10px;margin-top:4px;color:var(--muted)}
+.bt .ct b{font-size:15px;color:var(--cream)}
+.bt .tg{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px;margin-top:6px}
+.bt .low{display:table;margin:5px auto 0;font-size:9px;font-weight:800;letter-spacing:.08em;color:#1b1328;background:var(--honey);padding:3px 7px;border-radius:6px}
+.bt .out{background:var(--pink);color:#fff}
+.plank{grid-column:1/-1;height:10px;border-radius:6px;background:linear-gradient(90deg,var(--tang),var(--pink),var(--lav));margin:-6px 0 6px;box-shadow:0 8px 24px #ff4f8b40}
+.wave{animation:slide 3s linear infinite}
+@keyframes slide{to{transform:translateX(-40px)}}
+.empty-shelf{grid-column:1/-1;text-align:center;padding:28px 16px;border-radius:20px;background:var(--night2);border:1.5px solid var(--line);color:var(--muted);font-size:13px;line-height:1.6}
 
-/* STATS */
-.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#c8981e15;border-top:0.5px solid #c8981e20}
-.stat{padding:14px 6px;background:var(--bg);text-align:center}
-.stat-l{font-size:8px;color:rgba(245,240,232,.25);text-transform:uppercase;letter-spacing:.08em;font-family:var(--fm);margin-bottom:4px}
-.stat-v{font-family:var(--fh);font-size:24px;font-weight:700;color:var(--t1)}
-.stat-v.hi{color:var(--gold2)}
+/* ticket (bar setup + closing report) */
+.ticket{background:var(--cream);color:var(--ink);border-radius:22px;padding:20px 18px;position:relative}
+.ticket:before,.ticket:after{content:'';position:absolute;top:74px;width:22px;height:22px;border-radius:50%;background:var(--night)}
+.ticket:before{left:-11px}.ticket:after{right:-11px}
+.ticket .th{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-bottom:16px;border-bottom:2px dashed #d9c9b0;margin-bottom:14px}
+.ticket .th b{font-family:var(--fd);font-size:22px;font-weight:800;font-style:italic}
+.ticket .th span{font-family:var(--fx);font-size:9px;font-weight:700;letter-spacing:.12em;background:var(--ink);color:var(--lime);padding:6px 9px;border-radius:6px;white-space:nowrap}
+.grp{margin-bottom:14px}
+.grp:last-child{margin-bottom:0}
+.gl{font-family:var(--fx);font-size:10px;font-weight:700;letter-spacing:.12em;margin-bottom:8px;display:flex;align-items:center;gap:8px;text-transform:uppercase}
+.gl i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;font-weight:600;padding:6px 10px;border-radius:10px;background:var(--cream2)}
+.chip b{font-family:var(--fx);font-size:11px;margin-left:4px}
+.chip small{font-size:10px;color:#7a6a58;margin-left:2px}
+.cr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.cr-stats div{background:var(--cream2);border-radius:14px;padding:12px 8px;text-align:center}
+.cr-stats b{display:block;font-family:var(--fx);font-size:22px;font-weight:800}
+.cr-stats span{font-size:10px;font-weight:700;color:#7a6a58;letter-spacing:.06em;text-transform:uppercase}
+.cr-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid #eadbc4;font-size:13px}
+.cr-row:first-of-type{border-top:none}
+.cr-row b{font-weight:700}
+.cr-row span{font-family:var(--fx);font-size:11px;white-space:nowrap}
+.cr-thanks{text-align:center;margin-top:16px;padding-top:14px;border-top:2px dashed #d9c9b0;font-family:var(--fd);font-style:italic;font-size:19px}
+.cr-thanks small{display:block;font-family:var(--fx);font-style:normal;font-size:9px;letter-spacing:.18em;color:#7a6a58;margin-top:6px}
 
-/* MAIN */
-.main{padding:16px;max-width:600px;margin:0 auto;position:relative;z-index:1}
+/* glassware */
+.glass{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gc{background:var(--night2);border:1.5px solid var(--line);border-radius:18px;padding:14px 8px;text-align:center}
+.gc svg{height:52px;width:44px}
+.gc .gn{font-size:11px;font-weight:700;margin:6px 0 6px;color:var(--muted);line-height:1.25;min-height:28px}
+.gc .gs{font-family:var(--fx);font-size:20px;font-weight:800}
+.gc .gu{font-size:9px;color:var(--dim);font-weight:700;letter-spacing:.08em}
+.gc .gb{display:inline-block;margin-top:7px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
+.ok{background:#c6f43222;color:var(--lime)} .br{background:#ff4f8b22;color:var(--pink)} .tn{background:#3de0d222;color:var(--aqua)}
 
-.sec-lbl{font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:12px;display:flex;align-items:center;gap:10px}
-.sec-lbl::after{content:'';flex:1;height:.5px;background:linear-gradient(90deg,var(--b2),transparent)}
+/* timeline */
+.tl{border-left:2px dashed var(--line);margin-left:8px;padding-left:20px}
+.ti{position:relative;margin-bottom:16px}
+.ti:before{content:'';position:absolute;left:-28px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px var(--night)}
+.ti b{display:block;font-size:13px;font-weight:600;line-height:1.45}
+.ti span{font-size:11px;color:var(--dim);font-weight:600}
 
-/* BOTTLE CARDS */
-.bc{background:var(--s1);border:0.5px solid var(--b1);border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden}
-.bc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.bc.ok::before{background:linear-gradient(90deg,#1a5028,var(--grn))}
-.bc.low::before{background:linear-gradient(90deg,#5a3800,var(--amb))}
-.bc.empty::before{background:linear-gradient(90deg,#5a1010,var(--red))}
-.bc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.bc-left{display:flex;align-items:center;gap:10px}
-.bc-dot{width:11px;height:11px;border-radius:50%}
-.bc-name{font-size:15px;font-weight:500;color:var(--t1)}
-.bc-rem{font-family:var(--fh);font-size:32px;font-weight:700}
-.bc-rem.ok{color:var(--grn)}.bc-rem.low{color:var(--amb)}.bc-rem.empty{color:var(--red)}
-.bc-rem-l{font-size:9px;color:var(--t3);font-family:var(--fm);text-align:right;margin-top:2px}
-.bc-bottles{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:10px}
-.btl{width:13px;height:26px;border-radius:3px 3px 4px 4px}
-.bc-prog{height:5px;background:var(--s3);border-radius:3px;margin-bottom:8px;overflow:hidden}
-.bc-fill{height:5px;border-radius:3px;transition:width .8s ease}
-.bc-fill.ok{background:linear-gradient(90deg,#1a5028,var(--grn))}
-.bc-fill.low{background:linear-gradient(90deg,#5a3800,var(--amb))}
-.bc-fill.empty{background:var(--red)}
-.bc-nums{display:flex;justify-content:space-between;font-size:10px;font-family:var(--fm);color:var(--t3)}
+/* feedback */
+.fb{background:var(--night2);border:1.5px solid var(--line);border-radius:24px;padding:22px 18px}
+.fb-title{font-family:var(--fd);font-style:italic;font-size:26px;text-align:center}
+.fb-sub{font-size:12px;color:var(--muted);text-align:center;margin:6px 0 20px;line-height:1.6}
+.fb-q{font-family:var(--fx);font-size:10px;font-weight:700;letter-spacing:.12em;margin:18px 0 10px;text-transform:uppercase;color:var(--honey)}
+.stars{display:flex;gap:8px}
+.star{flex:1;height:46px;border-radius:14px;background:var(--night3);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;filter:grayscale(1);opacity:.45;transition:all .15s}
+.star.on{filter:none;opacity:1;background:#ffc44722;box-shadow:inset 0 0 0 1.5px var(--honey)}
+.fb-tags{display:flex;flex-wrap:wrap;gap:7px}
+.fb-tag{font-size:12px;font-weight:600;padding:8px 12px;border-radius:30px;border:1.5px solid var(--line);color:var(--muted);cursor:pointer;user-select:none}
+.fb-tag.on{background:var(--aqua);border-color:var(--aqua);color:#06302c}
+.fb-inp{width:100%;background:var(--night3);border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;color:var(--cream);font-family:var(--fb);font-size:14px;outline:none;resize:none}
+.fb-inp:focus{border-color:var(--aqua)}
+.book{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.book div{padding:13px;border-radius:14px;border:1.5px solid var(--line);text-align:center;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted)}
+.book .yes.on{background:var(--lime);border-color:var(--lime);color:#1a2100}
+.book .no.on{background:var(--night3);border-color:var(--lav);color:var(--lav)}
+.fb-submit{width:100%;margin-top:22px;padding:16px;border:none;border-radius:18px;background:var(--honey);color:#2a1a00;font-family:var(--fx);font-size:12px;font-weight:800;letter-spacing:.08em;cursor:pointer}
+.fb-err{color:var(--pink);font-size:12px;text-align:center;margin-top:10px;font-weight:600}
+.fb-done{text-align:center;padding:16px 0}
+.fb-done div{font-size:44px}
+.fb-done b{display:block;font-family:var(--fd);font-style:italic;font-size:30px;margin:8px 0}
+.fb-done p{font-size:13px;color:var(--muted);line-height:1.7}
 
-/* TIMELINE */
-.tl-wrap{background:var(--s1);border:0.5px solid var(--b1);border-radius:16px;overflow:hidden;margin-bottom:12px}
-.tl-item{display:flex;gap:12px;padding:11px 16px;border-bottom:.5px solid var(--s2);align-items:flex-start}
-.tl-item:last-child{border-bottom:none}
-.tl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.tl-dot.ok{background:var(--grn)}.tl-dot.low{background:var(--amb)}.tl-dot.empty{background:var(--red)}.tl-dot.info{background:var(--t3)}
-.tl-msg{font-size:12px;flex:1;line-height:1.6;color:var(--t2)}
-.tl-time{font-size:9px;color:var(--t3);font-family:var(--fm);white-space:nowrap}
+.foot{text-align:center;margin-top:44px;font-family:var(--fd);font-style:italic;font-size:20px;color:var(--muted)}
+.foot img{width:46px;height:46px;border-radius:50%;border:2px solid var(--honey);display:block;margin:0 auto 12px}
+.foot b{display:block;font-family:var(--fx);font-style:normal;font-size:9px;letter-spacing:.2em;color:var(--dim);margin-top:8px}
 
-/* NOTICES */
-.setup-notice{background:#f5a02010;border:0.5px solid #f5a02030;border-radius:14px;padding:16px;text-align:center;margin-bottom:14px}
-.close-banner{background:linear-gradient(135deg,#0a1e0e,#122010);border:0.5px solid #40c87040;border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.close-icon{width:48px;height:48px;border-radius:50%;background:#40c87018;border:1px solid #40c87040;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-
-/* FEEDBACK FORM */
-.fb-wrap{background:linear-gradient(160deg,#1a1200,#0f0c00,#080806);border:1px solid var(--gold-dim);border-radius:18px;padding:22px 18px;margin-bottom:16px;position:relative;overflow:hidden}
-.fb-wrap::before{content:'';position:absolute;top:-50px;right:-50px;width:150px;height:150px;background:radial-gradient(circle,#c8981e12 0%,transparent 70%)}
-.fb-wrap::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.fb-title{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--gold2);margin-bottom:5px}
-.fb-sub{font-size:12px;color:var(--t2);margin-bottom:22px;line-height:1.7}
-.fb-q{font-size:9px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:10px}
-.stars{display:flex;gap:10px;margin-bottom:18px}
-.star{font-size:34px;cursor:pointer;opacity:.25;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none}
-.star.on{opacity:1;transform:scale(1.1)}
-.fb-inp{width:100%;background:#161612;border:0.5px solid var(--b2);border-radius:12px;padding:13px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;resize:none;-webkit-appearance:none;margin-bottom:12px;transition:border-color .2s}
-.fb-inp:focus{border-color:var(--gold)}
-.fb-inp::placeholder{color:var(--t4)}
-.fb-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
-.fb-tag{padding:8px 14px;border-radius:20px;border:0.5px solid var(--b2);font-size:11px;color:var(--t2);cursor:pointer;background:transparent;transition:all .15s;font-family:var(--fb)}
-.fb-tag.on{background:#c8981e18;border-color:var(--gold-dim);color:var(--gold2);font-weight:600}
-.book-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
-.book-btn{padding:13px;border-radius:12px;border:0.5px solid var(--b2);background:transparent;color:var(--t2);font-size:13px;font-family:var(--fb);cursor:pointer;text-align:center;transition:all .15s}
-.book-btn.yes.on{background:#40c87018;border-color:#40c87040;color:var(--grn)}
-.book-btn.no.on{background:#e8404018;border-color:#e8404040;color:var(--red)}
-.fb-submit{width:100%;padding:16px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;font-family:var(--fb);font-size:15px;font-weight:700;border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 8px 24px var(--gold-dim)}
-.fb-submit:active{transform:scale(.97)}
-.fb-done{text-align:center;padding:24px 16px}
-.fb-done-icon{font-size:56px;margin-bottom:16px}
-.fb-done-title{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--gold2);margin-bottom:8px}
-.fb-done-sub{font-size:13px;color:var(--t2);line-height:1.8}
-
-/* FOOTER */
-.footer{text-align:center;padding:24px 16px 40px;border-top:.5px solid var(--b1);margin-top:4px}
-.footer-logo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid var(--gold-dim);margin-bottom:10px}
-.footer-brand{font-family:var(--fh);font-size:15px;font-weight:600;color:var(--t3);margin-bottom:4px}
-.footer-tag{font-size:9px;color:var(--gold);font-family:var(--fm);letter-spacing:.14em;margin-bottom:6px}
-.footer-sub{font-size:9px;color:var(--t4);font-family:var(--fm)}
-
-/* ERROR / LOADING */
-.full-center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--bg);position:relative;z-index:1}
-@keyframes glow{0%,100%{box-shadow:0 0 30px #c8981e50}50%{box-shadow:0 0 60px #c8981e80}}
-
-/* ===== VIEW MENU CTA + LIGHTBOX ===== */
-.menu-cta{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0805;font-family:var(--fb);font-size:14px;font-weight:700;border:none;cursor:pointer;letter-spacing:.03em;box-shadow:0 8px 24px var(--gold-dim);transition:transform .12s}
-.menu-cta:active{transform:scale(.98)}
-.menu-lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:300;flex-direction:column;padding:16px 16px 24px;backdrop-filter:blur(5px)}
-.menu-lb.open{display:flex}
-.menu-lb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0}
-.menu-lb-title{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--gold2)}
-.menu-lb-title span{display:block;font-family:var(--fm);font-size:9px;color:var(--gold);letter-spacing:.16em;text-transform:uppercase;margin-top:2px}
-.menu-lb-close{background:var(--s2);border:0.5px solid var(--b2);color:var(--t1);border-radius:10px;padding:9px 16px;font-size:13px;cursor:pointer;font-family:var(--fb);font-weight:600}
-.menu-lb-body{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;-webkit-overflow-scrolling:touch}
-.menu-lb-body img{max-width:100%;height:auto;border-radius:12px;border:1px solid var(--gold-dim);box-shadow:0 12px 40px rgba(0,0,0,.6)}
-
-/* ===== POLISH ===== */
-html{scroll-behavior:smooth}
-.bc{transition:border-color .2s,transform .1s}
-.fb-submit{transition:transform .12s,filter .15s}
-.star{transition:transform .12s,opacity .15s}
-.fb-tag,.book-btn{transition:all .15s}
-.fb-inp:focus{box-shadow:0 0 0 3px var(--gold-dim)}
+/* menu lightbox */
+.lb{display:none;position:fixed;inset:0;z-index:100;background:#0b0712f2;flex-direction:column}
+.lb.open{display:flex}
+.lb-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px}
+.lb-head b{font-family:var(--fd);font-style:italic;font-size:22px}
+.lb-head button{background:var(--night3);border:1.5px solid var(--line);color:var(--cream);border-radius:20px;padding:8px 14px;font-weight:700;font-size:12px;cursor:pointer}
+.lb-body{flex:1;overflow:auto;padding:0 14px 20px;display:flex;justify-content:center;align-items:flex-start}
+.lb-body img{max-width:100%;border-radius:14px}
 </style>
 </head>
 <body>
 
-<!-- ERROR -->
-<div id="v-error" style="display:none">
-  <div class="full-center">
-    <div>
-      <img src="rebelz%20bartending%20logo.png" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);margin-bottom:18px"/>
-      <div style="font-family:var(--fh);font-size:22px;font-weight:700;margin-bottom:8px;color:var(--t1)">Invalid Link</div>
-      <div style="font-size:13px;color:var(--t3);line-height:1.7">This link is not valid.<br/>Ask Rebelz Bartending team for your tracker link.</div>
-    </div>
-  </div>
+<!-- LOADING -->
+<div id="v-loading" class="center">
+  <div><img src="rebelz%20bartending%20logo.png" class="spin"/><h3>Pouring your tracker…</h3><p>REBELZ BARTENDING SERVICES</p></div>
 </div>
 
-<!-- LOADING -->
-<div id="v-loading" style="display:flex">
-  <div class="full-center">
-    <div>
-      <img src="rebelz%20bartending%20logo.png" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);animation:glow 2s infinite;margin-bottom:16px"/>
-      <div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--t1);margin-bottom:6px">Loading your tracker...</div>
-      <div style="font-size:9px;color:var(--gold);font-family:var(--fm);letter-spacing:.15em">REBELZ BARTENDING SERVICES</div>
-    </div>
-  </div>
+<!-- ERROR -->
+<div id="v-error" class="center hide">
+  <div><img src="rebelz%20bartending%20logo.png"/><h3>This link isn't valid</h3><p>Please ask the Rebelz Bartending team<br/>for your live tracker link.</p></div>
 </div>
 
 <!-- MAIN -->
-<div id="v-main" style="display:none">
+<div id="v-main" class="hide">
+<div class="page">
+  <div class="blob" style="width:260px;height:260px;background:var(--pink);top:-60px;right:-120px"></div>
+  <div class="blob" style="width:220px;height:220px;background:var(--aqua);top:560px;left:-140px"></div>
+  <div class="blob" style="width:240px;height:240px;background:var(--tang);top:1300px;right:-140px"></div>
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="logo-stage">
-      <img src="rebelz%20bartending%20logo.png" class="logo-img"/>
-      <div class="logo-ring1"></div>
-      <div class="logo-ring2"></div>
-    </div>
-    <div class="hero-brand">Rebelz <span>Bartending</span> Services</div>
-    <div class="hero-tag">✦ Think of Party, Think of Us ✦</div>
-    <div id="c-chip"></div>
-    <div class="ev-info-box">
-      <div class="ev-info-label">Your Live Alcohol Tracker</div>
-      <div class="ev-info-name" id="c-evname">—</div>
-      <div class="ev-info-meta" id="c-evmeta">—</div>
-    </div>
-    <div class="stats-bar">
-      <div class="stat"><div class="stat-l">Given</div><div class="stat-v" id="c-given">—</div></div>
-      <div class="stat"><div class="stat-l">Used</div><div class="stat-v" id="c-used">—</div></div>
-      <div class="stat"><div class="stat-l">Left</div><div class="stat-v hi" id="c-left">—</div></div>
-      <div class="stat"><div class="stat-l">Updated</div><div class="stat-v" style="font-size:11px;padding-top:6px" id="c-time">—</div></div>
-    </div>
-  </div>
-
-  <div class="main">
-
-    <!-- View Menu CTA (only when a menu card is attached) -->
-    <div id="c-menu-btn-wrap" style="display:none;margin-bottom:14px"></div>
-
-    <!-- Setup notice -->
-    <div id="c-setup" style="display:none" class="setup-notice">
-      <div style="font-size:16px;margin-bottom:6px">⏳</div>
-      <div style="font-size:14px;font-weight:500;color:var(--amb);margin-bottom:4px;font-family:var(--fh)">Bartender is setting up</div>
-      <div style="font-size:12px;color:var(--t2)">Confirming opening stock. This updates automatically.</div>
+  <div class="z">
+    <div class="top">
+      <div class="logo"><img src="rebelz%20bartending%20logo.png"/><div><b>REBELZ</b><small>BARTENDING</small></div></div>
+      <div id="c-pill"></div>
     </div>
 
-    <!-- ROYAL CLOSING REPORT -->
-    <div id="c-close" style="display:none"></div>
-
-    <!-- Bottles -->
-    <div id="c-bottles-wrap">
-      <div class="sec-lbl">Bottle Status</div>
-      <div id="c-bottles"></div>
+    <div class="hero">
+      <span class="kicker" id="c-kicker">TONIGHT'S BAR</span>
+      <h1 id="c-title">—</h1>
+      <svg class="squig" width="190" height="14" viewBox="0 0 190 14"><path d="M2 8 Q 14 1 26 8 T 50 8 T 74 8 T 98 8 T 122 8 T 146 8 T 170 8 T 188 6" fill="none" stroke="#ff4f8b" stroke-width="3.5" stroke-linecap="round"/></svg>
+      <div class="meta" id="c-meta"></div>
     </div>
 
-    <!-- Timeline -->
-    <div class="sec-lbl">Activity Timeline</div>
-    <div class="tl-wrap" id="c-timeline"></div>
+    <div id="c-menu"></div>
 
-    <!-- FEEDBACK -->
-    <div id="c-fb-wrap" style="display:none">
-      <div class="sec-lbl">Rate Your Experience</div>
-      <div class="fb-wrap">
+    <div id="c-setup" class="notice hide"><b>Your bar is being set up</b><span>The bartender is counting the opening stock.<br/>This page updates by itself — no need to refresh.</span></div>
+
+    <div class="stats" id="c-stats">
+      <div class="st" style="background:var(--honey)"><b id="s-given">0</b><span>bottles on the bar</span></div>
+      <div class="st" style="background:var(--aqua)"><b id="s-used">0</b><span>poured &amp; finished</span></div>
+      <div class="st" style="background:var(--lime)"><b id="s-left">0</b><span>still on the shelf</span></div>
+    </div>
+
+    <!-- closing report -->
+    <div id="c-close-wrap" class="hide">
+      <div class="sh"><h2>Closing <u>report</u></h2><small>Verified by Rebelz</small></div>
+      <div class="ticket" id="c-close"></div>
+    </div>
+
+    <div class="sh"><h2>The <u>bar shelf</u></h2><small id="c-upd">Live</small></div>
+    <div class="shelf" id="c-shelf"></div>
+
+    <div id="c-mixers-wrap" class="hide">
+      <div class="sh"><h2>Mixers by <u>Rebelz</u></h2><small>Live</small></div>
+      <div class="shelf" id="c-mixers"></div>
+    </div>
+
+    <div id="c-setup-wrap" class="hide">
+      <div class="sh"><h2>Your Rebelz <u>setup</u></h2><small id="c-setup-sub">Delivered to your event</small></div>
+      <div class="ticket" id="c-setup-ticket"></div>
+    </div>
+
+    <div id="c-glass-wrap" class="hide">
+      <div class="sh"><h2>Rental <u>glassware</u></h2><small id="c-glass-sub">With you tonight</small></div>
+      <div class="glass" id="c-glass"></div>
+    </div>
+
+    <div class="sh"><h2>Tonight's <u>story</u></h2><small>Every move, live</small></div>
+    <div class="tl" id="c-tl"></div>
+
+    <!-- feedback -->
+    <div id="c-fb-wrap" class="hide">
+      <div class="sh"><h2>How did we <u>do?</u></h2><small>30 seconds</small></div>
+      <div class="fb">
         <div id="fb-form">
-          <div style="text-align:center;margin-bottom:20px">
-            <div style="font-size:32px;margin-bottom:10px">🍸</div>
-            <div class="fb-title">How was the service?</div>
-            <div class="fb-sub">Your feedback helps us serve better at future events.<br/>Takes only 30 seconds!</div>
-          </div>
-
-          <div class="fb-q">Overall Experience</div>
-          <div class="stars" id="st-overall">
-            <span class="star" onclick="setStar('overall',1)">⭐</span>
-            <span class="star" onclick="setStar('overall',2)">⭐</span>
-            <span class="star" onclick="setStar('overall',3)">⭐</span>
-            <span class="star" onclick="setStar('overall',4)">⭐</span>
-            <span class="star" onclick="setStar('overall',5)">⭐</span>
-          </div>
-
-          <div class="fb-q">Bartender Performance</div>
-          <div class="stars" id="st-bartender">
-            <span class="star" onclick="setStar('bartender',1)">⭐</span>
-            <span class="star" onclick="setStar('bartender',2)">⭐</span>
-            <span class="star" onclick="setStar('bartender',3)">⭐</span>
-            <span class="star" onclick="setStar('bartender',4)">⭐</span>
-            <span class="star" onclick="setStar('bartender',5)">⭐</span>
-          </div>
-
-          <div class="fb-q">Cocktails & Drinks</div>
-          <div class="stars" id="st-cocktails">
-            <span class="star" onclick="setStar('cocktails',1)">⭐</span>
-            <span class="star" onclick="setStar('cocktails',2)">⭐</span>
-            <span class="star" onclick="setStar('cocktails',3)">⭐</span>
-            <span class="star" onclick="setStar('cocktails',4)">⭐</span>
-            <span class="star" onclick="setStar('cocktails',5)">⭐</span>
-          </div>
-
+          <div class="fb-title">Rate your night</div>
+          <div class="fb-sub">Your feedback helps us make every party better.</div>
+          <div class="fb-q">Overall experience</div>
+          <div class="stars" id="st-overall"></div>
+          <div class="fb-q">Bartender performance</div>
+          <div class="stars" id="st-bartender"></div>
+          <div class="fb-q">Cocktails &amp; drinks</div>
+          <div class="stars" id="st-cocktails"></div>
           <div class="fb-q">What did you love?</div>
           <div class="fb-tags" id="fb-tags">
-            <div class="fb-tag" onclick="this.classList.toggle('on')">🍹 Amazing cocktails</div>
-            <div class="fb-tag" onclick="this.classList.toggle('on')">⚡ Fast service</div>
-            <div class="fb-tag" onclick="this.classList.toggle('on')">😊 Friendly staff</div>
-            <div class="fb-tag" onclick="this.classList.toggle('on')">🎨 Creative presentation</div>
-            <div class="fb-tag" onclick="this.classList.toggle('on')">🎉 Made event special</div>
-            <div class="fb-tag" onclick="this.classList.toggle('on')">💯 Very professional</div>
-            <div class="fb-tag" onclick="this.classList.toggle('on')">🔥 Exceeded expectations</div>
+            <div class="fb-tag">🍹 Amazing cocktails</div>
+            <div class="fb-tag">⚡ Fast service</div>
+            <div class="fb-tag">😊 Friendly staff</div>
+            <div class="fb-tag">🎨 Creative presentation</div>
+            <div class="fb-tag">🎉 Made event special</div>
+            <div class="fb-tag">💯 Very professional</div>
+            <div class="fb-tag">🔥 Exceeded expectations</div>
           </div>
-
-          <div class="fb-q">Your Comments</div>
-          <textarea class="fb-inp" id="fb-comment" rows="3" placeholder="Tell us about your experience..."></textarea>
-
-          <input class="fb-inp" id="fb-name" placeholder="Your name (optional)" style="margin-bottom:18px"/>
-
+          <div class="fb-q">Your comments</div>
+          <textarea class="fb-inp" id="fb-comment" rows="3" placeholder="Tell us about your night…"></textarea>
+          <input class="fb-inp" id="fb-name" placeholder="Your name (optional)" style="margin-top:10px"/>
           <div class="fb-q">Would you book Rebelz again?</div>
-          <div class="book-row">
-            <div class="book-btn yes" id="book-yes" onclick="setBook(true)">✅ Yes, definitely!</div>
-            <div class="book-btn no" id="book-no" onclick="setBook(false)">❌ Not sure</div>
-          </div>
-
-          <button class="fb-submit" onclick="submitFb()">✦ Submit Feedback</button>
-          <div id="fb-err" style="color:var(--red);font-size:12px;text-align:center;margin-top:10px;display:none">Please give at least an overall star rating!</div>
+          <div class="book"><div class="yes" id="book-yes" onclick="setBook(true)">Yes, definitely!</div><div class="no" id="book-no" onclick="setBook(false)">Not sure</div></div>
+          <button class="fb-submit" onclick="submitFb()">SEND FEEDBACK ✦</button>
+          <div class="fb-err hide" id="fb-err">Please give at least an overall star rating</div>
         </div>
-
-        <div id="fb-done" style="display:none" class="fb-done">
-          <div class="fb-done-icon">🎉</div>
-          <div class="fb-done-title">Thank You!</div>
-          <div class="fb-done-sub">
-            Your feedback has been received.<br/>
-            We're so glad to have served you!<br/><br/>
-            <span style="color:var(--gold)">✦ Think of Party, Think of Us ✦</span>
-          </div>
-        </div>
+        <div id="fb-done" class="fb-done hide"><div>🥂</div><b>Thank you!</b><p>Your feedback has reached the Rebelz team.<br/>We loved serving at your event.</p></div>
       </div>
     </div>
 
-    <!-- Footer -->
-    <div class="footer">
-      <img src="rebelz%20bartending%20logo.png" class="footer-logo"/>
-      <div class="footer-brand">Rebelz Bartending Services</div>
-      <div class="footer-tag">✦ Think of Party, Think of Us ✦</div>
-      <div class="footer-sub">Vijayawada · Hyderabad · Visakhapatnam</div>
-      <div class="footer-sub" style="margin-top:3px">This tracker updates live automatically</div>
-    </div>
+    <div class="foot"><img src="rebelz%20bartending%20logo.png"/>Think of Party, Think of Us.<b>REBELZ BARTENDING SERVICES</b><b style="margin-top:4px">VIJAYAWADA · HYDERABAD · VISAKHAPATNAM</b></div>
   </div>
+</div>
 </div>
 
 <!-- MENU LIGHTBOX -->
-<div class="menu-lb" id="menu-lb" onclick="if(event.target===this)closeMenu()">
-  <div class="menu-lb-head">
-    <div class="menu-lb-title">Cocktail Menu<span>Rebelz Bartending</span></div>
-    <button class="menu-lb-close" onclick="closeMenu()">✕ Close</button>
-  </div>
-  <div class="menu-lb-body"><img id="menu-lb-img" src="" alt="Cocktail Menu"/></div>
+<div class="lb" id="menu-lb" onclick="if(event.target===this)closeMenu()">
+  <div class="lb-head"><b>Cocktail menu</b><button onclick="closeMenu()">✕ Close</button></div>
+  <div class="lb-body"><img id="menu-lb-img" src="" alt="Cocktail menu"/></div>
 </div>
 
 <script type="module">
@@ -372,175 +301,223 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-const COLORS={whiskey:'#c8860a',gin:'#0e9e80',vodka:'#7c5cc4',beer:'#3a7a20',wine:'#aa3870',rum:'#c04020',tequila:'#d4a017',brandy:'#8b4513',other:'#888',juices:'#e87020',softdrinks:'#c02040',soda:'#4090c8',water:'#30a8c8','nonalc-other':'#888'};
-const NONALC_CATS=['juices','softdrinks','soda','water','nonalc-other'];
-function isNonAlc(cat){return NONALC_CATS.indexOf(cat)>=0;}
-function gid(id){return document.getElementById(id);}
-function nowTime(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
-function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}):'—';}catch(e){return d||'—';}}
-function getRem(it){return Math.max(0,it.qty-(it.used||0));}
-function getSt(it){const r=getRem(it);if(r===0)return 'empty';return(r/it.qty)<=0.25?'low':'ok';}
-
-const ratings={overall:0,bartender:0,cocktails:0};
-let bookAgain=null,curEvId=null;
-
-window.setStar=function(type,val){
-  ratings[type]=val;
-  gid('st-'+type).querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('on',i<val));
+// ---------- palette & shapes ----------
+const PAL={whiskey:'#ff9a3c',vodka:'#9fd8ff',gin:'#3de0d2',rum:'#ff6a3d',wine:'#ff4f8b',beer:'#ffc447',tequila:'#c6f432',brandy:'#d9773a',other:'#b79cff',
+  juices:'#ff7a45',softdrinks:'#ff4f8b',soda:'#9fd8ff',tonic:'#3de0d2',water:'#9fd8ff',syrups:'#ffc447',gingerale:'#c6f432','nonalc-other':'#b79cff'};
+const NONALC_CATS=['juices','softdrinks','soda','tonic','water','syrups','gingerale','nonalc-other'];
+const isNonAlc=c=>NONALC_CATS.indexOf(c)>=0;
+const SHAPES={
+  spirit:'M40 6h20v8h-2v20c0 6 18 10 18 26v80c0 4-3 6-6 6H30c-3 0-6-2-6-6V60c0-16 18-20 18-26V14h-2z',
+  wine:'M43 4h14v6h-1v34c0 10 16 14 16 34v62c0 4-3 6-6 6H34c-3 0-6-2-6-6V78c0-20 16-24 16-34V10h-1z',
+  beer:'M42 14h16v8h-1v18c0 8 15 12 15 28v72c0 4-3 6-6 6H34c-3 0-6-2-6-6V68c0-16 15-20 15-28V22h-1z',
+  can:'M30 30c0-6 4-8 8-8h24c4 0 8 2 8 8v4c2 1 2 3 2 5v96c0 6-4 9-9 9H37c-5 0-9-3-9-9V39c0-2 0-4 2-5z'
 };
-window.setBook=function(val){
-  bookAgain=val;
-  gid('book-yes').classList.toggle('on',val===true);
-  gid('book-no').classList.toggle('on',val===false);
-};
-window.submitFb=function(){
-  if(!ratings.overall){gid('fb-err').style.display='block';return;}
-  gid('fb-err').style.display='none';
-  const tags=Array.from(document.querySelectorAll('.fb-tag.on')).map(t=>t.textContent.trim());
-  const fb={
-    overall:ratings.overall,bartender:ratings.bartender,cocktails:ratings.cocktails,
-    tags,book_again:bookAgain,
-    comment:gid('fb-comment').value.trim(),
-    name:gid('fb-name').value.trim()||'Guest',
-    submitted_at:new Date().toISOString()
-  };
-  if(curEvId){set(ref(db,'feedback/'+curEvId),fb);}
-  localStorage.setItem('fb_done_'+curEvId,'1');
-  gid('fb-form').style.display='none';
-  gid('fb-done').style.display='block';
-};
+const shapeOf=c=>c==='wine'?'wine':c==='beer'?'beer':isNonAlc(c)?'can':'spirit';
+const SET_COL={'Soft drinks':'#ff4f8b','Soda & mixers':'#3de0d2','Energy drinks':'#c6f432','Juices':'#ff7a45','Syrups':'#ffc447','Ice':'#9fd8ff','Disposables':'#b79cff','Bar props':'#ff9a3c'};
+const SET_ORDER=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Disposables','Bar props'];
+const RENTAL='Rental glassware';
 
-window.openMenu=function(){gid('menu-lb').classList.add('open');};
-window.closeMenu=function(){gid('menu-lb').classList.remove('open');};
-
-const params=new URLSearchParams(window.location.search);
-const evId=params.get('ev');
-curEvId=evId;
-
-// Load the event. Runs only after anonymous sign-in succeeds (needed so the
-// locked database allows this page to read the event / write feedback).
-function initEvent(){
-  if(!evId){
-    gid('v-loading').style.display='none';
-    gid('v-error').style.display='block';
-    return;
-  }
-  onValue(ref(db,'events/'+evId),(snap)=>{
-    gid('v-loading').style.display='none';
-    const ev=snap.val();
-    if(!ev){gid('v-error').style.display='flex';gid('v-main').style.display='none';return;}
-    renderDash(ev);
-    const fbWrap=gid('c-fb-wrap');
-    if(ev.status==='closed'){
-      fbWrap.style.display='block';
-      if(localStorage.getItem('fb_done_'+evId)){gid('fb-form').style.display='none';gid('fb-done').style.display='block';}
-    } else fbWrap.style.display='none';
-  });
+// Rental glass silhouettes, picked by the glass name
+function glassSVG(name){
+  const n=String(name).toLowerCase(), s='fill="none" stroke="#3de0d2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"', L='#ff4f8b';
+  if(/old\s*fash|rock|whisk|lowball|tumbler/.test(n))   // old fashioned
+    return `<svg viewBox="0 0 44 52"><path d="M14 30h16v11H14z" fill="#ff9a3c" opacity=".85"/><rect x="17" y="24" width="8" height="8" rx="1.5" fill="#fff4e2" opacity=".8"/><path d="M9 18h26l-2 26c0 2-1 3-3 3H14c-2 0-3-1-3-3z" ${s}/><path d="M11 40h22" ${s} opacity=".5"/></svg>`;
+  if(/martini|coupe|cocktail/.test(n))
+    return `<svg viewBox="0 0 44 52"><path d="M10 12h24L22 25z" fill="${L}" opacity=".8"/><path d="M5 7h34L22 27zM22 27v17M14 47h16" ${s}/><circle cx="29" cy="11" r="2.2" fill="#c6f432"/></svg>`;
+  if(/champ|flute|prosecco/.test(n))
+    return `<svg viewBox="0 0 44 52"><path d="M18 9h8l-.5 15c0 3-1.5 5-3.5 5s-3.5-2-3.5-5z" fill="#ffc447" opacity=".85"/><path d="M17 3h10l-1 22c0 4-2 6-4 6s-4-2-4-6zM22 31v12M15 47h14" ${s}/></svg>`;
+  if(/shot/.test(n))
+    return `<svg viewBox="0 0 44 52"><path d="M15 28h14l-1 12H16z" fill="#ff9a3c" opacity=".85"/><path d="M13 16h18l-2 27c0 1-1 2-2 2H17c-1 0-2-1-2-2z" ${s}/></svg>`;
+  if(/beer|pint|mug|pilsner/.test(n))
+    return `<svg viewBox="0 0 44 52"><path d="M12 16h18v26H12z" fill="#ffc447" opacity=".85"/><path d="M12 13c2-4 16-4 18 0" fill="#fff4e2"/><path d="M10 10h22v34c0 2-1 3-3 3H13c-2 0-3-1-3-3zM32 18h4c2 0 3 1 3 3v10c0 2-1 3-3 3h-4" ${s}/></svg>`;
+  if(/high\s*ball|collins|tall|cooler|mocktail/.test(n))
+    return `<svg viewBox="0 0 44 52"><path d="M15 20h14v24H15z" fill="${L}" opacity=".75"/><path d="M26 3l-4 20" stroke="#c6f432" stroke-width="2.4" stroke-linecap="round"/><path d="M13 9h18l-1 37c0 1-1 2-2 2H16c-1 0-2-1-2-2z" ${s}/></svg>`;
+  if(/wine|goblet|red|white/.test(n))
+    return `<svg viewBox="0 0 44 52"><path d="M10 12h24c-1 8-4 12-12 12s-11-4-12-12z" fill="${L}" opacity=".8"/><path d="M9 5h26c0 14-4 20-13 21-9-1-13-7-13-21zM22 26v16M14 46h16" ${s}/></svg>`;
+  return `<svg viewBox="0 0 44 52"><path d="M14 22h16v20H14z" fill="#b79cff" opacity=".8"/><path d="M11 10h22l-2 34c0 2-1 3-3 3H16c-2 0-3-1-3-3z" ${s}/></svg>`;
 }
 
-// Silent anonymous sign-in — the guest just opens the link, no login screen.
-let evInit=false;
-onAuthStateChanged(auth,(user)=>{ if(user && !evInit){ evInit=true; initEvent(); } });
-signInAnonymously(auth).catch((e)=>{
-  console.error('Anonymous sign-in failed:', e);
-  gid('v-loading').style.display='none';
-  gid('v-error').style.display='block';
+// ---------- helpers ----------
+const gid=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const asList=x=>Array.isArray(x)?x:(x?Object.values(x):[]);
+const getRem=it=>Math.max(0,(it.qty||0)-(it.used||0));
+function fmtDate(d){try{return d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';}catch(e){return d||'—';}}
+const fmtTime=t=>{try{return new Date(t).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true});}catch(e){return '';}};
+const show=(id,on)=>gid(id).classList.toggle('hide',!on);
+
+// ---------- feedback ----------
+const ratings={overall:0,bartender:0,cocktails:0};
+let bookAgain=null;
+['overall','bartender','cocktails'].forEach(k=>{
+  gid('st-'+k).innerHTML=[1,2,3,4,5].map(v=>`<div class="star" onclick="setStar('${k}',${v})">⭐</div>`).join('');
 });
+document.querySelectorAll('.fb-tag').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('on')));
+window.setStar=(k,v)=>{ratings[k]=v;gid('st-'+k).querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('on',i<v));};
+window.setBook=v=>{bookAgain=v;gid('book-yes').classList.toggle('on',v===true);gid('book-no').classList.toggle('on',v===false);};
+window.submitFb=function(){
+  if(!ratings.overall){show('fb-err',true);return;}
+  show('fb-err',false);
+  const fb={overall:ratings.overall,bartender:ratings.bartender,cocktails:ratings.cocktails,
+    tags:[...document.querySelectorAll('.fb-tag.on')].map(t=>t.textContent.trim()),book_again:bookAgain,
+    comment:gid('fb-comment').value.trim(),name:gid('fb-name').value.trim()||'Guest',submitted_at:new Date().toISOString()};
+  if(evId) set(ref(db,'feedback/'+evId),fb);
+  localStorage.setItem('fb_done_'+evId,'1');
+  show('fb-form',false); show('fb-done',true);
+};
+window.openMenu=()=>gid('menu-lb').classList.add('open');
+window.closeMenu=()=>gid('menu-lb').classList.remove('open');
 
-function renderDash(ev){
-  gid('v-error').style.display='none';gid('v-main').style.display='block';
-  document.title=ev.event_name+' — Rebelz Tracker';
-  gid('c-evname').textContent=ev.event_name+' — '+ev.client_name;
-  gid('c-evmeta').textContent=fmtDate(ev.event_date)+' · '+(ev.venue||ev.city||'')+(ev.guests?' · '+ev.guests+' guests':'');
+// ---------- load ----------
+const evId=new URLSearchParams(location.search).get('ev');
+function fail(){show('v-loading',false);show('v-main',false);show('v-error',true);}
+function initEvent(){
+  if(!evId){fail();return;}
+  onValue(ref(db,'events/'+evId),snap=>{
+    const ev=snap.val();
+    show('v-loading',false);
+    if(!ev){fail();return;}
+    show('v-error',false); show('v-main',true);
+    render(ev);
+  });
+}
+let evInit=false;
+onAuthStateChanged(auth,u=>{if(u&&!evInit){evInit=true;initEvent();}});
+signInAnonymously(auth).catch(e=>{console.error('Anonymous sign-in failed:',e);fail();});
 
-  const chip=gid('c-chip');
-  if(ev.status==='live') chip.innerHTML='<div class="chip-live"><div class="chip-dot"></div><div class="chip-txt">Live Now</div></div>';
-  else if(ev.status==='closed') chip.innerHTML='<div class="chip-live" style="background:#c9a84c14"><div class="chip-txt" style="color:var(--gold2)">✦ Event Concluded</div></div>';
-  else chip.innerHTML='<div class="chip-setup"><div class="chip-setup-dot"></div><div class="chip-setup-txt">Setting Up</div></div>';
+// ---------- render ----------
+let counted=false;
+function countUp(id,to){
+  const el=gid(id);
+  if(counted||!to){el.textContent=to;return;}
+  let n=0;const step=Math.max(1,Math.ceil(to/30));
+  const t=setInterval(()=>{n=Math.min(to,n+step);el.textContent=n;if(n>=to)clearInterval(t);},35);
+}
+function bottle(it,i,prefix){
+  const left=getRem(it), qty=it.qty||0, pct=qty?left/qty:0, col=PAL[it.cat]||PAL.other;
+  const top=146-(126*pct), id=prefix+i, d=SHAPES[shapeOf(it.cat)];
+  const flag=left===0?'<div class="low out">ALL POURED</div>':(pct<=.25?'<div class="low">RUNNING LOW</div>':'');
+  return `<div class="bt">
+   <svg viewBox="0 0 100 150" aria-label="${esc(it.name)}: ${left} of ${qty} left"><defs><clipPath id="${id}"><path d="${d}"/></clipPath></defs>
+    <path d="${d}" fill="#2a2042"/>
+    ${left?`<g clip-path="url(#${id})">
+      <rect x="0" y="${top+4}" width="100" height="150" fill="${col}"/>
+      <path class="wave" d="M0 ${top+4} q10 -6 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 v12 h-140z" fill="${col}"/>
+      <rect x="30" y="${top+10}" width="7" height="${Math.max(0,140-top-14)}" rx="3" fill="#ffffff33"/></g>`:''}
+    <path d="${d}" fill="none" stroke="${col}" stroke-width="2.5" opacity=".9"/>
+    <rect x="30" y="86" width="40" height="26" rx="4" fill="#fff4e2" opacity=".92"/>
+    <text x="50" y="104" text-anchor="middle" font-family="Unbounded,Arial Black,sans-serif" font-weight="800" font-size="13" fill="#21172f">${left}</text>
+   </svg>
+   <div class="nm">${esc(it.name)}</div>
+   <div class="ct"><b>${left}</b> of ${qty} left</div>
+   <div class="tg" style="background:${col}22;color:${col}">${esc(it.cat==='nonalc-other'?'mixer':it.cat)}</div>${flag}</div>`;
+}
+function shelfHTML(items,prefix){
+  let h='';items.forEach((it,i)=>{h+=bottle(it,i,prefix);if(i%3===2||i===items.length-1)h+='<div class="plank"></div>';});
+  return h;
+}
+// what Rebelz delivered: confirmed received counts (or packed counts) + mid-event extras
+function supplies(ev){
+  const m={},order=[];
+  const add=(cat,name,unit,q)=>{const k=cat+'|'+String(name).toLowerCase();if(!m[k]){m[k]={cat,name,unit,qty:0};order.push(k);}m[k].qty+=q;};
+  let state='none';
+  if(ev.indent_rcv){state='delivered';asList(ev.indent_rcv.items).forEach(l=>add(l.cat,l.name,l.unit,l.received||0));}
+  else if(ev.indent){state='packed';asList(ev.indent.items).forEach(l=>add(l.cat,l.name,l.unit,l.qty||0));}
+  asList(ev.extras).forEach(x=>{add(x.cat,x.name,x.unit,x.qty||0);if(state==='none')state='delivered';});
+  return {state,items:order.map(k=>m[k]).filter(x=>x.qty>0)};
+}
+function render(ev){
+  document.title=(ev.event_name||'Your event')+' — Rebelz Live Bar';
+  const st=ev.status||'setup';
+  gid('c-pill').innerHTML=st==='live'?'<div class="pill p-live"><i></i>LIVE BAR</div>':st==='closed'?'<div class="pill p-done"><i></i>CONCLUDED</div>':'<div class="pill p-setup"><i></i>SETTING UP</div>';
+  gid('c-kicker').textContent=st==='closed'?'THAT WAS A NIGHT':"TONIGHT'S BAR";
 
-  // View Menu button — only when a menu card is attached to this event
-  const mb=gid('c-menu-btn-wrap');
-  if(ev.menu_img){
-    mb.style.display='block';
-    mb.innerHTML='<button class="menu-cta" onclick="openMenu()">🍸 View Cocktail Menu</button>';
-    gid('menu-lb-img').src=ev.menu_img;
-  } else { mb.style.display='none'; }
+  // Title: last word of the event name in italic gold, client name on top
+  const words=String(ev.event_name||'Your Event').trim().split(/\s+/);
+  const lastW=words.pop();
+  gid('c-title').innerHTML=(ev.client_name?esc(ev.client_name)+"'s<br/>":'')+(words.length?esc(words.join(' '))+' ':'')+`<em>${esc(lastW)}</em>`;
+  const venue=ev.venue||'';
+  const venueChip=/^https?:\/\//.test(venue)?`<span>📍 <a href="${esc(venue)}" target="_blank" rel="noopener">${esc(ev.city||'Venue')} · map</a></span>`:`<span>📍 ${esc(venue||ev.city||'—')}</span>`;
+  gid('c-meta').innerHTML=`<span>📅 ${esc(fmtDate(ev.event_date))}</span>${venueChip}${ev.guests?`<span>👥 ${esc(ev.guests)} guests</span>`:''}`;
 
-  const stock=ev.stock||[];
-  const tot=stock.reduce((s,i)=>s+i.qty,0);
-  const used=stock.reduce((s,i)=>s+(i.used||0),0);
-  gid('c-given').textContent=tot||'—';gid('c-used').textContent=used||'—';
-  gid('c-left').textContent=tot?Math.max(0,tot-used):'—';gid('c-time').textContent=nowTime();
+  if(ev.menu_img){gid('c-menu').innerHTML='<button class="menu-cta" onclick="openMenu()">🍸 VIEW COCKTAIL MENU</button>';gid('menu-lb-img').src=ev.menu_img;}
+  else gid('c-menu').innerHTML='';
 
-  gid('c-close').style.display=ev.status==='closed'?'block':'none';
-  if(ev.status==='closed'){
-    const leftItems=stock.filter(i=>getRem(i)>0);
-    const consumedItems=stock.filter(i=>(i.used||0)>0);
-    const mlItems=(ev.closing&&ev.closing.items||[]).filter(c=>(c.openBottles||0)>0||(c.mlLeft||0)>0);
-    let crHtml=`<div class="cr-wrap">
-      <div class="cr-crest">🥂</div>
-      <div class="cr-title">Closing Report</div>
-      <div class="cr-sub">Rebelz Bartending Services · Verified</div>
-      <div class="cr-stats">
-        <div class="cr-stat"><div class="cr-stat-l">Given</div><div class="cr-stat-v">${tot}</div></div>
-        <div class="cr-stat"><div class="cr-stat-l">Consumed</div><div class="cr-stat-v">${used}</div></div>
-        <div class="cr-stat"><div class="cr-stat-l">Left Over</div><div class="cr-stat-v">${Math.max(0,tot-used)}</div></div>
-      </div>`;
-    if(consumedItems.length){
-      crHtml+=`<div class="cr-sec-lbl">Consumed</div><div class="cr-list">${consumedItems.map(i=>`<div class="cr-item"><span class="cr-item-name">${i.name}</span><span class="cr-item-val">${i.used} consumed</span></div>`).join('')}</div>`;
-    }
-    if(leftItems.length){
-      crHtml+=`<div class="cr-sec-lbl">Left Over — Full Bottles</div><div class="cr-list">${leftItems.map(i=>`<div class="cr-item"><span class="cr-item-name">${i.name}</span><span class="cr-item-val">${getRem(i)} left</span></div>`).join('')}</div>`;
-    }
-    if(mlItems.length){
-      crHtml+=`<div class="cr-sec-lbl">Open Bottles — ML Remaining</div><div class="cr-list">${mlItems.map(c=>`<div class="cr-item"><span class="cr-item-name">${c.name}</span><span class="cr-item-val">${c.openBottles} open · ~${c.mlLeft} ml</span></div>`).join('')}</div>`;
-    }
-    crHtml+=`<div class="cr-line"></div>
-      <div class="cr-thanks">Thank you for choosing Rebelz</div>
-      <div class="cr-tag">✦ THINK OF PARTY, THINK OF US ✦</div>
-    </div>`;
-    gid('c-close').innerHTML=crHtml;
+  const stock=asList(ev.stock), confirmed=!!ev.stock_confirmed&&stock.length>0;
+  show('c-setup',!confirmed&&st!=='closed');
+
+  // stats (alcohol + legacy mixers, same as before)
+  const tot=stock.reduce((s,i)=>s+(i.qty||0),0), used=stock.reduce((s,i)=>s+(i.used||0),0);
+  show('c-stats',confirmed);
+  if(confirmed){countUp('s-given',tot);countUp('s-used',used);countUp('s-left',Math.max(0,tot-used));counted=true;}
+  gid('c-upd').textContent='Live · '+new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true});
+
+  // bottle shelf
+  const alc=stock.filter(i=>!isNonAlc(i.cat)), mix=stock.filter(i=>isNonAlc(i.cat));
+  gid('c-shelf').innerHTML=confirmed&&alc.length?shelfHTML(alc,'a'):`<div class="empty-shelf">${confirmed?'No bottles on the shelf.':'Your bottles appear here once the bartender confirms the opening stock.'}</div>`;
+  show('c-mixers-wrap',confirmed&&mix.length>0);
+  if(mix.length) gid('c-mixers').innerHTML=shelfHTML(mix,'m');
+
+  // Your Rebelz setup (list only — no consumption)
+  const sup=supplies(ev);
+  const setupItems=sup.items.filter(x=>x.cat!==RENTAL);
+  show('c-setup-wrap',setupItems.length>0);
+  if(setupItems.length){
+    gid('c-setup-sub').textContent=sup.state==='delivered'?'Delivered to your event':'Packed at the Rebelz store';
+    let h=`<div class="th"><b>Bar setup</b><span>${sup.state==='delivered'?'✓ DELIVERED':'📦 ON ITS WAY'}</span></div>`;
+    const cats=[...SET_ORDER,...new Set(setupItems.map(x=>x.cat).filter(c=>SET_ORDER.indexOf(c)<0))];
+    cats.forEach(cat=>{
+      const rows=setupItems.filter(x=>x.cat===cat); if(!rows.length) return;
+      h+=`<div class="grp"><div class="gl"><i style="background:${SET_COL[cat]||'#b79cff'}"></i>${esc(cat)}</div><div class="chips">${
+        rows.map(x=>`<span class="chip">${esc(x.name)}<b>${x.qty}</b>${['bag','packet','litre','kg','box','tray'].indexOf(x.unit)>=0?`<small>${esc(x.unit==='packet'?'pkt':x.unit)}</small>`:''}</span>`).join('')}</div></div>`;
+    });
+    gid('c-setup-ticket').innerHTML=h;
   }
-  gid('c-setup').style.display=(!ev.stock_confirmed)?'block':'none';
 
-  const bEl=gid('c-bottles');
-  if(!ev.stock_confirmed||!stock.length){
-    bEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--t3);font-size:13px;background:var(--s1);border-radius:14px;border:0.5px solid var(--b1)">Bartender is confirming stock...<br/>This updates automatically.</div>';
-  } else {
-    const cardHtml=item=>{
-      const rem=getRem(item);const st=getSt(item);
-      const pct=Math.round((rem/item.qty)*100);
-      const col=COLORS[item.cat]||'#888';
-      const maxShow=Math.min(item.qty,20);
-      const filled=Math.round((rem/item.qty)*maxShow);
-      const bottles=Array.from({length:maxShow},(_,i)=>`<div class="btl" style="background:${i<filled?col:'#1d1a15'}"></div>`).join('');
-      return `<div class="bc ${st}">
-        <div class="bc-top">
-          <div class="bc-left"><div class="bc-dot" style="background:${col}"></div><div class="bc-name">${item.name}</div></div>
-          <div style="text-align:right"><div class="bc-rem ${st}">${rem}</div><div class="bc-rem-l">remaining</div></div>
-        </div>
-        <div class="bc-bottles">${bottles}</div>
-        <div class="bc-prog"><div class="bc-fill ${st}" style="width:${pct}%"></div></div>
-        <div class="bc-nums"><span>Given: ${item.qty}</span><span>Used: ${item.used||0}</span><span>Left: ${rem} (${pct}%)</span></div>
-      </div>`;
-    };
-    const alc=stock.filter(i=>!isNonAlc(i.cat));
-    const na=stock.filter(i=>isNonAlc(i.cat));
-    let h=alc.map(cardHtml).join('');
-    if(na.length)h+='<div class="sec-lbl" style="margin-top:16px">Non-Alcoholic — Rebelz Supply</div>'+na.map(cardHtml).join('');
-    bEl.innerHTML=h;
-  }
-
-  const tl=gid('c-timeline');
-  if(!ev.log||!ev.log.length){
-    tl.innerHTML='<div class="tl-item"><div class="tl-dot info"></div><div class="tl-msg">Waiting for first update from your bartender...</div><div class="tl-time">—</div></div>';
-  } else {
-    tl.innerHTML=ev.log.slice(0,15).map(l=>{
-      const t=new Date(l.time).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-      const st=l.msg.toLowerCase().includes('low')?'low':l.msg.toLowerCase().includes('closed')||l.msg.toLowerCase().includes('all done')?'empty':'ok';
-      return `<div class="tl-item"><div class="tl-dot ${st}"></div><div class="tl-msg">${l.msg}</div><div class="tl-time">${t}</div></div>`;
+  // Rental glassware — sent + breakage (after closing)
+  const ret=ev.returns&&asList(ev.returns.rental);
+  const glasses=ret&&ret.length?ret.map(g=>({name:g.name,sent:g.sent,broken:g.broken||0,missing:g.missing||0,final:true}))
+    :sup.items.filter(x=>x.cat===RENTAL).map(g=>({name:g.name,sent:g.qty,final:false}));
+  show('c-glass-wrap',glasses.length>0);
+  if(glasses.length){
+    gid('c-glass-sub').textContent=glasses[0].final?'Counted at closing':'With you tonight';
+    gid('c-glass').innerHTML=glasses.map(g=>{
+      let badge='<span class="gb tn">with you tonight</span>';
+      if(g.final){
+        const lost=[g.broken?g.broken+' broken':'',g.missing?g.missing+' missing':''].filter(Boolean).join(' · ');
+        badge=lost?`<span class="gb br">${lost}</span>`:'<span class="gb ok">all safe ✓</span>';
+      }
+      return `<div class="gc">${glassSVG(g.name)}<div class="gn">${esc(g.name)}</div><div class="gs">${g.sent}</div><div class="gu">SENT</div>${badge}</div>`;
     }).join('');
   }
+
+  // Closing report
+  show('c-close-wrap',st==='closed');
+  if(st==='closed'){
+    const consumed=stock.filter(i=>(i.used||0)>0), leftover=stock.filter(i=>getRem(i)>0);
+    const ml=asList(ev.closing&&ev.closing.items).filter(c=>(c.openBottles||0)>0||(c.mlLeft||0)>0);
+    let h=`<div class="th"><b>Final count</b><span>✓ VERIFIED</span></div>
+      <div class="cr-stats"><div><b>${tot}</b><span>Given</span></div><div><b>${used}</b><span>Consumed</span></div><div><b>${Math.max(0,tot-used)}</b><span>Left over</span></div></div>`;
+    const sec=(title,col,rows)=>rows.length?`<div class="grp"><div class="gl"><i style="background:${col}"></i>${title}</div>${rows.join('')}</div>`:'';
+    h+=sec('Consumed','#ff4f8b',consumed.map(i=>`<div class="cr-row"><b>${esc(i.name)}</b><span>${i.used} consumed</span></div>`));
+    h+=sec('Left over — full bottles','#c6f432',leftover.map(i=>`<div class="cr-row"><b>${esc(i.name)}</b><span>${getRem(i)} left</span></div>`));
+    h+=sec('Open bottles — ml remaining','#3de0d2',ml.map(c=>`<div class="cr-row"><b>${esc(c.name)}</b><span>${c.openBottles} open · ~${c.mlLeft} ml</span></div>`));
+    h+=`<div class="cr-thanks">Thank you for choosing Rebelz<small>THINK OF PARTY, THINK OF US</small></div>`;
+    gid('c-close').innerHTML=h;
+  }
+
+  // Timeline
+  // Office-only entries (indent checks, returns, photos, corrections) stay internal
+  const INTERNAL=/store indent|return to office|removed mid-event|photo|status:|not matching|undo/i;
+  const log=asList(ev.log).filter(l=>l&&l.msg&&!INTERNAL.test(l.msg))
+    .map(l=>({...l,msg:String(l.msg).replace(/\s*\((bought locally|sent by store)\)/i,'')}));
+  const colFor=m=>{m=m.toLowerCase();return /closed|all done|fully/.test(m)?'#ff4f8b':/low/.test(m)?'#ffc447':/added|extra|new drink|restock/.test(m)?'#b79cff':/consumed|undo/.test(m)?'#ff9a3c':/confirm|live|received|team/.test(m)?'#c6f432':'#3de0d2';};
+  gid('c-tl').innerHTML=log.length?log.slice(0,15).map(l=>`<div class="ti" style="--c:${colFor(l.msg||'')}"><b>${esc(l.msg)}</b><span>${esc(fmtTime(l.time))}</span></div>`).join('')
+    :'<div class="ti" style="--c:#3de0d2"><b>Waiting for the first update from your bartender…</b><span>—</span></div>';
+
+  // Feedback after closing
+  show('c-fb-wrap',st==='closed');
+  if(st==='closed'&&localStorage.getItem('fb_done_'+evId)){show('fb-form',false);show('fb-done',true);}
 }
 </script>
 </body>
