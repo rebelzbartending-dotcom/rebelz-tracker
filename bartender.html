@@ -145,6 +145,24 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--fb);opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .divider{height:0.5px;background:var(--b1);margin:12px 0}
+/* ---- Store indent / supplies / returns ---- */
+.sp-grp{font-size:9px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin:12px 0 6px;display:flex;justify-content:space-between;align-items:center}
+.sp-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:0.5px solid var(--b1)}
+.sp-row:first-of-type{border-top:none}
+.sp-name{flex:1;min-width:0;font-size:13px;font-weight:500;color:var(--t1)}
+.sp-sub{font-size:9px;color:var(--t3);font-family:var(--fm);margin-top:2px}
+.sp-inp{width:64px;background:var(--s1);border:0.5px solid var(--b2);border-radius:8px;padding:8px 4px;color:var(--gold2);font-size:16px;font-family:var(--fh);font-weight:700;text-align:center;outline:none}
+.sp-inp.diff{border-color:var(--red);color:var(--red)}
+.sp-tag{font-size:8px;font-family:var(--fm);padding:2px 7px;border-radius:8px;letter-spacing:.04em}
+.sp-ok{background:#40c87015;color:var(--grn);border:0.5px solid #40c87040}
+.sp-warn{background:#f5a02015;color:var(--amb);border:0.5px solid #f5a02040}
+.sp-bad{background:#e8404015;color:var(--red);border:0.5px solid #e8404040}
+.src-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.src-btn{padding:10px;border-radius:10px;border:0.5px solid var(--b2);background:var(--s2);color:var(--t2);font-size:12px;font-weight:600;text-align:center;cursor:pointer}
+.src-btn.on{border-color:var(--gold);color:var(--gold2);background:#c8981e15}
+.rt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.rt-grid label{display:block;font-size:8px;color:var(--gold);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;text-align:center}
+#net-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--amb);color:#1a1000;font-size:11px;font-weight:700;text-align:center;padding:6px;font-family:var(--fm)}
 .error-screen{display:flex;align-items:center;justify-content:center;min-height:80vh;padding:24px;text-align:center}
 
 /* ===== POLISH ===== */
@@ -245,6 +263,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     <div style="background:#f5a02012;border:0.5px solid #f5a02030;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--amb);line-height:1.7">
       <strong>Step 2 of 3 — Opening Stock:</strong> Add each brand one by one, exactly matching what the client has brought. Then photos → confirm → go live.
     </div>
+    <div class="card" id="indent-card" style="display:none;border-color:var(--gold-dim)"></div>
     <div class="card">
       <div class="card-title">Step 1 — Alcoholic Beverages</div>
       <div style="font-size:10px;color:var(--t3);margin-bottom:10px;font-family:var(--fm)">Add one brand at a time:</div>
@@ -344,6 +363,9 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
     <div style="font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:10px">Live Consumption — Tap to Update</div>
     <div id="drink-cards"></div>
 
+    <!-- REBELZ SUPPLIES (store indent + mid-event items) -->
+    <div class="card" id="supplies-card" style="display:none;border-color:var(--gold-dim)"></div>
+
     <!-- ADD NEW DRINK -->
     <div class="card" style="border-color:var(--gold-dim)">
       <div class="card-title" style="color:var(--gold2)">+ New Drink Added by Client</div>
@@ -406,8 +428,9 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       <div class="photo-note">For each <strong style="color:var(--gold2)">alcohol</strong> drink: how many bottles are <strong style="color:var(--gold2)">open</strong> and roughly how much <strong style="color:var(--gold2)">ML is left</strong>. Non-alcoholic items just show consumed.</div>
       <div id="close-items"></div>
     </div>
+    <div class="card" id="return-card" style="display:none;border-color:var(--gold-dim)"></div>
     <div class="card">
-      <div class="card-title">Step 2 — Closing Photos (Required)</div>
+      <div class="card-title" id="cl-photo-title">Step 2 — Closing Photos (Required)</div>
       <div class="photo-note">Attach <strong style="color:var(--gold2)">3 photos</strong> of the closing stock / bar counter. <em>Visible to Admin only.</em></div>
       <div class="photo-grid three">
         <div class="photo-slot" id="cl-slot-0" onclick="pickPhoto('close',0)">
@@ -422,7 +445,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
       </div>
     </div>
     <div class="card">
-      <div class="card-title">Step 3 — Close Event</div>
+      <div class="card-title" id="cl-close-title">Step 3 — Close Event</div>
       <div class="confirm-box">
         <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--gold2);margin-bottom:6px">Ready to close?</div>
         <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6">Final closing report will be sent on WhatsApp to client and manager — same as always.</div>
@@ -438,6 +461,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 <input type="file" id="photo-input" accept="image/*" style="display:none"/>
 
 <div class="toast" id="toast"></div>
+<div id="net-banner">📶 Weak / no network — your entries are saved on this phone and will sync automatically</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -536,7 +560,8 @@ function initEvent(){
     } else {
       const wasLoggedIn=curEv._loggedIn;
       curEv=data;curEv._loggedIn=wasLoggedIn;
-      if(wasLoggedIn&&curEv.stock_confirmed){renderCards();renderLog();}
+      if(wasLoggedIn&&curEv.stock_confirmed){renderCards();renderLog();renderSupplies();}
+      if(wasLoggedIn&&gid('scr-setup').classList.contains('active')) renderIndentCard('setup');
       if(wasLoggedIn&&gid('scr-menu').classList.contains('active')) renderMenuScreen();
     }
   });
@@ -641,8 +666,10 @@ window.saveTeam=function(){
 function showSetup(){
   showScreen('scr-setup');gid('setup-ev-label').textContent=curEv.event_name;
   setupDrinks=[];
-  gid('nonalc-card').style.display=curEv.non_alc?'block':'none';
-  if(curEv.non_alc) renderNAFixed();
+  const useOldNA=curEv.non_alc&&!curEv.indent;   // store indent replaces the old fixed list
+  gid('nonalc-card').style.display=useOldNA?'block':'none';
+  if(useOldNA) renderNAFixed();
+  renderIndentCard('setup');
   renderSetupItems();
 }
 
@@ -729,6 +756,7 @@ function buildOpeningMsg(){
 }
 
 window.confirmStock=function(){
+  if(curEv.indent&&!indentConfirmed()){toast('📦 Confirm the store indent first (top of this page)');const c=gid('indent-card');if(c)c.scrollIntoView({behavior:'smooth'});return;}
   if(!setupDrinks.length){toast('Add at least one drink first');return;}
   if(!openPhotos[0]||!openPhotos[1]){toast('📷 Attach both opening photos first!');return;}
   curEv.stock=setupDrinks.map(d=>({...d,used:0}));
@@ -751,7 +779,7 @@ function showPanel(){
   gid('panel-ev-name').textContent=curEv.event_name;
   gid('panel-ev-meta').textContent=curEv.client_name+' · '+fmtDate(curEv.event_date)+' · '+(curEv.city||'')+(curEv.guests?' · '+curEv.guests+' guests':'');
   gid('ev-status').value=curEv.status;
-  renderCards();renderLog();
+  renderCards();renderLog();renderSupplies();
 }
 
 function renderMetrics(){
@@ -842,6 +870,10 @@ function buildSummaryMsg(){
   const lines=curEv.stock.map(i=>`  • ${i.name}: ${i.used||0} used / ${getRem(i)} remaining`).join('\n');
   return `🍸 *Rebelz Bartending — ${curEv.event_name}*\n*Update (${nowTime()}):*\n\n${lines}\n\n📊 ${curEv.stock.reduce((s,i)=>s+(i.used||0),0)} consumed · ${curEv.stock.reduce((s,i)=>s+getRem(i),0)} remaining\n\n_Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦`;
 }
+function rentalMsgLines(){
+  const r=curEv.returns&&curEv.returns.rental; if(!r||!r.length) return '';
+  return '\n\n🍷 *Rental Glassware:*\n'+r.map(g=>`  • ${g.name}: ${g.sent} sent · ${g.returned} returned${g.broken?` · ${g.broken} broken`:''}${g.missing?` · ${g.missing} missing`:''}`).join('\n');
+}
 function buildClosingMsg(){
   const consumed=curEv.stock.filter(i=>(i.used||0)>0).map(i=>`  • ${i.name}: ${i.used} consumed`).join('\n');
   const leftover=curEv.stock.filter(i=>getRem(i)>0).map(i=>`  • ${i.name}: ${getRem(i)} left over`).join('\n');
@@ -849,7 +881,7 @@ function buildClosingMsg(){
   if(curEv.closing&&curEv.closing.items){
     mlLines=curEv.closing.items.filter(c=>(c.openBottles||0)>0||(c.mlLeft||0)>0).map(c=>`  • ${c.name}: ${c.openBottles} open bottle${c.openBottles!==1?'s':''} · approx ${c.mlLeft} ml left`).join('\n');
   }
-  return `✅ *Rebelz Bartending Services*\n*CLOSING REPORT*\n*${curEv.event_name} — ${fmtDate(curEv.event_date)}*\n━━━━━━━━━━━━━━━\n\n🥃 *Consumed:*\n${consumed||'  None'}\n\n📦 *Left Over (Full Bottles):*\n${leftover||'  None'}${mlLines?`\n\n🍾 *Open Bottles & ML Remaining:*\n${mlLines}`:''}\n\n📊 *Final Summary:*\n  Given: ${curEv.stock.reduce((s,i)=>s+i.qty,0)}\n  Consumed: ${curEv.stock.reduce((s,i)=>s+(i.used||0),0)}\n  Left Over: ${curEv.stock.reduce((s,i)=>s+getRem(i),0)}\n\n_Verified by Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦\nVijayawada · Hyderabad · Visakhapatnam`;
+  return `✅ *Rebelz Bartending Services*\n*CLOSING REPORT*\n*${curEv.event_name} — ${fmtDate(curEv.event_date)}*\n━━━━━━━━━━━━━━━\n\n🥃 *Consumed:*\n${consumed||'  None'}\n\n📦 *Left Over (Full Bottles):*\n${leftover||'  None'}${mlLines?`\n\n🍾 *Open Bottles & ML Remaining:*\n${mlLines}`:''}${rentalMsgLines()}\n\n📊 *Final Summary:*\n  Given: ${curEv.stock.reduce((s,i)=>s+i.qty,0)}\n  Consumed: ${curEv.stock.reduce((s,i)=>s+(i.used||0),0)}\n  Left Over: ${curEv.stock.reduce((s,i)=>s+getRem(i),0)}\n\n_Verified by Rebelz Bartending Services_\n✦ Think of Party, Think of Us ✦\nVijayawada · Hyderabad · Visakhapatnam`;
 }
 function openWA(msg,phone){const p=(phone||'').replace(/\D/g,'');const full=p.length===10?'91'+p:p;window.open('https://wa.me/'+full+'?text='+encodeURIComponent(msg),'_blank');}
 
@@ -880,8 +912,17 @@ window.closeEventFn=function(){
   }).join('')||'<div style="text-align:center;padding:14px;font-size:11px;color:var(--t3)">No stock items</div>';
 };
 window.cancelClosing=function(){showPanel();};
+const _closeEventFn=window.closeEventFn;
+window.closeEventFn=function(){
+  _closeEventFn();
+  const has=renderReturnCard();
+  gid('cl-photo-title').textContent=(has?'Step 3':'Step 2')+' — Closing Photos (Required)';
+  gid('cl-close-title').textContent=(has?'Step 4':'Step 3')+' — Close Event';
+};
 window.finalizeClose=function(){
   if(!closePhotos[0]||!closePhotos[1]||!closePhotos[2]){toast('📷 Attach all 3 closing photos first!');return;}
+  const ret=collectReturns(); if(ret===false) return;
+  if(ret) curEv.returns=ret;
   // Save closing verification data (admin + Excel)
   curEv.closing={
     items:(curEv.stock||[]).map((it,i)=>{
@@ -923,6 +964,217 @@ function renderLog(){
     return `<div class="log-item"><span style="color:var(--t2);flex:1">${l.msg}</span><span style="color:var(--t3);font-family:var(--fm);font-size:9px;flex-shrink:0">${t}</span></div>`;
   }).join('');
 }
+
+// =====================================================================
+// STORE INDENT · REBELZ SUPPLIES · RETURN TO OFFICE   (Phase 2 — step 3)
+// Data on the event:
+//   indent      -> written by the Store Manager (store.html)
+//   indent_rcv  -> what the bartender actually received (sent vs received)
+//   extras      -> items added mid-event (source: store / local)
+//   returns     -> what goes back to the office + rental glass breakage
+// No costing anywhere — only names, units and counts.
+// =====================================================================
+const SCATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Disposables','Bar props','Rental glassware'];
+const SUNITS=['bottle','can','packet','bag','pcs','litre','kg','box','tray'];
+const RENTAL='Rental glassware';
+let rcvDraft=null, rcvDraftVer=null, rcvEditing=false, extraSrc='store';
+function escH(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function indentVer(){return (curEv.indent&&curEv.indent.version)||1;}
+function indentConfirmed(){return !!(curEv.indent&&curEv.indent_rcv&&curEv.indent_rcv.version===indentVer()&&!rcvEditing);}
+function skey(cat,name){return cat+'|'+String(name).trim().toLowerCase();}
+function asList(x){return Array.isArray(x)?x:(x?Object.values(x):[]);}
+
+// Everything Rebelz supplied at this event = confirmed indent (received) + mid-event extras
+function suppliesGiven(){
+  const m={}, order=[];
+  const add=(cat,name,unit,q)=>{const k=skey(cat,name);if(!m[k]){m[k]={cat,name,unit,given:0};order.push(k);}m[k].given+=q;};
+  if(curEv.indent_rcv) asList(curEv.indent_rcv.items).forEach(l=>add(l.cat,l.name,l.unit,l.received||0));
+  asList(curEv.extras).forEach(x=>add(x.cat,x.name,x.unit,x.qty||0));
+  return order.map(k=>m[k]).filter(x=>x.given>0);
+}
+
+// ---------- Indent "received" confirmation (setup screen + live panel) ----------
+function indentHTML(){
+  const ind=curEv.indent; if(!ind) return '';
+  const items=asList(ind.items);
+  if(indentConfirmed()){
+    const r=curEv.indent_rcv, rows=asList(r.items), short=rows.filter(x=>x.received!==x.sent);
+    let h=`<div class="card-title" style="color:var(--gold2)">📦 Store Indent — Received ✓</div>
+      <div style="font-size:11px;color:var(--grn);font-family:var(--fm);line-height:1.6;margin-bottom:6px">Confirmed ${escH(fmtDT(r.confirmed_at))} · ${rows.length} items${short.length?` · <span style="color:var(--red)">${short.length} not matching</span>`:' · all matched'}</div>`;
+    if(short.length) h+=short.map(x=>`<div class="sp-row"><div class="sp-name">${escH(x.name)}<div class="sp-sub">sent ${x.sent} · received ${x.received} ${escH(x.unit)}</div></div><span class="sp-tag sp-bad">${x.received-x.sent>0?'+':''}${x.received-x.sent}</span></div>`).join('');
+    h+=`<button class="btn btn-ghost" style="font-size:11px;padding:9px;margin-top:8px" onclick="editRcv()">✏️ Edit received counts</button>`;
+    return h;
+  }
+  const changed=curEv.indent_rcv&&curEv.indent_rcv.version!==indentVer()&&!rcvEditing;
+  if(!rcvDraft||rcvDraftVer!==indentVer()||rcvDraft.length!==items.length){
+    const prev={}; if(curEv.indent_rcv) asList(curEv.indent_rcv.items).forEach(x=>prev[skey(x.cat,x.name)]=x.received);
+    rcvDraft=items.map(l=>{const p=prev[skey(l.cat,l.name)];return (p!=null&&rcvEditing)?p:l.qty;}); rcvDraftVer=indentVer();
+  }
+  let h=`<div class="card-title" style="color:var(--gold2)">📦 Store Indent — Check & Confirm</div>
+    <div class="photo-note">${changed?'<strong style="color:var(--amb)">The store updated this indent — please check and confirm again.</strong><br/>':''}The store sent these items. Count them when they reach you. If a count is different, change the number — the office will see both.</div>`;
+  SCATS.forEach(cat=>{
+    const rows=items.map((l,i)=>[l,i]).filter(([l])=>l.cat===cat); if(!rows.length) return;
+    h+=`<div class="sp-grp"><span>${escH(cat)}</span>${cat===RENTAL?'<span class="sp-tag sp-warn">count carefully</span>':''}</div>`;
+    rows.forEach(([l,i])=>{
+      const v=rcvDraft[i];
+      h+=`<div class="sp-row"><div class="sp-name">${escH(l.name)}<div class="sp-sub">sent: ${l.qty} ${escH(l.unit)}</div></div>
+        <input class="sp-inp${v!==l.qty?' diff':''}" type="number" inputmode="numeric" min="0" value="${v}" oninput="rcvSet(${i},this)"/></div>`;
+    });
+  });
+  h+=`<div class="divider"></div>
+    <button class="btn btn-gold" onclick="confirmRcv(true)">✅ All Received — Same as Sent</button>
+    <button class="btn btn-ghost" style="border-color:var(--gold-dim);color:var(--gold2)" onclick="confirmRcv(false)">Confirm My Counts</button>
+    ${rcvEditing?'<button class="btn btn-ghost" style="font-size:11px;padding:9px" onclick="cancelRcvEdit()">Cancel</button>':''}`;
+  return h;
+}
+function renderIndentCard(){
+  const el=gid('indent-card'); if(!el) return;
+  if(!curEv.indent){el.style.display='none';return;}
+  el.style.display='block'; el.innerHTML=indentHTML();
+}
+window.rcvSet=function(i,inp){
+  const sent=asList(curEv.indent.items)[i].qty;
+  rcvDraft[i]=Math.max(0,parseInt(inp.value,10)||0);
+  inp.classList.toggle('diff',rcvDraft[i]!==sent);
+};
+window.confirmRcv=function(asSent){
+  const items=asList(curEv.indent.items);
+  const rows=items.map((l,i)=>({cat:l.cat,name:l.name,unit:l.unit,sent:l.qty,received:asSent?l.qty:(rcvDraft?rcvDraft[i]:l.qty)}));
+  const short=rows.filter(r=>r.received!==r.sent).length;
+  curEv.indent_rcv={items:rows,version:indentVer(),confirmed_at:nowISO(),mismatch:short};
+  rcvEditing=false; rcvDraft=null;
+  addLog('Store indent received — '+rows.length+' items'+(short?' · '+short+' NOT matching':' · all matched'));
+  toast(short?'Saved — '+short+' item(s) flagged to office':'Indent confirmed ✓');
+  renderIndentCard(); renderSupplies();
+};
+window.editRcv=function(){rcvEditing=true;rcvDraft=null;renderIndentCard();renderSupplies();};
+window.cancelRcvEdit=function(){rcvEditing=false;rcvDraft=null;renderIndentCard();renderSupplies();};
+
+// ---------- Live panel: Rebelz Supplies + "+ Add Items" ----------
+function keepVals(ids){const v={};ids.forEach(id=>{const e=gid(id);if(e)v[id]=e.value;});return v;}
+function putVals(v){Object.entries(v).forEach(([id,x])=>{const e=gid(id);if(e)e.value=x;});}
+function renderSupplies(){
+  const el=gid('supplies-card'); if(!el||!curEv) return;
+  const extras=asList(curEv.extras);
+  if(!curEv.indent&&!curEv.non_alc&&!extras.length){el.style.display='none';return;}
+  const saved=keepVals(['ex-cat','ex-name','ex-unit','ex-qty']);
+  el.style.display='block';
+  let h='';
+  if(curEv.indent&&!indentConfirmed()) h+=`<div style="background:#f5a02012;border:0.5px solid #f5a02040;border-radius:12px;padding:12px;margin-bottom:12px">${indentHTML()}</div>`;
+  const given=suppliesGiven();
+  h+=`<div class="card-title" style="color:var(--gold2)">🥤 Rebelz Supplies at this Event</div>`;
+  if(!given.length) h+=`<div class="photo-note">No Rebelz items recorded yet.</div>`;
+  SCATS.forEach(cat=>{
+    const rows=given.filter(g=>g.cat===cat); if(!rows.length) return;
+    h+=`<div class="sp-grp"><span>${escH(cat)}</span></div>`+rows.map(g=>`<div class="sp-row"><div class="sp-name">${escH(g.name)}</div><div style="font-family:var(--fh);font-size:18px;font-weight:700;color:var(--gold2)">${g.given}<span style="font-size:10px;color:var(--t3);font-family:var(--fm);margin-left:4px">${escH(g.unit)}</span></div></div>`).join('');
+  });
+  const names=[...new Set([...asList(curEv.indent&&curEv.indent.items),...extras].map(x=>x.name))];
+  h+=`<div class="divider"></div>
+    <div class="card-title" style="margin-bottom:6px">＋ Add Items (mid-event)</div>
+    <div class="photo-note" style="margin-bottom:8px">Ran short? Add what came in — from the store, or what you bought nearby.</div>
+    <div class="src-toggle">
+      <div class="src-btn${extraSrc==='store'?' on':''}" onclick="setSrc('store')">📦 Sent by Store</div>
+      <div class="src-btn${extraSrc==='local'?' on':''}" onclick="setSrc('local')">🛒 Bought Locally</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <select class="inp" id="ex-cat" style="font-size:13px">${SCATS.map(c=>`<option>${escH(c)}</option>`).join('')}</select>
+      <select class="inp" id="ex-unit" style="font-size:13px">${SUNITS.map(u=>`<option>${u}</option>`).join('')}</select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 72px;gap:8px;margin-bottom:8px">
+      <input class="inp" id="ex-name" list="ex-names" placeholder="Item — e.g. Red Bull" style="font-size:13px"/>
+      <input class="inp" id="ex-qty" type="number" inputmode="numeric" min="1" placeholder="Qty" style="text-align:center;font-size:13px"/>
+    </div>
+    <datalist id="ex-names">${names.map(n=>`<option value="${escH(n)}">`).join('')}</datalist>
+    <button class="btn btn-ghost" style="border-color:var(--gold-dim);color:var(--gold2);font-size:12px;padding:11px" onclick="addExtra()">＋ Add Item</button>`;
+  if(extras.length){
+    h+=`<div class="sp-grp"><span>Added during event</span></div>`+extras.map((x,i)=>`<div class="sp-row">
+      <div class="sp-name">${escH(x.name)} <span style="color:var(--gold2);font-weight:700">× ${x.qty}</span> <span style="font-size:10px;color:var(--t3)">${escH(x.unit)}</span>
+      <div class="sp-sub">${escH(x.cat)} · ${escH(fmtDT(x.at))}</div></div>
+      <span class="sp-tag ${x.source==='local'?'sp-warn':'sp-ok'}">${x.source==='local'?'Bought locally':'From store'}</span>
+      <button class="remove-x" onclick="delExtra(${i})" aria-label="Remove">✕</button></div>`).join('');
+  }
+  el.innerHTML=h; putVals(saved);
+}
+window.setSrc=function(s){extraSrc=s;document.querySelectorAll('.src-btn').forEach((b,i)=>b.classList.toggle('on',(i===0&&s==='store')||(i===1&&s==='local')));};
+window.addExtra=function(){
+  const cat=gid('ex-cat').value, name=gid('ex-name').value.trim(), unit=gid('ex-unit').value, qty=parseInt(gid('ex-qty').value,10);
+  if(!name){toast('Enter the item name');return;}
+  if(!qty||qty<1){toast('Enter quantity');return;}
+  const extras=asList(curEv.extras); extras.push({cat,name,unit,qty,source:extraSrc,at:nowISO()}); curEv.extras=extras;
+  gid('ex-name').value=''; gid('ex-qty').value='';
+  addLog(`Added mid-event: ${qty} ${unit} ${name} (${extraSrc==='local'?'bought locally':'sent by store'})`);
+  renderSupplies(); toast(name+' added ✓');
+};
+window.delExtra=function(i){
+  const extras=asList(curEv.extras), x=extras[i]; if(!x) return;
+  if(!confirm('Remove '+x.qty+' '+x.name+'? (only if it was added by mistake)')) return;
+  extras.splice(i,1); curEv.extras=extras; addLog('Removed mid-event item: '+x.qty+' '+x.name); renderSupplies();
+};
+
+// ---------- Closing: Return to Office + rental glass breakage ----------
+function renderReturnCard(){
+  const el=gid('return-card'); if(!el) return false;
+  const given=suppliesGiven().filter(g=>g.cat!=='Ice');
+  if(!given.length){el.style.display='none';return false;}
+  el.style.display='block';
+  const rental=given.filter(g=>g.cat===RENTAL), other=given.filter(g=>g.cat!==RENTAL);
+  let h=`<div class="card-title">Step 2 — Return to Office (Rebelz items)</div>`;
+  if(other.length){
+    h+=`<div class="photo-note">How many of each are <strong style="color:var(--gold2)">going back to the office</strong>? Unopened drinks, leftover disposables, all bar props. Ice is not counted.</div>`;
+    SCATS.forEach(cat=>{
+      const rows=other.filter(g=>g.cat===cat); if(!rows.length) return;
+      h+=`<div class="sp-grp"><span>${escH(cat)}</span></div>`+rows.map(g=>{
+        const k=given.indexOf(g), def=cat==='Bar props'?g.given:0;
+        return `<div class="sp-row"><div class="sp-name">${escH(g.name)}<div class="sp-sub">had ${g.given} ${escH(g.unit)}</div></div>
+          <input class="sp-inp" id="rt-${k}" type="number" inputmode="numeric" min="0" max="${g.given}" value="${def}"/></div>`;
+      }).join('');
+    });
+  }
+  if(rental.length){
+    h+=`<div class="divider"></div><div class="sp-grp"><span>🍷 Rental Glassware — count every glass</span><span class="sp-tag sp-warn">client sees this</span></div>`;
+    rental.forEach(g=>{
+      const k=given.indexOf(g);
+      h+=`<div style="padding:8px 0;border-top:0.5px solid var(--b1)"><div class="sp-name">${escH(g.name)} <span class="sp-sub">· ${g.given} sent</span></div>
+        <div class="rt-grid">
+          <div><label>Returned</label><input class="close-inp" id="rg-ret-${k}" type="number" inputmode="numeric" min="0" value="${g.given}" oninput="rgCalc(${k},${g.given})"/></div>
+          <div><label>Broken</label><input class="close-inp" id="rg-brk-${k}" type="number" inputmode="numeric" min="0" value="0" oninput="rgCalc(${k},${g.given})"/></div>
+          <div><label>Missing</label><div class="close-inp" id="rg-mis-${k}" style="color:var(--t2)">0</div></div>
+        </div></div>`;
+    });
+  }
+  el.innerHTML=h;
+  return true;
+}
+window.rgCalc=function(k,sent){
+  const r=parseInt(gid('rg-ret-'+k).value,10)||0, b=parseInt(gid('rg-brk-'+k).value,10)||0, m=sent-r-b;
+  const el=gid('rg-mis-'+k); el.textContent=m<0?'!':m; el.style.color=m<0?'var(--red)':m>0?'var(--amb)':'var(--t2)';
+};
+// returns null (nothing to return), false (invalid) or the returns object
+function collectReturns(){
+  const el=gid('return-card'); if(!el||el.style.display==='none') return null;
+  const given=suppliesGiven().filter(g=>g.cat!=='Ice');
+  const items=[], rental=[];
+  for(let k=0;k<given.length;k++){
+    const g=given[k];
+    if(g.cat===RENTAL){
+      const r=parseInt(gid('rg-ret-'+k).value,10)||0, b=parseInt(gid('rg-brk-'+k).value,10)||0;
+      if(r+b>g.given){toast(`🍷 ${g.name}: returned + broken is more than ${g.given} sent`);return false;}
+      rental.push({name:g.name,unit:g.unit,sent:g.given,returned:r,broken:b,missing:g.given-r-b});
+    } else {
+      const r=parseInt(gid('rt-'+k).value,10)||0;
+      if(r>g.given){toast(`${g.name}: return (${r}) is more than you had (${g.given})`);return false;}
+      items.push({cat:g.cat,name:g.name,unit:g.unit,given:g.given,returned:r});
+    }
+  }
+  const lost=rental.reduce((s,g)=>s+g.broken+g.missing,0);
+  addLog('Return to office recorded — '+items.length+' items'+(rental.length?' · rental glasses: '+lost+' broken/missing':''));
+  return {items,rental,at:nowISO()};
+}
+
+// ---------- Weak network banner ----------
+setTimeout(()=>{
+  onValue(ref(db,'.info/connected'),s=>{gid('net-banner').style.display=s.val()?'none':'block';});
+},2500);
 </script>
 </body>
 </html>
