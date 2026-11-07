@@ -1208,6 +1208,7 @@ function renderList(){
       </div>
       ${ev.menu_img?`<div style="font-size:10px;font-family:var(--fm);margin-bottom:${ev.team?'6px':'12px'};padding:8px;background:var(--s2);border-radius:8px">📋 Menu: ${menuStatusHTML(ev)}</div>`:''}
       ${ev.team?`<div style="font-size:10px;font-family:var(--fm);color:var(--gold2);margin-bottom:12px;padding:8px;background:#ffc4470d;border:0.5px solid var(--gold-dim);border-radius:8px">👥 Lead: <strong>${ev.team.leader}</strong> · ${ev.team.count} bartender${ev.team.count>1?'s':''} — ${(ev.team.members||[]).join(', ')}</div>`:''}
+      ${returnsStatusHTML(ev)}
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="showModalById('${ev.id}')">🔗 Links</button>
         <button class="btn btn-ghost btn-sm" onclick="copyText(barLink('${ev.id}'))">Copy Bartender</button>
@@ -1223,6 +1224,21 @@ function renderList(){
   }).join('');
 }
 
+
+// ---- Store returns check status on each event card (internal) ----
+function returnsStatusHTML(ev){
+  if(ev.status!=='closed'||!ev.returns) return '';
+  const L=x=>Array.isArray(x)?x:(x?Object.values(x):[]);
+  const box=(bg,bd,col,html)=>`<div style="font-size:10px;font-family:var(--fm);color:${col};margin:-6px 0 12px;padding:8px;background:${bg};border:0.5px solid ${bd};border-radius:8px;line-height:1.7">${html}</div>`;
+  const rent=L(ev.returns.rental), lost=rent.reduce((s,g)=>s+(g.broken||0)+(g.missing||0),0);
+  const glassTxt=rent.length?` · 🍷 ${rent.map(g=>`${g.name}: ${g.sent} sent, ${g.broken||0} broken, ${g.missing||0} missing`).join(' · ')}`:'';
+  const c=ev.returns_chk;
+  if(!c) return box('#ffc4470d','#ffc44755','var(--amb)',`🔁 Store returns check pending${lost?` · ${lost} glasses broken/missing (bartender)`:''}`);
+  const bad=[...L(c.items).filter(i=>i.store!==i.bartender).map(i=>`${i.name}: bartender ${i.bartender} → store ${i.store}`),
+             ...L(c.rental).filter(g=>g.store!==g.bartender).map(g=>`🍷 ${g.name}: bartender ${g.bartender} → store ${g.store}`)];
+  if(bad.length) return box('#ff4f8b14','#ff4f8b66','var(--red)',`⚠ <strong>Returns mismatch (${bad.length})</strong> · checked by ${c.checked_by_name||'store'}<br/>${bad.join('<br/>')}${c.note?'<br/>📝 '+c.note:''}`);
+  return box('#c6f4320d','#c6f43255','var(--grn)',`✅ Returns checked by ${c.checked_by_name||'store'} · all matched${glassTxt}`);
+}
 function updateStats(){
   gid('st-total').textContent=EVENTS.length;
   gid('st-live').textContent=EVENTS.filter(e=>e.status==='live').length;

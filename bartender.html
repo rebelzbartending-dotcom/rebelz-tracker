@@ -930,7 +930,7 @@ function buildSummaryMsg(){
 }
 function rentalMsgLines(){
   const r=curEv.returns&&curEv.returns.rental; if(!r||!r.length) return '';
-  return '\n\n🍷 *Rental Glassware:*\n'+r.map(g=>`  • ${g.name}: ${g.sent} sent · ${g.returned} returned${g.broken?` · ${g.broken} broken`:''}${g.missing?` · ${g.missing} missing`:''}`).join('\n');
+  return '\n\n🍷 *Rental Glassware:*\n'+r.map(g=>`  • ${g.name}: ${g.sent} sent${g.broken?` · ${g.broken} broken`:''}${g.missing?` · ${g.missing} missing`:''} · ${g.returned} back to office`).join('\n');
 }
 function buildClosingMsg(){
   const consumed=curEv.stock.filter(i=>(i.used||0)>0).map(i=>`  • ${i.name}: ${i.used} consumed`).join('\n');
@@ -1189,14 +1189,14 @@ function renderReturnCard(){
     });
   }
   if(rental.length){
-    h+=`<div class="divider"></div><div class="sp-grp"><span>🍷 Rental Glassware — count every glass</span><span class="sp-tag sp-warn">client sees this</span></div>`;
+    h+=`<div class="divider"></div><div class="sp-grp"><span>🍷 Rental Glassware — enter broken &amp; missing</span><span class="sp-tag sp-warn">client sees this</span></div>`;
     rental.forEach(g=>{
       const k=given.indexOf(g);
       h+=`<div style="padding:8px 0;border-top:0.5px solid var(--b1)"><div class="sp-name">${escH(g.name)} <span class="sp-sub">· ${g.given} sent</span></div>
         <div class="rt-grid">
-          <div><label>Returned</label><input class="close-inp" id="rg-ret-${k}" type="number" inputmode="numeric" min="0" value="${g.given}" oninput="rgCalc(${k},${g.given})"/></div>
           <div><label>Broken</label><input class="close-inp" id="rg-brk-${k}" type="number" inputmode="numeric" min="0" value="0" oninput="rgCalc(${k},${g.given})"/></div>
-          <div><label>Missing</label><div class="close-inp" id="rg-mis-${k}" style="color:var(--t2)">0</div></div>
+          <div><label>Missing</label><input class="close-inp" id="rg-mis-${k}" type="number" inputmode="numeric" min="0" value="0" oninput="rgCalc(${k},${g.given})"/></div>
+          <div><label>Back to office</label><div class="close-inp" id="rg-ret-${k}" style="color:var(--t2)">${g.given}</div></div>
         </div></div>`;
     });
   }
@@ -1204,8 +1204,9 @@ function renderReturnCard(){
   return true;
 }
 window.rgCalc=function(k,sent){
-  const r=parseInt(gid('rg-ret-'+k).value,10)||0, b=parseInt(gid('rg-brk-'+k).value,10)||0, m=sent-r-b;
-  const el=gid('rg-mis-'+k); el.textContent=m<0?'!':m; el.style.color=m<0?'var(--red)':m>0?'var(--amb)':'var(--t2)';
+  // sent − broken − missing = glasses going back to the office
+  const b=parseInt(gid('rg-brk-'+k).value,10)||0, m=parseInt(gid('rg-mis-'+k).value,10)||0, r=sent-b-m;
+  const el=gid('rg-ret-'+k); el.textContent=r<0?'!':r; el.style.color=r<0?'var(--red)':(b||m)?'var(--amb)':'var(--t2)';
 };
 // returns null (nothing to return), false (invalid) or the returns object
 function collectReturns(){
@@ -1215,9 +1216,9 @@ function collectReturns(){
   for(let k=0;k<given.length;k++){
     const g=given[k];
     if(g.cat===RENTAL){
-      const r=parseInt(gid('rg-ret-'+k).value,10)||0, b=parseInt(gid('rg-brk-'+k).value,10)||0;
-      if(r+b>g.given){toast(`🍷 ${g.name}: returned + broken is more than ${g.given} sent`);return false;}
-      rental.push({name:g.name,unit:g.unit,sent:g.given,returned:r,broken:b,missing:g.given-r-b});
+      const b=parseInt(gid('rg-brk-'+k).value,10)||0, m=parseInt(gid('rg-mis-'+k).value,10)||0;
+      if(b<0||m<0||b+m>g.given){toast(`🍷 ${g.name}: broken + missing is more than ${g.given} sent`);return false;}
+      rental.push({name:g.name,unit:g.unit,sent:g.given,returned:g.given-b-m,broken:b,missing:m});
     } else {
       const r=parseInt(gid('rt-'+k).value,10)||0;
       if(r>g.given){toast(`${g.name}: return (${r}) is more than you had (${g.given})`);return false;}

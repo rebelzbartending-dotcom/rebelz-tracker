@@ -5,7 +5,7 @@
    - Pages are "network first": when there is signal, the latest version from GitHub loads.
      With weak or no signal, the saved copy opens after a few seconds. */
 
-const VERSION = 'rebelz-app-v4';
+const VERSION = 'rebelz-app-v5';
 const PAGE_CACHE = VERSION + '-pages';
 const LIB_CACHE = VERSION + '-libs';
 

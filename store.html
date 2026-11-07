@@ -136,6 +136,24 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .photo-slot{border-radius:18px!important;border:2px dashed var(--b2)!important}
 .status-pill.sp-live,.live-pill{border-radius:30px!important}
 ::selection{background:var(--pink);color:#fff}
+/* ---- Returns Check ---- */
+.rc-ev{cursor:pointer}
+.rc-ev .rc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.rc-ev b{font-family:var(--fh);font-size:17px;color:var(--t1)}
+.rc-ev .rc-sub{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.5}
+.pill{font-size:10px;font-weight:800;padding:4px 10px;border-radius:30px;white-space:nowrap}
+.p-wait{background:#ffc44722;color:var(--honey,#ffc447)}.p-ok{background:#c6f43222;color:var(--grn)}.p-bad{background:#ff4f8b22;color:var(--red)}
+.rc-row{padding:10px 0;border-top:0.5px solid var(--b1)}
+.rc-row:first-of-type{border-top:none}
+.rc-line{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rc-nums{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.6}
+.rc-nums b{color:var(--t1)}
+.rc-inp{width:64px;height:40px;text-align:center;border-radius:12px;border:1.5px solid var(--b2);background:var(--s3);color:var(--t1);font-size:16px;font-weight:700;font-family:var(--fb);outline:none}
+.rc-inp.bad{border-color:var(--red);color:var(--red)}
+.rc-lbl{font-size:9px;color:var(--t3);text-align:center;margin-bottom:3px;font-weight:700;letter-spacing:.06em}
+.rc-diff{font-size:11px;font-weight:700;color:var(--red);margin-top:4px}
+.rc-used{font-size:11px;color:var(--acc);margin-top:2px;font-weight:600}
+.rc-badge{display:inline-block;min-width:18px;padding:1px 6px;margin-left:4px;border-radius:10px;background:var(--honey,#ffc447);color:#150f1f;font-size:10px;font-weight:800}
 </style>
 </head>
 <body>
@@ -180,6 +198,7 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 
   <div class="chips">
     <div class="fchip active" data-t="indent" onclick="setTab('indent')">📦 Send Indent</div>
+    <div class="fchip" data-t="returns" onclick="setTab('returns')">🔁 Returns Check<span class="rc-badge hidden" id="rc-count"></span></div>
     <div class="fchip" data-t="items" onclick="setTab('items')">📋 Item List</div>
   </div>
 
@@ -215,6 +234,12 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 
       <div id="indent-list"></div>
     </div>
+  </div>
+
+  <!-- ================= RETURNS CHECK TAB ================= -->
+  <div id="tab-returns" class="hidden">
+    <div id="rc-list"></div>
+    <div id="rc-detail" class="hidden"></div>
   </div>
 
   <!-- ================= ITEM LIST TAB ================= -->
@@ -274,7 +299,7 @@ const STARTER={
 };
 
 // ---- STATE ----
-let PAST=[]; let ME=null, CITY=null, EVENTS=[], MASTER={}, curEv=null, LINES=[], dirty=false, listenersOn=false, evUnsub=null, mUnsub=null;
+let PAST=[], CLOSED=[], rcOpen=null, rcEdit=false; let ME=null, CITY=null, EVENTS=[], MASTER={}, curEv=null, LINES=[], dirty=false, listenersOn=false, evUnsub=null, mUnsub=null;
 
 // ---- HELPERS ----
 function gid(id){return document.getElementById(id);}
@@ -330,7 +355,7 @@ window.setCity=function(c){
   CITY=c; localStorage.setItem('rbz_store_city',c);
   document.querySelectorAll('#city-chips .fchip').forEach(x=>x.classList.toggle('active',x.dataset.c===c));
   gid('page-tag').textContent='Store · '+c+(ME.name?' · '+ME.name:'')+(ME.role==='super'?' (Super Admin)':'');
-  curEv=null; LINES=[]; dirty=false;
+  curEv=null; LINES=[]; dirty=false; rcOpen=null; rcEdit=false;
   if(evUnsub)evUnsub(); if(mUnsub)mUnsub();
   evUnsub=onValue(ref(db,'events'),s=>{
     const d=s.val()||{};
@@ -339,6 +364,11 @@ window.setCity=function(c){
     EVENTS=Object.values(d).filter(e=>(e.city||'')===CITY&&e.status!=='closed')
       .sort((a,b)=>(a.event_date||'').localeCompare(b.event_date||''));
     renderEvSel();
+    const cut=new Date(); cut.setDate(cut.getDate()-30); const cutS=cut.toISOString().slice(0,10);
+    CLOSED=Object.values(d).filter(e=>(e.city||'')===CITY&&e.status==='closed'&&e.returns&&
+        (!e.returns_chk||(e.event_date||'')>=cutS||(e.returns_chk.checked_at||'').slice(0,10)>=cutS))
+      .sort((a,b)=>(b.event_date||'').localeCompare(a.event_date||''));
+    renderReturns();
   });
   mUnsub=onValue(ref(db,'store_items/'+CITY),s=>{MASTER=s.val()||{};renderMaster();fillItemSel(true);});
 };
@@ -348,6 +378,8 @@ window.setTab=function(t){
   document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('active',x.dataset.t===t));
   gid('tab-indent').classList.toggle('hidden',t!=='indent');
   gid('tab-items').classList.toggle('hidden',t!=='items');
+  gid('tab-returns').classList.toggle('hidden',t!=='returns');
+  if(t==='returns') renderReturns();
   gid('send-bar').classList.toggle('hidden',t!=='indent'||!curEv);
 };
 
@@ -550,6 +582,140 @@ window.copyFrom=function(id){
   gid('copy-sel').value='';
   touch();
   toast('Copied '+items.length+' items from '+(src.client_name||'past event')+' — adjust quantities');
+};
+
+// ===================== RETURNS CHECK (next morning at the office) =====================
+// Bartender's closing "Return to Office" vs what the store actually counts. Internal only.
+function rcList(x){return Array.isArray(x)?x:(x?Object.values(x):[]);}
+function rcKey(cat,name){return (cat+'|'+name).toLowerCase();}
+// where each item came from: store indent (received), store extras, bought locally
+function rcSources(e){
+  const m={};
+  const add=(cat,name,f,q)=>{const k=rcKey(cat,name);m[k]=m[k]||{store:0,local:0,sent:0};m[k][f]+=q;};
+  rcList(e.indent&&e.indent.items).forEach(l=>add(l.cat,l.name,'sent',l.qty||0));
+  if(e.indent_rcv) rcList(e.indent_rcv.items).forEach(l=>add(l.cat,l.name,'store',l.received||0));
+  rcList(e.extras).forEach(x=>add(x.cat,x.name,x.source==='local'?'local':'store',x.qty||0));
+  return m;
+}
+function rcSaved(e){return e.returns_chk||null;}
+function rcMismatchCount(c){
+  if(!c) return 0;
+  return rcList(c.items).filter(i=>i.store!==i.bartender).length+rcList(c.rental).filter(g=>g.store!==g.bartender).length;
+}
+function renderReturns(){
+  const cnt=CLOSED.filter(e=>!rcSaved(e)).length, b=gid('rc-count');
+  if(b){b.textContent=cnt;b.classList.toggle('hidden',!cnt);}
+  const list=gid('rc-list'); if(!list) return;
+  if(rcOpen){ const e=CLOSED.find(x=>x.id===rcOpen); if(e){ if(!rcEdit&&rcSaved(e)) renderRcDetail(e); return; } rcOpen=null; }  // never re-draw over counts being typed
+  gid('rc-detail').classList.add('hidden'); list.classList.remove('hidden');
+  if(!CLOSED.length){list.innerHTML=`<div class="card"><div class="empty">No closed events to check in ${esc(CITY)}.<br/>After an event closes, the bartender's return list shows up here for you to count.</div></div>`;return;}
+  const wait=CLOSED.filter(e=>!rcSaved(e)), done=CLOSED.filter(e=>rcSaved(e));
+  const card=e=>{
+    const c=rcSaved(e), mm=rcMismatchCount(c), r=e.returns||{};
+    const rent=rcList(r.rental), lost=rent.reduce((s,g)=>s+(g.broken||0)+(g.missing||0),0);
+    const pill=!c?'<span class="pill p-wait">⏳ To check</span>':mm?`<span class="pill p-bad">⚠ ${mm} not matching</span>`:'<span class="pill p-ok">✅ Matched</span>';
+    return `<div class="card rc-ev" onclick="openRc('${esc(e.id)}')"><div class="rc-top"><div><b>${esc(e.event_name||e.client_name||'Event')}</b>
+      <div class="rc-sub">${esc(e.client_name||'')} · ${esc(fmtDate(e.event_date))}<br/>${rcList(r.items).length} items${rent.length?` · 🍷 ${rent.length} glass types${lost?` · ${lost} broken/missing`:''}`:''}${c?`<br/>Checked ${esc(fmtDT(c.checked_at))} by ${esc(c.checked_by_name||'—')}`:''}</div></div>${pill}</div></div>`;
+  };
+  list.innerHTML=(wait.length?`<div class="sec-lbl">Waiting for check · ${wait.length}</div>`+wait.map(card).join(''):'')+
+    (done.length?`<div class="sec-lbl">Checked · last 30 days</div>`+done.map(card).join(''):'');
+}
+window.openRc=function(id){rcOpen=id;rcEdit=false;const e=CLOSED.find(x=>x.id===id);if(e)renderRcDetail(e);window.scrollTo(0,0);};
+window.closeRc=function(){rcOpen=null;rcEdit=false;renderReturns();};
+window.editRc=function(){rcEdit=true;const e=CLOSED.find(x=>x.id===rcOpen);if(e)renderRcDetail(e,true);};
+
+function renderRcDetail(e,forceEdit){
+  gid('rc-list').classList.add('hidden');
+  const box=gid('rc-detail'); box.classList.remove('hidden');
+  const r=e.returns||{}, c=rcSaved(e), editing=!c||forceEdit, src=rcSources(e);
+  const items=rcList(r.items), rental=rcList(r.rental);
+  const savedItem=(cat,name)=>c&&rcList(c.items).find(i=>rcKey(i.cat,i.name)===rcKey(cat,name));
+  const savedGlass=name=>c&&rcList(c.rental).find(g=>g.name===name);
+  let h=`<button class="btn btn-ghost" style="margin-bottom:12px" onclick="closeRc()">← All events</button>
+    <div class="card"><div class="card-title">${esc(e.event_name||e.client_name||'Event')}</div>
+    <div class="rc-sub" style="font-size:11px;color:var(--t3);line-height:1.7">${esc(e.client_name||'')} · ${esc(fmtDate(e.event_date))}${e.team&&e.team.leader?' · Lead: '+esc(e.team.leader):''}<br/>
+    Bartender recorded returns ${esc(fmtDT(r.at))}</div>
+    ${c?`<div class="status ${rcMismatchCount(c)?'st-draft':'st-sent'}">${rcMismatchCount(c)?'⚠ '+rcMismatchCount(c)+' not matching':'✅ All matched'} · checked ${esc(fmtDT(c.checked_at))} by ${esc(c.checked_by_name||'—')}${c.pending?' · ⏳ waiting for network':''}</div>`:
+      `<div class="status st-new">Count everything that came back to the office and enter the <b>store count</b>. It's pre-filled with what the bartender said.</div>`}</div>`;
+
+  if(items.length){
+    h+=`<div class="card"><div class="card-title"><span>Rebelz items</span><span class="tag tag-c">internal</span></div>`;
+    items.forEach((it,i)=>{
+      const s=src[rcKey(it.cat,it.name)]||{}, sv=savedItem(it.cat,it.name);
+      const storeVal=sv?sv.store:it.returned;
+      const from=[s.store?`${s.store} from store`:'',s.local?`${s.local} bought locally`:''].filter(Boolean).join(' + ');
+      h+=`<div class="rc-row"><div class="rc-line"><div style="min-width:0"><span class="rname">${esc(it.name)}</span><span class="runit">${esc(it.unit)}</span>
+          <div class="rc-nums">Had at event <b>${it.given}</b>${from?` (${esc(from)})`:''} · Bartender says back <b>${it.returned}</b></div>
+          <div class="rc-used" id="rc-used-${i}"></div><div class="rc-diff" id="rc-diff-${i}"></div></div>
+        <div><div class="rc-lbl">STORE COUNT</div><input class="rc-inp" id="rc-i-${i}" type="number" inputmode="numeric" min="0" value="${storeVal}" ${editing?'':'disabled'} oninput="rcCalc()"/></div></div></div>`;
+    });
+    h+='</div>';
+  }
+  if(rental.length){
+    h+=`<div class="card" style="border-color:#6b4a10"><div class="card-title"><span>🍷 Rental glassware</span><span class="tag tag-r">count every glass</span></div>`;
+    rental.forEach((g,i)=>{
+      const sv=savedGlass(g.name), storeVal=sv?sv.store:g.returned;
+      h+=`<div class="rc-row"><div class="rc-line"><div style="min-width:0"><span class="rname">${esc(g.name)}</span><span class="runit">${esc(g.unit||'pcs')}</span>
+          <div class="rc-nums">Sent <b>${g.sent}</b> · Broken <b>${g.broken||0}</b> · Missing <b>${g.missing||0}</b><br/>Bartender says back <b>${g.returned}</b></div>
+          <div class="rc-diff" id="rc-gdiff-${i}"></div></div>
+        <div><div class="rc-lbl">STORE COUNT</div><input class="rc-inp" id="rc-g-${i}" type="number" inputmode="numeric" min="0" value="${storeVal}" ${editing?'':'disabled'} oninput="rcCalc()"/></div></div></div>`;
+    });
+    h+='</div>';
+  }
+  if(!items.length&&!rental.length) h+=`<div class="card"><div class="empty">The bartender didn't record any returns for this event.</div></div>`;
+  h+=`<div class="field"><label>Note (optional)</label><input class="inp" id="rc-note" placeholder="e.g. 2 straws packets wet, thrown" value="${esc(c&&c.note||'')}" ${editing?'':'disabled'}/></div>`;
+  if(editing) h+=`<button class="btn btn-gold" onclick="saveRc()">✅ Confirm Returns</button>`;
+  else h+=`<button class="btn btn-ghost" onclick="editRc()">✏️ Edit store counts</button>`;
+  if(c&&!editing&&rcMismatchCount(c)) h+=`<button class="btn btn-wa" onclick="rcAlert()">📲 Send mismatch alert on WhatsApp</button>`;
+  box.innerHTML=h;
+  rcCalc();
+}
+window.rcCalc=function(){
+  const e=CLOSED.find(x=>x.id===rcOpen); if(!e) return;
+  const r=e.returns||{};
+  rcList(r.items).forEach((it,i)=>{
+    const inp=gid('rc-i-'+i); if(!inp) return;
+    const v=parseInt(inp.value,10); const n=isNaN(v)?0:v, d=n-it.returned;
+    inp.classList.toggle('bad',d!==0);
+    gid('rc-used-'+i).textContent=`Used at event: ${Math.max(0,it.given-n)} ${it.unit}`;
+    gid('rc-diff-'+i).textContent=d?(d<0?`⚠ ${-d} less than bartender said`:`⚠ ${d} more than bartender said`):'';
+  });
+  rcList(r.rental).forEach((g,i)=>{
+    const inp=gid('rc-g-'+i); if(!inp) return;
+    const v=parseInt(inp.value,10); const n=isNaN(v)?0:v, d=n-g.returned;
+    inp.classList.toggle('bad',d!==0);
+    gid('rc-gdiff-'+i).textContent=d?(d<0?`⚠ ${-d} glass${-d>1?'es':''} short at office`:`⚠ ${d} more than bartender said`):'';
+  });
+};
+window.saveRc=function(){
+  const e=CLOSED.find(x=>x.id===rcOpen); if(!e) return;
+  const r=e.returns||{}, items=[], rental=[];
+  const num=id=>{const v=parseInt((gid(id)||{}).value,10);return isNaN(v)||v<0?null:v;};
+  const ri=rcList(r.items), rg=rcList(r.rental);
+  for(let i=0;i<ri.length;i++){const it=ri[i],n=num('rc-i-'+i); if(n===null){toast('Enter the store count for '+it.name);return;}
+    items.push({cat:it.cat,name:it.name,unit:it.unit,given:it.given,bartender:it.returned,store:n,used:Math.max(0,it.given-n)});}
+  for(let i=0;i<rg.length;i++){const g=rg[i],n=num('rc-g-'+i); if(n===null){toast('Enter the store count for '+g.name);return;}
+    rental.push({name:g.name,unit:g.unit||'pcs',sent:g.sent,broken:g.broken||0,missing:g.missing||0,bartender:g.returned,store:n,short:Math.max(0,g.returned-n)});}
+  const prev=rcSaved(e)||{};
+  const data={items,rental,note:(gid('rc-note').value||'').trim(),checked_at:nowISO(),checked_by:auth.currentUser.uid,
+    checked_by_name:ME.name||'',version:(prev.version||0)+1};
+  data.mismatch=rcMismatchCount(data);
+  // Firebase keeps the write queued on the phone if the network is weak
+  set(ref(db,'events/'+e.id+'/returns_chk'),data)
+    .then(()=>toast('Returns check synced ✓'))
+    .catch(err=>toast('Could not save — '+((err&&err.code)||'check connection'),5000));
+  e.returns_chk=data; rcEdit=false;
+  renderRcDetail(e);
+  toast(data.mismatch?`Saved · ⚠ ${data.mismatch} not matching — send the alert`:'Saved · ✅ all matched');
+};
+window.rcAlert=function(){
+  const e=CLOSED.find(x=>x.id===rcOpen), c=e&&rcSaved(e); if(!c) return;
+  const bad=rcList(c.items).filter(i=>i.store!==i.bartender).map(i=>`• ${i.name}: bartender ${i.bartender} · store counted ${i.store} ${i.unit}`);
+  const badG=rcList(c.rental).filter(g=>g.store!==g.bartender).map(g=>`• ${g.name}: sent ${g.sent} · broken ${g.broken} · missing ${g.missing} · bartender says ${g.bartender} back · store counted ${g.store}`);
+  const msg=`⚠️ *REBELZ STORE — RETURNS MISMATCH*\n\n📋 *${e.event_name||e.client_name}*\n${e.client_name||''} · ${fmtDate(e.event_date)} · ${CITY}${e.team&&e.team.leader?`\nBartender lead: ${e.team.leader}`:''}\n`+
+    (bad.length?`\n*Items*\n${bad.join('\n')}\n`:'')+(badG.length?`\n*🍷 Rental glassware*\n${badG.join('\n')}\n`:'')+
+    (c.note?`\n📝 ${c.note}\n`:'')+`\n_Checked by ${c.checked_by_name||'Store'} · ${fmtDT(c.checked_at)}_`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 };
 </script>
 </body>
