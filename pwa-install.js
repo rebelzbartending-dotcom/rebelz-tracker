@@ -42,7 +42,7 @@
   function build() {
     var chip = document.createElement('button');
     chip.id = 'rbz-inst';
-    chip.innerHTML = '<img src="icons/' + APP + '-192.png" alt=""/>INSTALL APP<span class="x" aria-label="Close">✕</span>';
+    chip.innerHTML = '<img src="rbz-icon-' + APP + '-192.png" alt=""/>INSTALL APP<span class="x" aria-label="Close">✕</span>';
     document.body.appendChild(chip);
 
     var sheet = document.createElement('div');

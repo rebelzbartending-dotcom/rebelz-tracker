@@ -11,25 +11,25 @@
   "theme_color": "#150f1f",
   "icons": [
     {
-      "src": "icons/store-192.png",
+      "src": "rbz-icon-store-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/store-512.png",
+      "src": "rbz-icon-store-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/store-maskable-192.png",
+      "src": "rbz-icon-store-maskable-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "icons/store-maskable-512.png",
+      "src": "rbz-icon-store-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

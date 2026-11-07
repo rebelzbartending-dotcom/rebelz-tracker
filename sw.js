@@ -5,7 +5,7 @@
    - Pages are "network first": when there is signal, the latest version from GitHub loads.
      With weak or no signal, the saved copy opens after a few seconds. */
 
-const VERSION = 'rebelz-app-v3';
+const VERSION = 'rebelz-app-v4';
 const PAGE_CACHE = VERSION + '-pages';
 const LIB_CACHE = VERSION + '-libs';
 
@@ -16,9 +16,9 @@ const PRECACHE = [
   '/manifest-admin.json',
   '/manifest-store.json',
   '/rebelz%20bartending%20logo.png',
-  '/icons/admin-192.png',
-  '/icons/store-192.png',
-  '/icons/favicon-32.png',
+  '/rbz-icon-admin-192.png',
+  '/rbz-icon-store-192.png',
+  '/rbz-icon-favicon-32.png',
   '/pwa-install.js'
 ];
 
@@ -54,7 +54,7 @@ function isAppPage(url) {
 function isOwnAsset(url) {
   if (url.origin !== self.location.origin) return false;
   const p = url.pathname;
-  return p.startsWith('/icons/') || p.startsWith('/manifest-') || p === '/pwa-install.js' || p.endsWith('.png');
+  return p.startsWith('/manifest-') || p === '/pwa-install.js' || p.endsWith('.png');
 }
 function isLib(url) {
   if (!LIB_HOSTS.includes(url.hostname)) return false;
