@@ -6,15 +6,16 @@
 <title>Rebelz — Admin</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,500;1,9..144,700&family=Unbounded:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#080806;--s1:#0f0f0c;--s2:#161612;--s3:#1e1e18;--s4:#252520;
-  --b1:#2a2a22;--b2:#383830;--b3:#454540;
-  --t1:#f5f0e8;--t2:#b8b0a0;--t3:#706858;--t4:#454038;
-  --gold:#c8981e;--gold2:#e8b830;--gold3:#f5d060;--gold-dim:#c8981e40;
-  --acc:#d4f040;--red:#e84040;--grn:#40c870;--amb:#f5a020;
-  --fh:'Cormorant Garamond',serif;--fb:'Outfit',sans-serif;--fm:'DM Mono',monospace;
+  --bg:#150f1f;--s1:#1e1630;--s2:#271d3d;--s3:#30254a;--s4:#3a2e58;
+  --b1:#3a2e58;--b2:#4a3c6e;--b3:#5c4d84;
+  --t1:#fff4e2;--t2:#d9cdef;--t3:#a796c4;--t4:#7d6e9a;
+  --gold:#ffc447;--gold2:#ffc447;--gold3:#ffe08a;--gold-dim:#ffc44740;
+  --acc:#3de0d2;--red:#ff4f8b;--grn:#c6f432;--amb:#ff7a45;
+  --tang:#ff7a45;--pink:#ff4f8b;--lime:#c6f432;--aqua:#3de0d2;--honey:#ffc447;--lav:#b79cff;
+  --fh:'Fraunces',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif;--fm:'Plus Jakarta Sans',system-ui,sans-serif;--fx:'Unbounded','Arial Black',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh;overflow-x:hidden}
@@ -23,7 +24,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;m
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
 
 /* HEADER */
-.hdr{background:linear-gradient(180deg,#0f0f0a 0%,#080806 100%);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100;overflow:hidden}
+.hdr{background:linear-gradient(180deg,#1e1630 0%,#150f1f 100%);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100;overflow:hidden}
 .hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .hdr-inner{padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
 .brand-wrap{display:flex;align-items:center;gap:12px}
@@ -34,7 +35,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .brand-tag{font-size:8px;color:var(--gold);font-family:var(--fm);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
 .sync-badge{display:flex;align-items:center;gap:6px;background:var(--s2);border:0.5px solid var(--b2);border-radius:20px;padding:5px 10px}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #40c87040}50%{opacity:.7;box-shadow:0 0 0 4px #40c87000}}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #c6f43240}50%{opacity:.7;box-shadow:0 0 0 4px #c6f43200}}
 .sync-txt{font-size:9px;color:var(--t3);font-family:var(--fm);letter-spacing:.06em}
 .page-tag{font-size:9px;color:var(--t4);font-family:var(--fm);letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:6px;border-top:0.5px solid var(--b1)}
 
@@ -48,7 +49,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .stat-box:nth-child(1)::before{background:linear-gradient(90deg,var(--gold),var(--gold2))}
 .stat-box:nth-child(2)::before{background:linear-gradient(90deg,#1a6035,var(--grn))}
 .stat-box:nth-child(3)::before{background:linear-gradient(90deg,#303030,#606060)}
-.stat-box:nth-child(4)::before{background:linear-gradient(90deg,#5a3800,var(--amb))}
+.stat-box:nth-child(4)::before{background:linear-gradient(90deg,#6b3a1a,var(--amb))}
 .stat-l{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fm);margin-bottom:6px}
 .stat-v{font-family:var(--fh);font-size:32px;font-weight:700;line-height:1}
 .sv-gold{color:var(--gold2)}.sv-grn{color:var(--grn)}.sv-wht{color:var(--t2)}.sv-amb{color:var(--amb)}
@@ -72,14 +73,14 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* +91 PHONE INPUT */
 .phone-wrap{display:flex;align-items:stretch;background:var(--s2);border:0.5px solid var(--b2);border-radius:10px;overflow:hidden;transition:border-color .2s}
 .phone-wrap:focus-within{border-color:var(--gold)}
-.phone-prefix{padding:12px 12px;background:#c8981e12;color:var(--gold2);font-family:var(--fm);font-size:14px;font-weight:600;border-right:0.5px solid var(--b2);display:flex;align-items:center;flex-shrink:0;letter-spacing:.04em}
+.phone-prefix{padding:12px 12px;background:#ffc44712;color:var(--gold2);font-family:var(--fm);font-size:14px;font-weight:600;border-right:0.5px solid var(--b2);display:flex;align-items:center;flex-shrink:0;letter-spacing:.04em}
 .phone-inp{flex:1;background:transparent;border:none;padding:12px 14px;color:var(--t1);font-size:14px;font-family:var(--fb);outline:none;-webkit-appearance:none;width:100%;letter-spacing:.06em}
 .phone-inp::placeholder{color:var(--t4);letter-spacing:normal}
 
 /* YES/NO TOGGLE */
 .toggle-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 .toggle-opt{padding:12px;border-radius:10px;border:0.5px solid var(--b2);background:var(--s2);text-align:center;font-size:13px;font-weight:600;font-family:var(--fb);color:var(--t2);cursor:pointer;transition:all .15s;user-select:none}
-.toggle-opt.active-yes{background:linear-gradient(135deg,#1a5028,var(--grn));border-color:transparent;color:#fff}
+.toggle-opt.active-yes{background:linear-gradient(135deg,#4a6b10,var(--grn));border-color:transparent;color:#fff}
 .toggle-opt.active-no{background:linear-gradient(135deg,#5a1a1a,var(--red));border-color:transparent;color:#fff}
 .toggle-hint{font-size:10px;color:var(--t3);font-family:var(--fm);margin-top:6px;line-height:1.5}
 select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23454038' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
@@ -89,9 +90,9 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 /* BUTTONS */
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;font-size:13px;font-family:var(--fb);font-weight:600;cursor:pointer;border:none;width:100%;transition:all .15s;margin-bottom:8px;letter-spacing:.02em}
 .btn:last-child{margin-bottom:0}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806}.btn-gold:active{transform:scale(.97);filter:brightness(.9)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#150f1f}.btn-gold:active{transform:scale(.97);filter:brightness(.9)}
 .btn-ghost{background:transparent;border:0.5px solid var(--b2);color:var(--t2)}.btn-ghost:active{background:var(--s2)}
-.btn-red{background:transparent;border:0.5px solid #e8404030;color:var(--red)}.btn-red:active{background:#e8404010}
+.btn-red{background:transparent;border:0.5px solid #ff4f8b30;color:var(--red)}.btn-red:active{background:#ff4f8b10}
 .btn-sm{padding:8px 14px;font-size:11px;width:auto;border-radius:8px;margin-bottom:0}
 
 /* EVENT CARDS */
@@ -99,8 +100,8 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .ev-card.live{border-color:var(--gold-dim)}
 .ev-card.live::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .status-pill{font-size:9px;font-family:var(--fm);padding:4px 10px;border-radius:20px;letter-spacing:.06em}
-.sp-live{background:#c8981e15;color:var(--gold2);border:0.5px solid var(--gold-dim)}
-.sp-setup{background:#f5a02015;color:var(--amb);border:0.5px solid #f5a02030}
+.sp-live{background:#ffc44715;color:var(--gold2);border:0.5px solid var(--gold-dim)}
+.sp-setup{background:#ff7a4515;color:var(--amb);border:0.5px solid #ff7a4530}
 .sp-closed{background:var(--s2);color:var(--t3);border:0.5px solid var(--b1)}
 
 /* MODAL */
@@ -127,7 +128,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 .fb-badge{font-size:10px;background:var(--gold-dim);color:var(--gold2);border-radius:10px;padding:2px 8px;font-family:var(--fm)}
 
 /* TOAST */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--fb);opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center;box-shadow:0 8px 32px var(--gold-dim)}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:linear-gradient(135deg,var(--gold),var(--gold2));color:#150f1f;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--fb);opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;max-width:88vw;text-align:center;box-shadow:0 8px 32px var(--gold-dim)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 .empty-state{text-align:center;padding:44px 20px;color:var(--t3)}
@@ -150,7 +151,7 @@ select.inp{cursor:pointer;padding-right:36px;background-image:url("data:image/sv
 #ev-search{margin-bottom:10px}
 .filter-chips{display:flex;gap:7px;flex-wrap:wrap}
 .fchip{padding:7px 14px;border-radius:20px;border:0.5px solid var(--b2);font-size:11px;color:var(--t2);cursor:pointer;background:transparent;font-family:var(--fm);letter-spacing:.04em;transition:all .15s;user-select:none}
-.fchip.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;border-color:transparent;font-weight:700}
+.fchip.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#150f1f;border-color:transparent;font-weight:700}
 
 /* ===== ANALYTICS ===== */
 .btn-analytics{background:linear-gradient(135deg,#2a2410,#3a3418);border:0.5px solid var(--gold-dim);color:var(--gold2)}
@@ -185,12 +186,68 @@ html{scroll-behavior:smooth}
 .stat-box:active{transform:scale(.97)}
 .lbtn{transition:background .15s,transform .1s}
 .lbtn:active{transform:scale(.96)}
+
+.qchips{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 12px}
+.qc{padding:6px 11px;border-radius:20px;border:1.5px solid var(--b2);background:var(--s2);font-size:11px;font-weight:700;color:var(--t2);cursor:pointer;user-select:none;white-space:nowrap}
+.qc:active{transform:scale(.95)}
+.qc.on{background:var(--aqua);border-color:var(--aqua);color:#06302c}
+.qc b{color:var(--honey);font-weight:800}
+.qlbl{font-size:10px;color:var(--t3);font-weight:700;margin:-4px 0 6px;letter-spacing:.04em}
+.smart-hint{display:none;font-size:11px;font-weight:700;color:var(--lime);margin:-6px 0 10px}
+/* ================= REBELZ NIGHT THEME (matches client page) ================= */
+body{background:radial-gradient(520px 420px at 112% -6%,#ff4f8b2e,transparent 62%),radial-gradient(480px 420px at -22% 48%,#3de0d21f,transparent 62%),radial-gradient(520px 420px at 118% 104%,#ff7a4524,transparent 62%),var(--bg)!important;background-attachment:fixed!important}
+body::before{display:none!important}
+.hdr{background:#150f1fe8!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.hdr::after{height:2px!important;background:linear-gradient(90deg,var(--tang),var(--pink),var(--lav))!important}
+.brand-name,.hdr-brand{font-family:var(--fh)!important;font-weight:800!important;letter-spacing:0!important}
+.brand-name span,.hdr-brand span{font-style:italic;font-weight:500;color:var(--honey)!important}
+.brand-tag,.hdr-tag{color:var(--pink)!important;font-weight:700}
+.brand-logo,.hdr-logo{border-color:var(--honey)!important;box-shadow:0 0 0 3px #ffc44722!important}
+.page-tag,.page-label{font-family:var(--fx)!important;font-size:9px!important;letter-spacing:.14em!important;color:var(--t3)!important}
+.card{border-radius:22px!important;border:1.5px solid var(--b1)!important;background:var(--s1)!important}
+.card::before{display:none!important}
+.card-title{font-family:var(--fx)!important;font-size:9px!important;font-weight:700!important;letter-spacing:.12em!important;color:var(--honey)!important}
+.sec-lbl{font-family:var(--fh)!important;font-style:italic;font-size:22px!important;font-weight:700!important;text-transform:none!important;letter-spacing:0!important;color:var(--t1)!important}
+.sec-lbl::after{background:linear-gradient(90deg,var(--b2),transparent)!important}
+.field label,label{font-weight:700!important;letter-spacing:.08em!important}
+.inp,.fb-inp{border-radius:14px!important;border:1.5px solid var(--b2)!important;background:var(--s2)!important;color:var(--t1)!important}
+.inp:focus{border-color:var(--aqua)!important;box-shadow:0 0 0 3px #3de0d226}
+.inp::placeholder{color:var(--t4)}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ffc447' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 13px center!important}
+.btn{border-radius:16px!important;font-weight:700!important;letter-spacing:.02em}
+.btn-gold{background:var(--honey)!important;color:#2a1a00!important;box-shadow:0 10px 26px #ffc4472e!important}
+.btn-ghost{border:1.5px solid var(--b2)!important;color:var(--t2)!important}
+.btn-wa{background:#25d366!important;color:#06280f!important}
+.btn-red{border:1.5px solid #ff4f8b66!important;color:var(--pink)!important}
+.toast{background:var(--lime)!important;color:#1a2100!important;border-radius:14px!important;font-weight:800!important;box-shadow:0 10px 30px #00000066!important}
+.fchip{border-radius:30px!important;border:1.5px solid var(--b2)!important;font-weight:700!important;font-family:var(--fb)!important}
+.fchip.active{background:var(--pink)!important;color:#fff!important;border-color:var(--pink)!important}
+/* chunky numbers */
+.stat-v,.metric-v,.qty-num,.dc-rem,.qn,.close-inp,.sp-inp,.pin-num{font-family:var(--fx)!important;font-weight:800!important}
+.stat-box,.metric{border-radius:22px!important;border:none!important;color:#1b1328!important}
+.stat-box::before{display:none!important}
+.stats-grid .stat-box:nth-child(1),.metrics .metric:nth-child(1){background:var(--honey)!important}
+.stats-grid .stat-box:nth-child(2),.metrics .metric:nth-child(2){background:var(--aqua)!important}
+.stats-grid .stat-box:nth-child(3),.metrics .metric:nth-child(3){background:var(--lime)!important}
+.stats-grid .stat-box:nth-child(4),.metrics .metric:nth-child(4){background:var(--pink)!important}
+.stat-box .stat-v,.stat-box .stat-l,.metric .metric-v,.metric .metric-l{color:#1b1328!important}
+.stat-box .stat-l,.metric .metric-l{font-weight:800!important;opacity:.75}
+.stats-grid .stat-box:nth-child(4) .stat-v,.stats-grid .stat-box:nth-child(4) .stat-l,.metrics .metric:nth-child(4) .metric-v,.metrics .metric:nth-child(4) .metric-l{color:#fff!important}
+.ev-card,.dc,.tpl-item,.close-item{border-radius:20px!important;border:1.5px solid var(--b1)!important;background:var(--s1)!important}
+.ev-card.live,.dc.ok{border-color:#c6f43255!important}
+.dc.low{border-color:#ff7a4566!important}.dc.empty{border-color:#ff4f8b66!important}
+.qty-btn,.qb{border-radius:12px!important;border:1.5px solid var(--b2)!important;background:var(--s3)!important;color:var(--honey)!important}
+.tap{border-radius:14px!important}
+.modal{border-radius:28px 28px 0 0!important;border-top:2px solid var(--pink)!important;background:var(--s1)!important}
+.photo-slot{border-radius:18px!important;border:2px dashed var(--b2)!important}
+.status-pill.sp-live,.live-pill{border-radius:30px!important}
+::selection{background:var(--pink);color:#fff}
 </style>
 </head>
 <body>
 
 <!-- ===== ADMIN LOGIN GATE ===== -->
-<div id="login-gate" style="position:fixed;inset:0;z-index:9999;background:#080806;display:flex;align-items:center;justify-content:center;padding:24px">
+<div id="login-gate" style="position:fixed;inset:0;z-index:9999;background:#150f1f;display:flex;align-items:center;justify-content:center;padding:24px">
   <div style="width:100%;max-width:360px;text-align:center">
     <img src="rebelz%20bartending%20logo.png" style="width:72px;height:72px;object-fit:contain;margin-bottom:14px"/>
     <div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--gold2)">Admin Login</div>
@@ -277,9 +334,10 @@ html{scroll-behavior:smooth}
   <div class="card">
     <div class="card-title">Event Details</div>
     <div class="grid2">
-      <div class="field"><label>Client Name *</label><input class="inp" id="f-client" placeholder="e.g. Sharma Family"/></div>
+      <div class="field"><label>Client Name *</label><input class="inp" id="f-client" list="dl-clients" autocomplete="off" placeholder="e.g. Sharma Family"/></div>
       <div class="field"><label>Event Name (optional)</label><input class="inp" id="f-event" placeholder="e.g. Wedding Reception"/></div>
     </div>
+    <div class="smart-hint" id="client-hint"></div>
     <div class="grid3">
       <div class="field"><label>Date *</label><input class="inp" id="f-date" type="date"/></div>
       <div class="field"><label>City</label>
@@ -287,19 +345,24 @@ html{scroll-behavior:smooth}
           <option>Vijayawada</option><option>Hyderabad</option><option>Visakhapatnam</option><option>Others</option>
         </select>
       </div>
-      <div class="field"><label>Guests</label><input class="inp" id="f-guests" type="number" placeholder="e.g. 150"/></div>
+      <div class="field"><label>Guests</label><input class="inp" id="f-guests" type="number" inputmode="numeric" placeholder="e.g. 150"/></div>
     </div>
-    <div class="field"><label>Venue (Google Maps link preferred)</label><input class="inp" id="f-venue" placeholder="Paste Google Maps location link"/></div>
+    <div class="qchips" id="date-chips"></div>
+    <div class="qchips" id="guest-chips"></div>
+    <div class="field"><label>Venue (Google Maps link preferred)</label><input class="inp" id="f-venue" list="dl-venues" autocomplete="off" placeholder="Paste Google Maps location link"/></div>
     <div class="grid2">
       <div class="field">
         <label>Client Number *</label>
-        <div class="phone-wrap"><div class="phone-prefix">+91</div><input class="phone-inp" id="f-cwa" type="tel" maxlength="10" placeholder="98765 43210"/></div>
+        <div class="phone-wrap"><div class="phone-prefix">+91</div><input class="phone-inp" id="f-cwa" type="tel" inputmode="numeric" placeholder="98765 43210"/></div>
       </div>
       <div class="field">
         <label>Bartender WhatsApp *</label>
-        <div class="phone-wrap"><div class="phone-prefix">+91</div><input class="phone-inp" id="f-owa" type="tel" maxlength="10" placeholder="98765 43210"/></div>
+        <div class="phone-wrap"><div class="phone-prefix">+91</div><input class="phone-inp" id="f-owa" type="tel" inputmode="numeric" placeholder="98765 43210"/></div>
       </div>
     </div>
+    <div class="qlbl" id="bt-lbl" style="display:none">Recent bartenders — tap to fill</div>
+    <div class="qchips" id="bt-chips"></div>
+    <datalist id="dl-clients"></datalist><datalist id="dl-venues"></datalist>
     <div class="field">
       <label>Non-Alcoholic Beverages from Rebelz?</label>
       <div class="toggle-row">
@@ -315,7 +378,9 @@ html{scroll-behavior:smooth}
         <div class="ps-lbl">Tap to upload your menu card image<br/>Bartender gets a direct menu link on WhatsApp · Client sees “View Menu”</div>
       </div>
     </div>
-    <div class="field"><label>Bartender PIN (4–6 digits)</label><input class="inp" id="f-pin" type="number" placeholder="e.g. 2580" style="letter-spacing:6px;font-family:var(--fm);font-size:18px"/></div>
+    <div class="field"><label>Bartender PIN (4–6 digits)</label>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px"><input class="inp" id="f-pin" type="number" inputmode="numeric" placeholder="e.g. 2580" style="letter-spacing:6px;font-size:18px"/>
+      <button type="button" class="qc" style="padding:0 16px;font-size:12px" onclick="genPin()">🎲 Generate</button></div></div>
     <div style="height:4px"></div>
     <button class="btn btn-gold" onclick="createNewEvent()">✦ Create Event + Send WhatsApp</button>
     <button class="btn btn-ghost" onclick="clearForm()">Clear Form</button>
@@ -323,7 +388,7 @@ html{scroll-behavior:smooth}
 
   <!-- ANALYTICS + EXPORT -->
   <button class="btn btn-analytics" onclick="openAnalytics()" style="margin-bottom:8px">📈 Owner Analytics Dashboard</button>
-  <button class="btn" onclick="exportAllExcel()" style="background:linear-gradient(135deg,#1a5028,#40c870);color:#fff;margin-bottom:16px">📊 Export All Data to Excel</button>
+  <button class="btn" onclick="exportAllExcel()" style="background:linear-gradient(135deg,#4a6b10,#c6f432);color:#fff;margin-bottom:16px">📊 Export All Data to Excel</button>
 
   <!-- EVENT LIST -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -584,7 +649,7 @@ function applyRole(){
 }
 function applyScope(){
   EVENTS = scopeCity==='all' ? ALL_EVENTS.slice() : ALL_EVENTS.filter(e=>(e.city||'')===scopeCity);
-  renderList(); updateStats();
+  renderList(); updateStats(); renderSmart();
 }
 window.setCity=function(c){
   if(!isSuper()) return;
@@ -814,7 +879,7 @@ window.viewPhotos=function(id){
   const op=(ev.photos&&ev.photos.opening)||[];
   const cl=(ev.photos&&ev.photos.closing)||[];
   let html='';
-  const phBlock=(p,name)=>'<div style="position:relative"><img src="'+p+'" style="width:100%;border-radius:10px;border:1px solid var(--gold-dim);display:block"/><a href="'+p+'" download="'+name+'.jpg" style="position:absolute;bottom:6px;right:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080806;font-size:10px;font-weight:700;font-family:var(--fb);padding:5px 10px;border-radius:8px;text-decoration:none">⬇ Download</a></div>';
+  const phBlock=(p,name)=>'<div style="position:relative"><img src="'+p+'" style="width:100%;border-radius:10px;border:1px solid var(--gold-dim);display:block"/><a href="'+p+'" download="'+name+'.jpg" style="position:absolute;bottom:6px;right:6px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#150f1f;font-size:10px;font-weight:700;font-family:var(--fb);padding:5px 10px;border-radius:8px;text-decoration:none">⬇ Download</a></div>';
   html+='<div style="font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-family:var(--fm);margin-bottom:8px">Opening Photos ('+op.filter(Boolean).length+'/2)</div>';
   html+=op.filter(Boolean).length
     ?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">'+op.filter(Boolean).map((p,i)=>phBlock(p,ev.id+'_opening_'+(i+1))).join('')+'</div>'
@@ -1132,7 +1197,7 @@ function renderList(){
         ${ev.stock_confirmed?`📦 ${tot} bottles · ${used} consumed · ${tot-used} remaining`:'⚠ Bartender yet to confirm opening stock'} · PIN: <span style="color:var(--gold2)">${ev.bartender_pin}</span> · 🥤 Non-Alc: <span style="color:${ev.non_alc?'var(--grn)':'var(--red)'}">${ev.non_alc?'Rebelz':'Client'}</span>
       </div>
       ${ev.menu_img?`<div style="font-size:10px;font-family:var(--fm);margin-bottom:${ev.team?'6px':'12px'};padding:8px;background:var(--s2);border-radius:8px">📋 Menu: ${menuStatusHTML(ev)}</div>`:''}
-      ${ev.team?`<div style="font-size:10px;font-family:var(--fm);color:var(--gold2);margin-bottom:12px;padding:8px;background:#c8981e0d;border:0.5px solid var(--gold-dim);border-radius:8px">👥 Lead: <strong>${ev.team.leader}</strong> · ${ev.team.count} bartender${ev.team.count>1?'s':''} — ${(ev.team.members||[]).join(', ')}</div>`:''}
+      ${ev.team?`<div style="font-size:10px;font-family:var(--fm);color:var(--gold2);margin-bottom:12px;padding:8px;background:#ffc4470d;border:0.5px solid var(--gold-dim);border-radius:8px">👥 Lead: <strong>${ev.team.leader}</strong> · ${ev.team.count} bartender${ev.team.count>1?'s':''} — ${(ev.team.members||[]).join(', ')}</div>`:''}
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="showModalById('${ev.id}')">🔗 Links</button>
         <button class="btn btn-ghost btn-sm" onclick="copyText(barLink('${ev.id}'))">Copy Bartender</button>
@@ -1140,7 +1205,7 @@ function renderList(){
         <button class="btn btn-ghost btn-sm" onclick="openMenuModal('${ev.id}')" style="color:var(--gold2);border-color:var(--gold-dim)">📋 ${ev.menu_img?'Menu':'+ Menu'}</button>
         <button class="btn btn-ghost btn-sm" onclick="viewPhotos('${ev.id}')" style="color:var(--gold3);border-color:var(--gold-dim)">📷 Photos</button>
         <button class="btn btn-ghost btn-sm" onclick="viewFeedback('${ev.id}')" style="color:var(--gold2);border-color:var(--gold-dim)">⭐ Feedback</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportOneExcel('${ev.id}')" style="color:var(--grn);border-color:#40c87040">📊 Export</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportOneExcel('${ev.id}')" style="color:var(--grn);border-color:#c6f43240">📊 Export</button>
         <button class="btn btn-ghost btn-sm" onclick="exportPDF('${ev.id}')" style="color:var(--gold3);border-color:var(--gold-dim)">📄 PDF Report</button>
         <button class="btn btn-red btn-sm" onclick="deleteEvt('${ev.id}')">Delete</button>
       </div>
@@ -1156,6 +1221,56 @@ function updateStats(){
 }
 
 gid('f-date').value=new Date().toISOString().split('T')[0];
+
+// ===================== SMART INPUT (create event) =====================
+// Suggestions come from your own past events — nothing is typed twice.
+function digits10(v){const d=String(v||'').replace(/\D/g,'');return d.length>10?d.slice(-10):d;}
+['f-cwa','f-owa'].forEach(id=>{const el=gid(id);if(el)el.addEventListener('input',()=>{const d=digits10(el.value);if(el.value!==d)el.value=d;});});
+function escA(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function isoDay(off){const d=new Date();d.setDate(d.getDate()+off);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function nextDow(dow){const d=new Date();const add=((dow-d.getDay())+7)%7||7;return isoDay(add);}
+function renderDateChips(){
+  const opts=[['Today',isoDay(0)],['Tomorrow',isoDay(1)],['This Sat',nextDow(6)],['This Sun',nextDow(0)]];
+  const cur=gid('f-date').value;
+  gid('date-chips').innerHTML=opts.map(([l,v])=>`<div class="qc${cur===v?' on':''}" onclick="pickDate('${v}')">📅 ${l}</div>`).join('');
+  gid('guest-chips').innerHTML=[50,100,150,200,300,500].map(n=>`<div class="qc${gid('f-guests').value==n?' on':''}" onclick="pickGuests(${n})">👥 ${n}</div>`).join('');
+}
+window.pickDate=function(v){gid('f-date').value=v;renderDateChips();};
+window.pickGuests=function(n){gid('f-guests').value=n;renderDateChips();};
+gid('f-date').addEventListener('change',renderDateChips);gid('f-guests').addEventListener('input',renderDateChips);
+window.genPin=function(){gid('f-pin').value=String(Math.floor(1000+Math.random()*9000));toast('PIN generated ✓');};
+let SMART={clients:{},bartenders:[]};
+function renderSmart(){
+  const src=(typeof EVENTS!=='undefined'&&EVENTS.length?EVENTS:ALL_EVENTS)||[];
+  const clients={}, venues={}, bts={};
+  src.forEach(e=>{   // EVENTS are newest first -> first seen = latest details
+    const c=(e.client_name||'').trim();
+    if(c&&!clients[c.toLowerCase()]) clients[c.toLowerCase()]={name:c,wa:e.client_wa||'',venue:e.venue||'',city:e.city||''};
+    if(e.venue&&!venues[e.venue]) venues[e.venue]=(e.client_name||'')+(e.city?' · '+e.city:'');
+    const w=digits10(e.owner_wa);
+    if(w&&!bts[w]) bts[w]={wa:w,name:(e.team&&e.team.leader)||'',count:0};
+    if(w){bts[w].count++; if(!bts[w].name&&e.team&&e.team.leader) bts[w].name=e.team.leader;}
+  });
+  SMART.clients=clients;
+  gid('dl-clients').innerHTML=Object.values(clients).slice(0,80).map(c=>`<option value="${escA(c.name)}">${c.city?escA(c.city):''}</option>`).join('');
+  gid('dl-venues').innerHTML=Object.entries(venues).slice(0,60).map(([v,l])=>`<option value="${escA(v)}">${escA(l)}</option>`).join('');
+  const list=Object.values(bts).slice(0,8);
+  gid('bt-lbl').style.display=list.length?'':'none';
+  gid('bt-chips').innerHTML=list.map(b=>`<div class="qc" onclick="pickBt('${b.wa}')">🍸 ${b.name?escA(b.name)+' · ':''}<b>${b.wa.slice(0,5)} ${b.wa.slice(5)}</b></div>`).join('');
+  renderDateChips();
+}
+window.pickBt=function(w){gid('f-owa').value=w;toast('Bartender number filled ✓');};
+gid('f-client').addEventListener('change',function(){
+  const c=SMART.clients[this.value.trim().toLowerCase()], hint=gid('client-hint');
+  if(!c){hint.style.display='none';return;}
+  const filled=[];
+  if(c.wa&&!gid('f-cwa').value){gid('f-cwa').value=digits10(c.wa);filled.push('number');}
+  if(c.venue&&!gid('f-venue').value){gid('f-venue').value=c.venue;filled.push('venue');}
+  if(c.city&&!gid('f-city').disabled&&[...gid('f-city').options].some(o=>o.value===c.city)){gid('f-city').value=c.city;}
+  hint.textContent='★ Repeat client'+(filled.length?' — '+filled.join(' & ')+' filled from last event':'');
+  hint.style.display='block';
+});
+renderDateChips();
 </script>
 </body>
 </html>
