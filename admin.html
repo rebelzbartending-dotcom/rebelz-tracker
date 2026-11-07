@@ -208,7 +208,7 @@ html{scroll-behavior:smooth}
     <div class="modal-handle"></div>
     <div class="card-title">Staff Logins</div>
     <div class="card">
-      <div class="card-title">Create New Login</div>
+      <div class="card-title" id="sf-title">Create New Login</div>
       <div class="field"><label>Full Name *</label><input class="inp" id="sf-name" placeholder="e.g. Ravi Kumar"/></div>
       <div class="grid2">
         <div class="field"><label>Username *</label><input class="inp" id="sf-user" placeholder="e.g. vja-admin" autocapitalize="none" spellcheck="false"/></div>
@@ -227,7 +227,8 @@ html{scroll-behavior:smooth}
         </div>
       </div>
       <div id="sf-err" style="color:var(--red);font-size:12px;font-family:var(--fm);min-height:16px;margin-bottom:8px"></div>
-      <button class="btn btn-gold" id="sf-btn" onclick="createStaff()">Create Login →</button>
+      <button class="btn btn-gold" id="sf-btn" onclick="saveStaff()">Create Login →</button>
+      <button class="btn btn-ghost" id="sf-cancel" onclick="cancelEdit()" style="display:none">Cancel Edit</button>
     </div>
     <div class="card-title" style="margin-top:6px">All Staff</div>
     <div id="staff-list"></div>
@@ -552,7 +553,7 @@ onAuthStateChanged(auth,(user)=>{
     // Older admin accounts (created before roles) have no profile -> Super Admin
     ME=p?p:{role:'super',name:'Admin',legacy:true};
     if(ME.active===false){ signOut(auth); gid('lg-err').textContent='This login has been disabled. Contact Super Admin.'; return; }
-    if(ME.role==='store'){ signOut(auth); gid('lg-err').textContent='Store Manager page is coming in the next update.'; return; }
+    if(ME.role==='store'){ window.location.href='store.html'; return; }
     gid('lg-err').textContent='';
     applyRole();
     showGate(false);
@@ -623,7 +624,7 @@ function renderStaff(){
           <div style="font-size:10px;color:var(--t3);font-family:var(--fm);margin-top:3px">${ROLE_LBL[p.role]||p.role}${p.city?' · '+p.city:''} · ${p.username||''}</div>
         </div>
         ${uid===auth.currentUser.uid?'<span class="fb-badge">You</span>':
-        `<button onclick="toggleStaff('${uid}')" style="background:none;border:0.5px solid var(--gold-dim);color:${off?'var(--grn)':'var(--red)'};font-family:var(--fm);font-size:10px;padding:6px 10px;border-radius:8px;cursor:pointer">${off?'Enable':'Disable'}</button>`}
+        `<div style="display:flex;gap:6px"><button onclick="editStaff('${uid}')" style="background:none;border:0.5px solid var(--gold-dim);color:var(--gold2);font-family:var(--fm);font-size:10px;padding:6px 10px;border-radius:8px;cursor:pointer">Edit</button><button onclick="toggleStaff('${uid}')" style="background:none;border:0.5px solid var(--gold-dim);color:${off?'var(--grn)':'var(--red)'};font-family:var(--fm);font-size:10px;padding:6px 10px;border-radius:8px;cursor:pointer">${off?'Enable':'Disable'}</button></div>`}
       </div></div>`;
   }).join('');
 }
@@ -632,6 +633,39 @@ window.toggleStaff=function(uid){
   const on=p.active===false;
   if(!on && !confirm('Disable login for '+p.name+'? They will not be able to log in.')) return;
   update(ref(db,'staff/'+uid),{active:on}).then(()=>toast(on?'Login enabled':'Login disabled'));
+};
+let editUid=null;
+function setRoleUI(){ gid('sf-city-wrap').style.display=gid('sf-role').value==='super'?'none':''; }
+window.editStaff=function(uid){
+  const p=staffData[uid]; if(!p) return;
+  editUid=uid;
+  gid('sf-title').textContent='Edit Login · '+(p.username||'');
+  gid('sf-name').value=p.name||'';
+  gid('sf-user').value=p.username||''; gid('sf-user').disabled=true;
+  gid('sf-pass').value=''; gid('sf-pass').placeholder='Cannot change here'; gid('sf-pass').disabled=true;
+  gid('sf-role').value=p.role||'city_admin';
+  if(p.city) gid('sf-city').value=p.city;
+  setRoleUI();
+  gid('sf-btn').textContent='Save Changes →'; gid('sf-cancel').style.display='';
+  gid('sf-err').textContent='';
+  gid('staff-modal').querySelector('.modal').scrollTop=0;
+};
+window.cancelEdit=function(){
+  editUid=null;
+  gid('sf-title').textContent='Create New Login';
+  ['sf-name','sf-user','sf-pass'].forEach(i=>{gid(i).value='';gid(i).disabled=false;});
+  gid('sf-pass').placeholder='Set a password';
+  gid('sf-btn').textContent='Create Login →'; gid('sf-cancel').style.display='none';
+  gid('sf-err').textContent='';
+};
+window.saveStaff=function(){
+  if(!editUid) return window.createStaff();
+  const name=gid('sf-name').value.trim(), role=gid('sf-role').value;
+  const city=role==='super'?'':gid('sf-city').value;
+  if(!name){ gid('sf-err').textContent='Enter the full name.'; return; }
+  update(ref(db,'staff/'+editUid),{name,role,city,updated_at:nowISO()})
+    .then(()=>{ toast('Login updated ✓ — '+name+' · '+(ROLE_LBL[role]||role)+(city?' · '+city:'')); cancelEdit(); })
+    .catch(e=>{ gid('sf-err').textContent='Could not save — '+((e&&e.code)||'check connection'); });
 };
 window.createStaff=function(){
   const name=gid('sf-name').value.trim();
