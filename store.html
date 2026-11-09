@@ -88,6 +88,21 @@ select.inp{cursor:pointer;padding-right:34px;background-image:url("data:image/sv
 .qc.on{background:var(--aqua);border-color:var(--aqua);color:#06302c}
 .copy-box{border:1.5px dashed var(--lav);border-radius:16px;padding:12px;margin-bottom:12px;background:#b79cff10}
 .copy-box label{color:var(--lav)!important}
+.srch{margin-bottom:6px}
+.srch .inp{border-color:var(--aqua);background:#3de0d20d}
+.sres{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.sres:empty{display:none}
+.sr{display:flex;flex-direction:column;padding:8px 12px;border-radius:14px;background:var(--s2);border:1.5px solid var(--b2);cursor:pointer;user-select:none;max-width:100%}
+.sr b{font-size:13px;font-weight:700;color:var(--cream,#fff4e2)}
+.sr small{font-size:10px;font-weight:600;color:var(--t2);margin-top:1px}
+.sr:first-child{border-color:var(--aqua);box-shadow:0 0 0 3px #3de0d222}
+.sr.new{border-style:dashed;border-color:var(--honey)}
+.sr.new b{color:var(--honey)}
+.sr-none{font-size:12px;color:var(--t2);padding:4px 2px}
+.or-line{display:flex;align-items:center;gap:10px;margin:12px 0 10px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2)}
+.or-line:before,.or-line:after{content:'';flex:1;height:1px;background:var(--b1)}
+.cat-load{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px dashed var(--honey);border-radius:16px;padding:12px 14px;margin-bottom:12px;background:#ffc4470d;font-size:12px;font-weight:600}
+.cat-load .btn{width:auto;margin:0;padding:9px 14px;font-size:11px;white-space:nowrap;flex:none}
 /* ================= REBELZ NIGHT THEME (matches client page) ================= */
 body{background:radial-gradient(520px 420px at 112% -6%,#ff4f8b2e,transparent 62%),radial-gradient(480px 420px at -22% 48%,#3de0d21f,transparent 62%),radial-gradient(520px 420px at 118% 104%,#ff7a4524,transparent 62%),var(--bg)!important;background-attachment:fixed!important}
 body::before{display:none!important}
@@ -217,6 +232,11 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
       </div>
       <div class="card">
         <div class="card-title">Add Item</div>
+        <div class="srch">
+          <input class="inp" id="a-srch" placeholder="🔍  Quick search — type 2 letters, e.g. lem" autocomplete="off" oninput="doSearch()" onkeydown="if(event.key==='Enter'){event.preventDefault();pickFirst();}"/>
+          <div class="sres" id="a-res"></div>
+        </div>
+        <div class="or-line"><span>or pick by category</span></div>
         <div class="grid2">
           <div class="field"><label>Category</label><select class="inp" id="a-cat" onchange="fillItemSel()"></select></div>
           <div class="field"><label>Item</label><select class="inp" id="a-item" onchange="onItemSel()"></select></div>
@@ -284,8 +304,8 @@ const auth = getAuth(app);
 const EMAIL_DOMAIN='@rebelz-admin.web';
 
 // ---- CONSTANTS ----
-const CATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Disposables','Bar props','Rental glassware'];
-const UNITS=['bottle','can','packet','bag','pcs','litre','kg','box','tray'];
+const CATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Fruits & veggies','Disposables','Bar props','Miscellaneous','Rental glassware'];
+const UNITS=['bottle','can','packet','bag','pcs','bunch','litre','kg','box','tray'];
 const STARTER={
   'Soft drinks':[['Coke','bottle'],['Sprite','bottle'],['Thums Up','bottle'],['Limca','bottle'],['Fanta','bottle']],
   'Soda & mixers':[['Soda','bottle'],['Ginger ale','can'],['Tonic water','can']],
@@ -293,6 +313,8 @@ const STARTER={
   'Juices':[['Orange juice','litre'],['Pineapple juice','litre'],['Cranberry juice','litre']],
   'Syrups':[['Sugar syrup','bottle'],['Grenadine','bottle'],['Blue curacao syrup','bottle']],
   'Ice':[['Ice cubes','bag']],
+  'Fruits & veggies':[['Lemon','pcs'],['Lime','pcs'],['Orange','pcs'],['Mint leaves','bunch'],['Cucumber','pcs'],['Watermelon','pcs'],['Pineapple','pcs'],['Green chilli','kg'],['Ginger','kg']],
+  'Miscellaneous':[['Garbage bags','packet'],['Toothpicks','packet'],['Aluminium foil','pcs'],['Cling wrap','pcs']],
   'Disposables':[['Cocktail disposable glass','pcs'],['Mocktail disposable glass','pcs'],['Short disposable glass','pcs'],['Tissue paper','packet'],['Straws','packet'],['Stirrers','packet']],
   'Bar props':[['Garnish tray','pcs'],['Bar mat','pcs'],['Shaker','pcs'],['Jigger','pcs'],['Ice bucket','pcs']],
   'Rental glassware':[['Wine glass','pcs'],['Highball glass','pcs'],['Martini glass','pcs'],['Rocks / whisky glass','pcs'],['Shot glass','pcs'],['Champagne flute','pcs']]
@@ -529,6 +551,12 @@ window.delMaster=function(k){
   if(!confirm('Remove "'+m.name+'" from the item list? (Past indents are not affected.)'))return;
   remove(ref(db,'store_items/'+CITY+'/'+k));
 };
+window.loadCatStarter=function(cat){
+  const upd={};
+  (STARTER[cat]||[]).forEach(([name,unit])=>{const k=slug(cat+'-'+name); if(!MASTER[k]) upd[k]={cat,name,unit,added_by:ME.name||'',added_at:nowISO()};});
+  update(ref(db,'store_items/'+CITY),upd).then(()=>toast(cat+' starter items added ✓ — edit anytime'))
+    .catch(e=>toast('Could not save — '+((e&&e.code)||'check connection')));
+};
 window.loadStarter=function(){
   const upd={};
   Object.entries(STARTER).forEach(([cat,list])=>list.forEach(([name,unit])=>{
@@ -542,6 +570,10 @@ function renderMaster(){
   if(!n){box.innerHTML=`<div class="card"><div class="empty">No items saved for ${esc(CITY)} yet.<br/>Load the starter list (Coke, Sprite, Thums Up, soda, Red Bull, ice, disposables, bar props, rental glasses…) and edit it.</div>
     <button class="btn btn-gold" onclick="loadStarter()">Load Starter List</button></div>`;return;}
   let h=`<div class="sec-lbl">${esc(CITY)} Item List · ${n} items</div>`;
+  ['Fruits & veggies','Miscellaneous'].forEach(cat=>{
+    if(masterFor(cat).length||!STARTER[cat]) return;
+    h+=`<div class="cat-load"><span>New category: <b>${esc(cat)}</b><br/><small style="color:var(--t2)">${esc(STARTER[cat].map(x=>x[0]).join(', '))}</small></span><button class="btn btn-gold" onclick="loadCatStarter('${esc(cat)}')">＋ Load</button></div>`;
+  });
   CATS.forEach(cat=>{
     const list=masterFor(cat); if(!list.length)return;
     h+=`<div class="card"><div class="card-title"><span>${esc(cat)}</span><span class="tag tag-c">${list.length}</span></div>`+
@@ -559,6 +591,47 @@ function drawQ(){
 gid('q-chips').addEventListener('click',e=>{const q=e.target.closest('[data-q]');if(!q)return;gid('a-qty').value=q.dataset.q;drawQ();});
 gid('a-qty').addEventListener('input',drawQ); drawQ();
 const _addLine=window.addLine; window.addLine=function(){_addLine();drawQ();};
+// ---- QUICK SEARCH (across all categories) ----
+let SRES=[];
+window.doSearch=function(){
+  const q=gid('a-srch').value.trim().toLowerCase(), box=gid('a-res');
+  if(!q){box.innerHTML='';SRES=[];return;}
+  const all=Object.entries(MASTER).filter(([k,v])=>v&&v.name&&v.name.toLowerCase().includes(q));
+  all.sort((a,b)=>{const sa=a[1].name.toLowerCase().startsWith(q)?0:1, sb=b[1].name.toLowerCase().startsWith(q)?0:1; return sa-sb||a[1].name.localeCompare(b[1].name);});
+  SRES=all.slice(0,8);
+  const exact=all.some(([k,v])=>v.name.toLowerCase()===q);
+  const raw=gid('a-srch').value.trim(), nice=raw.charAt(0).toUpperCase()+raw.slice(1);
+  let h=SRES.map(([k,v],i)=>`<div class="sr" onclick="pickSearch(${i})"><b>${esc(v.name)}</b><small>${esc(v.cat)} · ${esc(v.unit)}</small></div>`).join('');
+  if(!SRES.length) h+=`<div class="sr-none">Not in the ${esc(CITY)} list yet.</div>`;
+  if(!exact&&q.length>=2) h+=`<div class="sr new" onclick="newFromSearch()"><b>＋ Add “${esc(nice)}” as new item</b><small>saved for next time</small></div>`;
+  box.innerHTML=h;
+};
+window.pickSearch=function(i){
+  const r=SRES[i]; if(!r) return;
+  const [k,v]=r;
+  gid('a-cat').value=v.cat; window.fillItemSel(); gid('a-item').value=k; window.onItemSel();
+  gid('a-srch').value=''; gid('a-res').innerHTML=''; SRES=[];
+  gid('a-qty').focus();
+};
+window.pickFirst=function(){ if(SRES.length) window.pickSearch(0); else if(gid('a-srch').value.trim().length>=2) window.newFromSearch(); };
+window.newFromSearch=function(){
+  const raw=gid('a-srch').value.trim(); if(!raw) return;
+  gid('a-item').value='__new'; window.onItemSel();
+  gid('a-name').value=raw.charAt(0).toUpperCase()+raw.slice(1);
+  gid('a-srch').value=''; gid('a-res').innerHTML=''; SRES=[];
+  toast('Now choose the category and unit, then quantity');
+  gid('a-cat').focus();
+};
+// keep "New item" selected when the category changes after a search
+const _fillSel=window.fillItemSel;
+window.fillItemSel=function(keep){
+  const wasNew=gid('a-item').value==='__new'&&gid('a-name').value.trim();
+  _fillSel(keep);
+  if(wasNew){gid('a-item').value='__new';window.onItemSel();}
+};
+// clear search after adding
+const _addLine2=window.addLine; window.addLine=function(){_addLine2(); gid('a-srch').value=''; gid('a-res').innerHTML=''; SRES=[];};
+
 // Copy a previous indent (same city) into this event
 function renderCopy(){
   const sel=gid('copy-sel'); if(!sel) return;

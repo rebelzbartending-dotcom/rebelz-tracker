@@ -1032,7 +1032,9 @@ function renderLog(){
 //   returns     -> what goes back to the office + rental glass breakage
 // No costing anywhere — only names, units and counts.
 // =====================================================================
-const SCATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Disposables','Bar props','Rental glassware'];
+const SCATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Fruits & veggies','Disposables','Bar props','Miscellaneous','Rental glassware'];
+// used up at the event — never returned to the office
+const NO_RETURN=['Ice','Fruits & veggies','Miscellaneous'];
 const SUNITS=['bottle','can','packet','bag','pcs','litre','kg','box','tray'];
 const RENTAL='Rental glassware';
 let rcvDraft=null, rcvDraftVer=null, rcvEditing=false, extraSrc='store';
@@ -1172,7 +1174,7 @@ window.delExtra=function(i){
 // ---------- Closing: Return to Office + rental glass breakage ----------
 function renderReturnCard(){
   const el=gid('return-card'); if(!el) return false;
-  const given=suppliesGiven().filter(g=>g.cat!=='Ice');
+  const given=suppliesGiven().filter(g=>NO_RETURN.indexOf(g.cat)<0);
   if(!given.length){el.style.display='none';return false;}
   el.style.display='block';
   const rental=given.filter(g=>g.cat===RENTAL), other=given.filter(g=>g.cat!==RENTAL);
@@ -1211,7 +1213,7 @@ window.rgCalc=function(k,sent){
 // returns null (nothing to return), false (invalid) or the returns object
 function collectReturns(){
   const el=gid('return-card'); if(!el||el.style.display==='none') return null;
-  const given=suppliesGiven().filter(g=>g.cat!=='Ice');
+  const given=suppliesGiven().filter(g=>NO_RETURN.indexOf(g.cat)<0);
   const items=[], rental=[];
   for(let k=0;k<given.length;k++){
     const g=given[k];
