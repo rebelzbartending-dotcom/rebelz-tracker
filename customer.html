@@ -31,7 +31,9 @@ body{background:var(--night);color:var(--cream);font-family:var(--fb);min-height
 
 /* top bar */
 .top{display:flex;align-items:center;justify-content:space-between;padding:18px 0 8px}
-.logo{display:flex;align-items:center;gap:10px}
+.logo{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.logo:active,.foot a:active{transform:scale(.94)}
+.foot a{display:inline-block;-webkit-tap-highlight-color:transparent;transition:transform .15s}
 .logo img{width:42px;height:42px;border-radius:50%;border:2px solid var(--honey)}
 .logo b{font-family:var(--fx);font-size:13px;letter-spacing:.06em;display:block}
 .logo small{display:block;font-size:9px;color:var(--muted);letter-spacing:.16em;font-weight:700}
@@ -216,7 +218,7 @@ h1 em{font-style:italic;font-weight:500;color:var(--honey)}
 
   <div class="z">
     <div class="top">
-      <div class="logo"><img src="rebelz%20bartending%20logo.png"/><div><b>REBELZ</b><small>BARTENDING</small></div></div>
+      <a class="logo" href="https://www.rebelzbartending.com/" target="_blank" rel="noopener" aria-label="Visit rebelzbartending.com"><img src="rebelz%20bartending%20logo.png"/><div><b>REBELZ</b><small>BARTENDING</small></div></a>
       <div class="soc">
         <a class="s-ig" href="https://www.instagram.com/rebelz_bartending/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="#fff" stroke="none"/></svg></a>
         <a class="s-yt" href="https://www.youtube.com/@reblzbartending" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M8.5 6.2v11.6L18 12z" fill="#fff"/></svg></a>
@@ -314,7 +316,7 @@ h1 em{font-style:italic;font-weight:500;color:var(--honey)}
       <a class="fbtn s-wa" href="https://whatsapp.com/channel/0029Vb9EUkj0gcfLv18KWp13" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linejoin="round"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.8z"/><path d="M9.2 8.6c.2 2.9 2.4 5.3 5.4 6l1-1.3-1.8-1-.8.8c-1-.4-1.8-1.3-2.2-2.3l.8-.8-.9-1.9z" fill="#fff" stroke="none"/></svg><span>WhatsApp Channel<small>Updates &amp; offers</small></span><em>FOLLOW</em></a>
     </div>
 
-    <div class="foot"><img src="rebelz%20bartending%20logo.png"/>Think of Party, Think of Us.<b>REBELZ BARTENDING SERVICES</b><b style="margin-top:4px">VIJAYAWADA · HYDERABAD · VISAKHAPATNAM</b></div>
+    <div class="foot"><a href="https://www.rebelzbartending.com/" target="_blank" rel="noopener" aria-label="Visit rebelzbartending.com"><img src="rebelz%20bartending%20logo.png"/></a>Think of Party, Think of Us.<b>REBELZ BARTENDING SERVICES</b><b style="margin-top:4px">VIJAYAWADA · HYDERABAD · VISAKHAPATNAM</b></div>
   </div>
 </div>
 </div>
