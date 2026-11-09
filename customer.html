@@ -42,6 +42,33 @@ body{background:var(--night);color:var(--cream);font-family:var(--fb);min-height
 .p-done{background:var(--lav);color:#24124f}
 @keyframes beat{50%{transform:scale(.45);opacity:.4}}
 
+/* social icons (top right) */
+.soc{display:flex;gap:8px}
+.soc a{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px #0006;transition:transform .15s;text-decoration:none}
+.soc a:active{transform:scale(.9)}
+.soc svg{width:19px;height:19px}
+.s-ig{background:radial-gradient(circle at 30% 110%,#ffd25a 0%,#ff7a45 30%,#ff4f8b 55%,#a64dff 100%)}
+.s-yt{background:#ff2a2a}
+.s-wa{background:#25d366}
+.soc-hint{text-align:right;font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--dim);margin-top:-2px}
+.krow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+/* rate button (after closing) */
+.rate{display:flex;align-items:center;justify-content:center;width:100%;margin-top:18px;padding:15px;border:none;border-radius:18px;background:linear-gradient(90deg,var(--honey),var(--tang));color:#2a1400;font-family:var(--fx);font-size:12px;font-weight:800;letter-spacing:.05em;cursor:pointer;box-shadow:0 10px 30px #ffc44740;animation:nudge 2.4s ease-in-out infinite}
+.rate span{text-align:center}
+.rate small{display:block;font-family:var(--fb);font-weight:700;font-size:10px;letter-spacing:0;opacity:.75;margin-top:2px}
+@keyframes nudge{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+
+/* follow block (bottom + thank-you) */
+.follow{margin-top:40px;background:var(--night2);border:1.5px solid var(--line);border-radius:24px;padding:20px 16px;text-align:center}
+.follow h3{font-family:var(--fd);font-style:italic;font-size:24px}
+.follow p{font-size:12px;color:var(--muted);margin:4px 0 16px}
+.fbtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:8px;text-align:left}
+.fbtn svg{width:22px;height:22px;flex:none}
+.fbtn small{display:block;font-size:10px;font-weight:600;opacity:.85}
+.fbtn em{margin-left:auto;font-style:normal;font-family:var(--fx);font-size:10px;font-weight:700;letter-spacing:.08em;background:#ffffff2e;padding:6px 10px;border-radius:20px}
+.fb-follow{display:inline-flex;margin-top:16px}
+
 /* hero */
 .hero{padding:18px 0 6px}
 .kicker{display:inline-block;background:var(--pink);color:#fff;font-family:var(--fx);font-size:9px;font-weight:700;letter-spacing:.14em;padding:6px 10px;border-radius:6px;transform:rotate(-3deg)}
@@ -190,15 +217,22 @@ h1 em{font-style:italic;font-weight:500;color:var(--honey)}
   <div class="z">
     <div class="top">
       <div class="logo"><img src="rebelz%20bartending%20logo.png"/><div><b>REBELZ</b><small>BARTENDING</small></div></div>
-      <div id="c-pill"></div>
+      <div class="soc">
+        <a class="s-ig" href="https://www.instagram.com/rebelz_bartending/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="#fff" stroke="none"/></svg></a>
+        <a class="s-yt" href="https://www.youtube.com/@reblzbartending" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M8.5 6.2v11.6L18 12z" fill="#fff"/></svg></a>
+        <a class="s-wa" href="https://whatsapp.com/channel/0029Vb9EUkj0gcfLv18KWp13" target="_blank" rel="noopener" aria-label="WhatsApp Channel"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linejoin="round"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.8z"/><path d="M9.2 8.6c.2 2.9 2.4 5.3 5.4 6l1-1.3-1.8-1-.8.8c-1-.4-1.8-1.3-2.2-2.3l.8-.8-.9-1.9z" fill="#fff" stroke="none"/></svg></a>
+      </div>
     </div>
+    <div class="soc-hint">FOLLOW US ✦</div>
 
     <div class="hero">
-      <span class="kicker" id="c-kicker">TONIGHT'S BAR</span>
+      <div class="krow"><span class="kicker" id="c-kicker">TONIGHT'S BAR</span><div id="c-pill"></div></div>
       <h1 id="c-title">—</h1>
       <svg class="squig" width="190" height="14" viewBox="0 0 190 14"><path d="M2 8 Q 14 1 26 8 T 50 8 T 74 8 T 98 8 T 122 8 T 146 8 T 170 8 T 188 6" fill="none" stroke="#ff4f8b" stroke-width="3.5" stroke-linecap="round"/></svg>
       <div class="meta" id="c-meta"></div>
     </div>
+
+    <div id="c-rate" class="hide"><button class="rate" onclick="goRate()"><span>⭐ RATE TONIGHT'S BAR<small>Takes just 20 seconds</small></span></button></div>
 
     <div id="c-menu"></div>
 
@@ -268,8 +302,16 @@ h1 em{font-style:italic;font-weight:500;color:var(--honey)}
           <button class="fb-submit" onclick="submitFb()">SEND FEEDBACK ✦</button>
           <div class="fb-err hide" id="fb-err">Please give at least an overall star rating</div>
         </div>
-        <div id="fb-done" class="fb-done hide"><div>🥂</div><b>Thank you!</b><p>Your feedback has reached the Rebelz team.<br/>We loved serving at your event.</p></div>
+        <div id="fb-done" class="fb-done hide"><div>🥂</div><b>Thank you!</b><p>Your feedback has reached the Rebelz team.<br/>We loved serving at your event.</p><a class="fbtn s-ig fb-follow" href="https://www.instagram.com/rebelz_bartending/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="#fff" stroke="none"/></svg><span>Follow us on Instagram<small>@rebelz_bartending</small></span></a></div>
       </div>
+    </div>
+
+    <div class="follow">
+      <h3>Follow the party</h3>
+      <p>Cocktails, events and behind-the-bar moments</p>
+      <a class="fbtn s-ig" href="https://www.instagram.com/rebelz_bartending/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="#fff" stroke="none"/></svg><span>Instagram<small>@rebelz_bartending</small></span><em>FOLLOW</em></a>
+      <a class="fbtn s-yt" href="https://www.youtube.com/@reblzbartending" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M8.5 6.2v11.6L18 12z" fill="#fff"/></svg><span>YouTube<small>Rebelz Bartending</small></span><em>SUBSCRIBE</em></a>
+      <a class="fbtn s-wa" href="https://whatsapp.com/channel/0029Vb9EUkj0gcfLv18KWp13" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linejoin="round"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.8z"/><path d="M9.2 8.6c.2 2.9 2.4 5.3 5.4 6l1-1.3-1.8-1-.8.8c-1-.4-1.8-1.3-2.2-2.3l.8-.8-.9-1.9z" fill="#fff" stroke="none"/></svg><span>WhatsApp Channel<small>Updates &amp; offers</small></span><em>FOLLOW</em></a>
     </div>
 
     <div class="foot"><img src="rebelz%20bartending%20logo.png"/>Think of Party, Think of Us.<b>REBELZ BARTENDING SERVICES</b><b style="margin-top:4px">VIJAYAWADA · HYDERABAD · VISAKHAPATNAM</b></div>
@@ -363,8 +405,9 @@ window.submitFb=function(){
     comment:gid('fb-comment').value.trim(),name:gid('fb-name').value.trim()||'Guest',submitted_at:new Date().toISOString()};
   if(evId) set(ref(db,'feedback/'+evId),fb);
   localStorage.setItem('fb_done_'+evId,'1');
-  show('fb-form',false); show('fb-done',true);
+  show('fb-form',false); show('fb-done',true); show('c-rate',false);
 };
+window.goRate=()=>gid('c-fb-wrap').scrollIntoView({behavior:'smooth',block:'start'});
 window.openMenu=()=>gid('menu-lb').classList.add('open');
 window.closeMenu=()=>gid('menu-lb').classList.remove('open');
 
@@ -517,6 +560,7 @@ function render(ev){
 
   // Feedback after closing
   show('c-fb-wrap',st==='closed');
+  show('c-rate',st==='closed'&&!localStorage.getItem('fb_done_'+evId));
   if(st==='closed'&&localStorage.getItem('fb_done_'+evId)){show('fb-form',false);show('fb-done',true);}
 }
 </script>
