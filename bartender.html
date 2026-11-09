@@ -18,9 +18,9 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px}
-.screen{display:none;height:100vh;flex-direction:column;overflow:hidden}
+.screen{display:none;height:100vh;height:100dvh;flex-direction:column;overflow:hidden}
 .screen.active{display:flex}
-.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px}
+.scroll-body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(40px + env(safe-area-inset-bottom))}
 
 /* HEADER */
 .hdr{background:var(--s1);border-bottom:0.5px solid var(--b1);flex-shrink:0;position:relative;overflow:hidden}
