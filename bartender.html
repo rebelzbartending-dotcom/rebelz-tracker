@@ -615,6 +615,9 @@ function initEvent(){
       gid('login-ev-name').textContent=data.event_name;
       gid('login-ev-date').textContent=data.client_name+' · '+fmtDate(data.event_date)+(data.guests?' · '+data.guests+' guests':'');
       showScreen('scr-login');
+      // PIN remembered on this phone -> open straight to where they left off
+      let sp=null; try{sp=localStorage.getItem('rbz_pin_'+evId);}catch(e){}
+      if(sp&&data.bartender_pin!=null&&sp===String(data.bartender_pin)){ gid('l-pin').value=sp; doLogin(); }
     } else {
       const wasLoggedIn=curEv._loggedIn;
       curEv=data;curEv._loggedIn=wasLoggedIn;
@@ -645,8 +648,9 @@ function doLogin(){
   if(!pin){err.textContent='Enter your PIN';err.style.display='block';return;}
   if(curEv.bartender_pin.toString()!==pin.toString()){err.textContent='Wrong PIN. Try again.';err.style.display='block';return;}
   curEv._loggedIn=true;waLog=[];
+  try{localStorage.setItem('rbz_pin_'+evId,pin.toString());}catch(e){}
   if(curEv.stock_confirmed)showPanel();
-  else if(curEv.menu_img)showMenu();          // menu card first (only if admin attached one)
+  else if(curEv.menu_img&&!(curEv.menu_reviewed&&curEv.menu_reviewed.at))showMenu();          // menu card first (only if admin attached one)
   else if(curEv.team&&curEv.team.leader)showSetup();
   else showTeam();
   toast('Welcome! 🍸');
@@ -1032,7 +1036,9 @@ function renderLog(){
 //   returns     -> what goes back to the office + rental glass breakage
 // No costing anywhere — only names, units and counts.
 // =====================================================================
-const SCATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Fruits & veggies','Disposables','Bar props','Miscellaneous','Rental glassware'];
+const SCATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Fruits & veggies','Disposables','Bar props','Miscellaneous','Staff Kit (Internal)','Rental glassware'];
+// Staff Kit (uniforms, bar tools): goes back to the office, never shown to the client
+const STAFF='Staff Kit (Internal)';
 // used up at the event — never returned to the office
 const NO_RETURN=['Ice','Fruits & veggies','Miscellaneous'];
 const SUNITS=['bottle','can','packet','bag','pcs','litre','kg','box','tray'];
@@ -1162,7 +1168,7 @@ window.addExtra=function(){
   if(!qty||qty<1){toast('Enter quantity');return;}
   const extras=asList(curEv.extras); extras.push({cat,name,unit,qty,source:extraSrc,at:nowISO()}); curEv.extras=extras;
   gid('ex-name').value=''; gid('ex-qty').value='';
-  addLog(`Added mid-event: ${qty} ${unit} ${name} (${extraSrc==='local'?'bought locally':'sent by store'})`);
+  addLog(`Added mid-event: ${qty} ${unit} ${name} (${extraSrc==='local'?'bought locally':'sent by store'})${cat===STAFF?' · Staff Kit':''}`);
   renderSupplies(); toast(name+' added ✓');
 };
 window.delExtra=function(i){
@@ -1298,6 +1304,35 @@ window.saveTeam=function(){
 };
 const _teamObs=new MutationObserver(()=>{if(gid('scr-team')&&gid('scr-team').classList.contains('active'))offerSameTeam();});
 if(gid('scr-team')) _teamObs.observe(gid('scr-team'),{attributes:true,attributeFilter:['class']});
+
+function rbzBack(){
+  const a=document.querySelector('.screen.active'), id=a&&a.id;
+  if(!curEv||!curEv._loggedIn) return false;
+  if(id==='scr-closing'){ showPanel(); window.scrollTo(0,0); return true; }      // closing -> live panel
+  if(id==='scr-setup'){                                                          // stock -> team (names kept)
+    showTeam();
+    const t=curEv.team;
+    if(t&&t.members&&t.members.length){ const c=gid('t-count'); c.value=t.members.length; c.dispatchEvent(new Event('input')); t.members.forEach((m,i)=>{const el=gid('t-name-'+i); if(el) el.value=m;}); }
+    window.scrollTo(0,0); return true;
+  }
+  if(id==='scr-team'&&curEv.menu_img){ showMenu(); window.scrollTo(0,0); return true; } // team -> menu card
+  return false;
+}
+// ===== PHONE BACK BUTTON — stay inside the app =====
+// Back closes the open popup / goes to the previous step instead of
+// leaving the app. On the main screen: "Press back again to exit".
+(function(){
+  let armed=0;
+  function guard(){ if(!(history.state&&history.state.rbzBack)) history.pushState({rbzBack:1},''); }
+  // add the guard after the user touches the page (Chrome ignores it otherwise)
+  ['pointerdown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,guard,{capture:true,passive:true}));
+  window.addEventListener('popstate',()=>{
+    let handled=false; try{ handled=rbzBack(); }catch(e){ console.error(e); }
+    if(handled){ armed=0; guard(); return; }
+    if(Date.now()-armed<2500) return;            // second press -> leaves next time
+    armed=Date.now(); toast('Press back again to exit');
+  });
+})();
 </script>
 </body>
 </html>

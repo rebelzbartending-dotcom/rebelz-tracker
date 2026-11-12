@@ -252,16 +252,22 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .photo-slot{border-radius:18px!important;border:2px dashed var(--b2)!important}
 .status-pill.sp-live,.live-pill{border-radius:30px!important}
 ::selection{background:var(--pink);color:#fff}
+
+/* login gate: 'Opening…' while the saved login is checked */
+#login-gate .lg-wait{display:none;font-size:13px;color:var(--t3);margin-top:8px}
+#login-gate.checking .lg-wait{display:block}
+#login-gate.checking input,#login-gate.checking button,#login-gate.checking #lg-err{display:none}
 </style>
 </head>
 <body>
 
 <!-- ===== ADMIN LOGIN GATE ===== -->
-<div id="login-gate" style="position:fixed;inset:0;z-index:9999;background:#150f1f;display:flex;align-items:center;justify-content:center;padding:24px">
+<div id="login-gate" class="checking" style="position:fixed;inset:0;z-index:9999;background:#150f1f;display:flex;align-items:center;justify-content:center;padding:24px">
   <div style="width:100%;max-width:360px;text-align:center">
     <img src="rebelz%20bartending%20logo.png" style="width:72px;height:72px;object-fit:contain;margin-bottom:14px"/>
     <div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--gold2)">Admin Login</div>
     <div style="font-size:11px;color:var(--t3);font-family:var(--fm);margin:6px 0 22px;letter-spacing:.04em">Rebelz Bartending — authorized staff only</div>
+    <div class="lg-wait">Opening… ✦</div>
     <input id="lg-user" class="inp" placeholder="Username" autocomplete="username" autocapitalize="none" spellcheck="false" style="margin-bottom:12px"/>
     <input id="lg-pass" class="inp" type="password" placeholder="Password" autocomplete="current-password" style="margin-bottom:8px"/>
     <div id="lg-err" style="color:var(--red);font-size:12px;font-family:var(--fm);min-height:16px;margin-bottom:10px"></div>
@@ -620,11 +626,19 @@ function doLogin(){
     .catch(()=>{ err.textContent='Wrong username or password.'; });
 }
 function doLogout(){ signOut(auth); }
+
+// Profile is saved on this phone, so a weak network never forces a re-login.
+function rbzProfile(uid){
+  const k='rbz_me_'+uid;
+  const net=new Promise((ok,no)=>{ get(ref(db,'staff/'+uid)).then(s=>{const p=s.val();try{localStorage.setItem(k,JSON.stringify(p||null));}catch(e){} ok(p);}).catch(no); setTimeout(()=>no(new Error('slow')),7000); });
+  return net.catch(err=>{ const raw=localStorage.getItem(k); if(raw===null) throw err; toast('Weak network — using saved login'); return JSON.parse(raw); });
+}
+setTimeout(()=>{const g=gid('login-gate');if(g)g.classList.remove('checking');},9000);
 onAuthStateChanged(auth,(user)=>{
+  gid('login-gate').classList.remove('checking');
   // A real admin has providerData (password). Anything else = show login.
   if(!(user && user.providerData && user.providerData.length)){ ME=null; showGate(true); return; }
-  get(ref(db,'staff/'+user.uid)).then(snap=>{
-    const p=snap.val();
+  rbzProfile(user.uid).then(p=>{
     // Older admin accounts (created before roles) have no profile -> Super Admin
     ME=p?p:{role:'super',name:'Admin',legacy:true};
     if(ME.active===false){ signOut(auth); gid('lg-err').textContent='This login has been disabled. Contact Super Admin.'; return; }
@@ -1297,6 +1311,31 @@ gid('f-client').addEventListener('change',function(){
   hint.style.display='block';
 });
 renderDateChips();
+
+function rbzBack(){
+  if(gid('login-gate').style.display!=='none') return false;
+  const close={'staff-modal':window.closeStaff,'modal':window.closeModal,'ph-modal':window.closePhModal,'mn-modal':window.closeMenuModal,'fb-modal':window.closeFbModal,'an-modal':window.closeAnalytics};
+  const open=[...document.querySelectorAll('.modal-bg.open')];
+  if(!open.length) return false;
+  const m=open[open.length-1];
+  if(close[m.id]) close[m.id](); else m.classList.remove('open');
+  return true;
+}
+// ===== PHONE BACK BUTTON — stay inside the app =====
+// Back closes the open popup / goes to the previous step instead of
+// leaving the app. On the main screen: "Press back again to exit".
+(function(){
+  let armed=0;
+  function guard(){ if(!(history.state&&history.state.rbzBack)) history.pushState({rbzBack:1},''); }
+  // add the guard after the user touches the page (Chrome ignores it otherwise)
+  ['pointerdown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,guard,{capture:true,passive:true}));
+  window.addEventListener('popstate',()=>{
+    let handled=false; try{ handled=rbzBack(); }catch(e){ console.error(e); }
+    if(handled){ armed=0; guard(); return; }
+    if(Date.now()-armed<2500) return;            // second press -> leaves next time
+    armed=Date.now(); toast('Press back again to exit');
+  });
+})();
 </script>
 </body>
 </html>

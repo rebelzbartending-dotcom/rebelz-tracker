@@ -169,16 +169,22 @@ select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 .rc-diff{font-size:11px;font-weight:700;color:var(--red);margin-top:4px}
 .rc-used{font-size:11px;color:var(--acc);margin-top:2px;font-weight:600}
 .rc-badge{display:inline-block;min-width:18px;padding:1px 6px;margin-left:4px;border-radius:10px;background:var(--honey,#ffc447);color:#150f1f;font-size:10px;font-weight:800}
+
+/* login gate: 'Opening…' while the saved login is checked */
+#login-gate .lg-wait{display:none;font-size:13px;color:var(--t3);margin-top:8px}
+#login-gate.checking .lg-wait{display:block}
+#login-gate.checking input,#login-gate.checking button,#login-gate.checking #lg-err{display:none}
 </style>
 </head>
 <body>
 
 <!-- ===== LOGIN GATE ===== -->
-<div id="login-gate" style="position:fixed;inset:0;z-index:9999;background:#150f1f;display:flex;align-items:center;justify-content:center;padding:24px">
+<div id="login-gate" class="checking" style="position:fixed;inset:0;z-index:9999;background:#150f1f;display:flex;align-items:center;justify-content:center;padding:24px">
   <div style="width:100%;max-width:360px;text-align:center">
     <img src="rebelz%20bartending%20logo.png" style="width:72px;height:72px;object-fit:contain;margin-bottom:14px"/>
     <div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--gold2)">Store Login</div>
     <div style="font-size:11px;color:var(--t3);font-family:var(--fm);margin:6px 0 22px;letter-spacing:.04em">Rebelz Bartending — store managers only</div>
+    <div class="lg-wait">Opening… ✦</div>
     <input id="lg-user" class="inp" placeholder="Username" autocomplete="username" autocapitalize="none" spellcheck="false" style="margin-bottom:12px"/>
     <input id="lg-pass" class="inp" type="password" placeholder="Password" autocomplete="current-password" style="margin-bottom:8px"/>
     <div id="lg-err" style="color:var(--red);font-size:12px;font-family:var(--fm);min-height:16px;margin-bottom:10px"></div>
@@ -304,7 +310,9 @@ const auth = getAuth(app);
 const EMAIL_DOMAIN='@rebelz-admin.web';
 
 // ---- CONSTANTS ----
-const CATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Fruits & veggies','Disposables','Bar props','Miscellaneous','Rental glassware'];
+const CATS=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Fruits & veggies','Disposables','Bar props','Miscellaneous','Staff Kit (Internal)','Rental glassware'];
+// Staff Kit = uniforms, bar tools, anything the team takes. Internal only: never shown on the client page.
+const STAFF='Staff Kit (Internal)';
 const UNITS=['bottle','can','packet','bag','pcs','bunch','litre','kg','box','tray'];
 const STARTER={
   'Soft drinks':[['Coke','bottle'],['Sprite','bottle'],['Thums Up','bottle'],['Limca','bottle'],['Fanta','bottle']],
@@ -317,6 +325,7 @@ const STARTER={
   'Miscellaneous':[['Garbage bags','packet'],['Toothpicks','packet'],['Aluminium foil','pcs'],['Cling wrap','pcs']],
   'Disposables':[['Cocktail disposable glass','pcs'],['Mocktail disposable glass','pcs'],['Short disposable glass','pcs'],['Tissue paper','packet'],['Straws','packet'],['Stirrers','packet']],
   'Bar props':[['Garnish tray','pcs'],['Bar mat','pcs'],['Shaker','pcs'],['Jigger','pcs'],['Ice bucket','pcs']],
+  'Staff Kit (Internal)':[['T-shirt','pcs'],['Apron','pcs'],['Cap','pcs'],['Waistcoat','pcs'],['Bow tie','pcs'],['Bar knife','pcs'],['Bar spoon','pcs'],['Strainer','pcs'],['Muddler','pcs'],['Bottle opener','pcs']],
   'Rental glassware':[['Wine glass','pcs'],['Highball glass','pcs'],['Martini glass','pcs'],['Rocks / whisky glass','pcs'],['Shot glass','pcs'],['Champagne flute','pcs']]
 };
 
@@ -345,10 +354,18 @@ window.doLogin=function(){
 window.doLogout=function(){ if(dirty&&!confirm('You have an unsent indent (kept on this phone). Log out anyway?'))return; signOut(auth); };
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&gid('login-gate').style.display!=='none')window.doLogin();});
 
+
+// Profile is saved on this phone, so a weak network never forces a re-login.
+function rbzProfile(uid){
+  const k='rbz_me_'+uid;
+  const net=new Promise((ok,no)=>{ get(ref(db,'staff/'+uid)).then(s=>{const p=s.val();try{localStorage.setItem(k,JSON.stringify(p||null));}catch(e){} ok(p);}).catch(no); setTimeout(()=>no(new Error('slow')),7000); });
+  return net.catch(err=>{ const raw=localStorage.getItem(k); if(raw===null) throw err; toast('Weak network — using saved login'); return JSON.parse(raw); });
+}
+setTimeout(()=>{const g=gid('login-gate');if(g)g.classList.remove('checking');},9000);
 onAuthStateChanged(auth,user=>{
+  gid('login-gate').classList.remove('checking');
   if(!(user&&user.providerData&&user.providerData.length)){ME=null;showGate(true);return;}
-  get(ref(db,'staff/'+user.uid)).then(s=>{
-    const p=s.val();
+  rbzProfile(user.uid).then(p=>{
     ME=p?p:{role:'super',name:'Admin',legacy:true};
     if(ME.active===false){signOut(auth);gid('lg-err').textContent='This login has been disabled. Contact Super Admin.';return;}
     if(ME.role!=='store'&&ME.role!=='super'){signOut(auth);gid('lg-err').textContent='This page is for Store Managers only.';return;}
@@ -570,13 +587,13 @@ function renderMaster(){
   if(!n){box.innerHTML=`<div class="card"><div class="empty">No items saved for ${esc(CITY)} yet.<br/>Load the starter list (Coke, Sprite, Thums Up, soda, Red Bull, ice, disposables, bar props, rental glasses…) and edit it.</div>
     <button class="btn btn-gold" onclick="loadStarter()">Load Starter List</button></div>`;return;}
   let h=`<div class="sec-lbl">${esc(CITY)} Item List · ${n} items</div>`;
-  ['Fruits & veggies','Miscellaneous'].forEach(cat=>{
+  ['Fruits & veggies','Miscellaneous',STAFF].forEach(cat=>{
     if(masterFor(cat).length||!STARTER[cat]) return;
     h+=`<div class="cat-load"><span>New category: <b>${esc(cat)}</b><br/><small style="color:var(--t2)">${esc(STARTER[cat].map(x=>x[0]).join(', '))}</small></span><button class="btn btn-gold" onclick="loadCatStarter('${esc(cat)}')">＋ Load</button></div>`;
   });
   CATS.forEach(cat=>{
     const list=masterFor(cat); if(!list.length)return;
-    h+=`<div class="card"><div class="card-title"><span>${esc(cat)}</span><span class="tag tag-c">${list.length}</span></div>`+
+    h+=`<div class="card"><div class="card-title"><span>${cat===STAFF?'🔒 ':''}${esc(cat)}</span><span class="tag tag-c">${list.length}</span></div>`+
       list.map(([k,v])=>`<div class="row"><div><span class="rname">${esc(v.name)}</span><span class="runit">${esc(v.unit)}</span></div>
         <button class="xb" onclick="delMaster('${esc(k)}')" aria-label="Remove">✕</button></div>`).join('')+'</div>';
   });
@@ -790,6 +807,29 @@ window.rcAlert=function(){
     (c.note?`\n📝 ${c.note}\n`:'')+`\n_Checked by ${c.checked_by_name||'Store'} · ${fmtDT(c.checked_at)}_`;
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 };
+
+function rbzBack(){
+  if(gid('login-gate').style.display!=='none') return false;
+  if(rcOpen){ if(rcEdit&&!confirm('Leave without saving this count?')) return true; window.closeRc(); window.scrollTo(0,0); return true; }
+  const t=document.querySelector('[data-t].active');
+  if(t&&t.dataset.t!=='indent'){ window.setTab('indent'); window.scrollTo(0,0); return true; }
+  return false;
+}
+// ===== PHONE BACK BUTTON — stay inside the app =====
+// Back closes the open popup / goes to the previous step instead of
+// leaving the app. On the main screen: "Press back again to exit".
+(function(){
+  let armed=0;
+  function guard(){ if(!(history.state&&history.state.rbzBack)) history.pushState({rbzBack:1},''); }
+  // add the guard after the user touches the page (Chrome ignores it otherwise)
+  ['pointerdown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,guard,{capture:true,passive:true}));
+  window.addEventListener('popstate',()=>{
+    let handled=false; try{ handled=rbzBack(); }catch(e){ console.error(e); }
+    if(handled){ armed=0; guard(); return; }
+    if(Date.now()-armed<2500) return;            // second press -> leaves next time
+    armed=Date.now(); toast('Press back again to exit');
+  });
+})();
 </script>
 </body>
 </html>

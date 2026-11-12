@@ -360,6 +360,8 @@ const shapeOf=c=>c==='wine'?'wine':c==='beer'?'beer':isNonAlc(c)?'can':'spirit';
 const SET_COL={'Soft drinks':'#ff4f8b','Soda & mixers':'#3de0d2','Energy drinks':'#c6f432','Juices':'#ff7a45','Syrups':'#ffc447','Ice':'#9fd8ff','Fruits & veggies':'#7ee081','Disposables':'#b79cff','Bar props':'#ff9a3c','Miscellaneous':'#ffd9a8'};
 const SET_ORDER=['Soft drinks','Soda & mixers','Energy drinks','Juices','Syrups','Ice','Fruits & veggies','Disposables','Bar props','Miscellaneous'];
 const RENTAL='Rental glassware';
+// Staff Kit (uniforms, bar tools) is internal: never shown to the client
+const STAFF='Staff Kit (Internal)';
 
 // Rental glass silhouettes, picked by the glass name
 function glassSVG(name){
@@ -464,7 +466,7 @@ function shelfHTML(items,prefix){
 // what Rebelz delivered: confirmed received counts (or packed counts) + mid-event extras
 function supplies(ev){
   const m={},order=[];
-  const add=(cat,name,unit,q)=>{const k=cat+'|'+String(name).toLowerCase();if(!m[k]){m[k]={cat,name,unit,qty:0};order.push(k);}m[k].qty+=q;};
+  const add=(cat,name,unit,q)=>{if(cat===STAFF)return;const k=cat+'|'+String(name).toLowerCase();if(!m[k]){m[k]={cat,name,unit,qty:0};order.push(k);}m[k].qty+=q;};
   let state='none';
   if(ev.indent_rcv){state='delivered';asList(ev.indent_rcv.items).forEach(l=>add(l.cat,l.name,l.unit,l.received||0));}
   else if(ev.indent){state='packed';asList(ev.indent.items).forEach(l=>add(l.cat,l.name,l.unit,l.qty||0));}
@@ -553,7 +555,7 @@ function render(ev){
 
   // Timeline
   // Office-only entries (indent checks, returns, photos, corrections) stay internal
-  const INTERNAL=/store indent|return to office|removed mid-event|photo|status:|not matching|undo/i;
+  const INTERNAL=/store indent|return to office|removed mid-event|staff kit|photo|status:|not matching|undo/i;
   const log=asList(ev.log).filter(l=>l&&l.msg&&!INTERNAL.test(l.msg))
     .map(l=>({...l,msg:String(l.msg).replace(/\s*\((bought locally|sent by store)\)/i,'')}));
   const colFor=m=>{m=m.toLowerCase();return /closed|all done|fully/.test(m)?'#ff4f8b':/low/.test(m)?'#ffc447':/added|extra|new drink|restock/.test(m)?'#b79cff':/consumed|undo/.test(m)?'#ff9a3c':/confirm|live|received|team/.test(m)?'#c6f432':'#3de0d2';};
